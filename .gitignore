@@ -1,0 +1,14 @@
+# binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+
+# test binaries
+*.test
+
+# output of the go coverage tool
+*.out
+
+# project-local glide cache
+.glide/
