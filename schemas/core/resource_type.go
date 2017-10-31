@@ -1,12 +1,14 @@
 package core
 
+// SchemaExtension ...
 type SchemaExtension struct {
 	Schema   string `json:"schema"`
 	Required bool   `json:"required"`
 }
 
+// ResourceType ...
 type ResourceType struct {
-	Resource
+	Common
 	Name             string            `json:"name"`
 	Endpoint         string            `json:"endpoint"`
 	Description      string            `json:"description"`

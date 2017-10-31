@@ -18,7 +18,7 @@ type Attribute struct {
 
 // Schema ...
 type Schema struct {
-	Resource
+	Common
 	Name        string       `json:"name,omitempty"`
 	Description string       `json:"description,omitempty"`
 	Attributes  []*Attribute `json:"attributes,omitempty"`

@@ -38,7 +38,7 @@ type AuthenticationScheme struct {
 
 type ServiceProviderConfig struct {
 	ID string `json:"id,omitempty"`
-	Resource
+	Common
 	DocumentationURI      string                 `json:"documentationUri"`
 	Patch                 Patch                  `json:"patch"`
 	Bulk                  Bulk                   `json:"bulk"`
