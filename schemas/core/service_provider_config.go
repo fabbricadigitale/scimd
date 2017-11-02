@@ -27,7 +27,7 @@ type Etag struct {
 	Supported bool `json:"supported"`
 }
 
-type AuthenticationScheme struct {
+type AuthenticationSchema struct {
 	Name             string `json:"name"`
 	Description      string `json:"description"`
 	SpecURI          string `json:"specUri"`
@@ -46,5 +46,5 @@ type ServiceProviderConfig struct {
 	ChangePassword        ChangePassword         `json:"changePassword"`
 	Sort                  Sort                   `json:"sort"`
 	Etag                  Etag                   `json:"etag"`
-	AuthenticationSchemes []AuthenticationScheme `json:"authenticationSchemes"`
+	AuthenticationSchemas []AuthenticationSchema `json:"authenticationSchemas"`
 }
