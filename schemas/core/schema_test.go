@@ -10,7 +10,7 @@ import (
 )
 
 func TestSchemaResource(t *testing.T) {
-	// Non-normative of SCIM user resource type [https: //tools.ietf.org/html/rfc7643#section-8.6]
+	// Non-normative of SCIM user schama representation [https://tools.ietf.org/html/rfc7643#section-8.7.1]
 	dat, err := ioutil.ReadFile("testdata/user_schema.json")
 
 	require.NotNil(t, dat)
