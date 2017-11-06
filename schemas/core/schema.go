@@ -33,3 +33,8 @@ type Schema struct {
 	Description string     `json:"description,omitempty"`
 	Attributes  Attributes `json:"attributes,omitempty"`
 }
+
+// GetIdentifier ...
+func (s Schema) GetIdentifier() string {
+	return s.Name
+}

@@ -15,3 +15,8 @@ type ResourceType struct {
 	Schema           string            `json:"schema"`
 	SchemaExtensions []SchemaExtension `json:"schemaExtensions"`
 }
+
+// GetIdentifier ...
+func (rt ResourceType) GetIdentifier() string {
+	return rt.ID
+}

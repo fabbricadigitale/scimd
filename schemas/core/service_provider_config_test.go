@@ -10,7 +10,7 @@ import (
 )
 
 func TestServiceProviderConfigResource(t *testing.T) {
-	//Non-normative of SCIM service provider configuration [https://tools.ietf.org/html/rfc7643#section-8.5]
+	// Non-normative of SCIM service provider configuration [https://tools.ietf.org/html/rfc7643#section-8.5]
 	dat, err := ioutil.ReadFile("testdata/service_provider_config.json")
 
 	require.NotNil(t, dat)
