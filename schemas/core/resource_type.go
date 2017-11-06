@@ -18,5 +18,5 @@ type ResourceType struct {
 
 // GetIdentifier ...
 func (rt ResourceType) GetIdentifier() string {
-	return rt.ID
+	return rt.Name
 }

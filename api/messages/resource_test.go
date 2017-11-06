@@ -12,17 +12,18 @@ import (
 )
 
 func TestUnmarshalResource(t *testing.T) {
+	resTypeRepo := schemas.GetResourceTypeRepository()
+	if err := resTypeRepo.Add("../../schemas/core/testdata/user.json"); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
 
-	repo := schemas.Repository()
-	if err := repo.LoadResourceType("../../schemas/core/testdata/user.json"); err != nil {
+	schemaRepo := schemas.GetSchemaRepository()
+	if err := schemaRepo.Add("../../schemas/core/testdata/user_schema.json"); err != nil {
 		t.Log(err)
 		t.Fail()
 	}
-	if err := repo.LoadSchema("../../schemas/core/testdata/user_schema.json"); err != nil {
-		t.Log(err)
-		t.Fail()
-	}
-	if err := repo.LoadSchema("../../schemas/core/testdata/enterprise_user_schema.json"); err != nil {
+	if err := schemaRepo.Add("../../schemas/core/testdata/enterprise_user_schema.json"); err != nil {
 		t.Log(err)
 		t.Fail()
 	}

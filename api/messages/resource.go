@@ -24,10 +24,10 @@ type Resource struct {
 }
 
 func getSchema(schema string, allowedSchemas []string) *core.Schema {
-	repo := schemas.Repository()
+	repo := schemas.GetSchemaRepository()
 	for _, s := range allowedSchemas {
 		if s == schema {
-			return repo.GetSchema(s)
+			return repo.Get(s)
 		}
 	}
 
@@ -35,8 +35,7 @@ func getSchema(schema string, allowedSchemas []string) *core.Schema {
 }
 
 func (r *Resource) UnmarshalJSON(b []byte) error {
-
-	repo := schemas.Repository()
+	repo := schemas.GetResourceTypeRepository()
 
 	// Unmarshal common parts
 	if err := json.Unmarshal(b, &r.Common); err != nil {
@@ -44,7 +43,7 @@ func (r *Resource) UnmarshalJSON(b []byte) error {
 	}
 
 	// Validate and get ResourceType
-	resourceType := repo.GetResourceType(r.Common.Meta.ResourceType)
+	resourceType := repo.Get(r.Common.Meta.ResourceType)
 	if resourceType == nil {
 		return &ScimError{"Unsupported Resource Type"}
 	}
@@ -71,7 +70,7 @@ func (r *Resource) UnmarshalJSON(b []byte) error {
 	if err != nil {
 		return err
 	}
-	r.Attributes[baseSchema.ID] = *baseAttrs
+	r.Attributes[baseSchema.GetIdentifier()] = *baseAttrs
 
 	// Grab extension schemas attributes
 	for _, schExt := range resourceType.SchemaExtensions {
@@ -90,7 +89,7 @@ func (r *Resource) UnmarshalJSON(b []byte) error {
 				if err != nil {
 					return err
 				}
-				r.Attributes[extSchema.ID] = *attrs
+				r.Attributes[extSchema.GetIdentifier()] = *attrs
 			}
 
 		}

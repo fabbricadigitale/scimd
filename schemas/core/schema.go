@@ -36,5 +36,5 @@ type Schema struct {
 
 // GetIdentifier ...
 func (s Schema) GetIdentifier() string {
-	return s.Name
+	return s.ID
 }
