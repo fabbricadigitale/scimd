@@ -23,21 +23,6 @@ type Resource struct {
 	Attributes map[string]core.Complex `json:"-"`
 }
 
-func unmarshalAttrs(schema *core.Schema, parts map[string]json.RawMessage) (*core.Complex, error) {
-	attrs := core.Complex{}
-	for _, aDef := range schema.Attributes {
-		if part, ok := parts[aDef.Name]; ok {
-			var value interface{}
-			if err := json.Unmarshal(part, &value); err != nil {
-				return nil, err
-			}
-			attrs[aDef.Name] = value
-		}
-	}
-
-	return &attrs, nil
-}
-
 func getSchema(schema string, allowedSchemas []string) *core.Schema {
 	repo := schemas.Repository()
 	for _, s := range allowedSchemas {
@@ -70,7 +55,7 @@ func (r *Resource) UnmarshalJSON(b []byte) error {
 		return &ScimError{"Unsupported Schema"}
 	}
 
-	// Unmarshal othe parts
+	// Unmarshal other parts
 	var parts map[string]json.RawMessage
 	if err := json.Unmarshal(b, &parts); err != nil {
 		return err
@@ -81,7 +66,8 @@ func (r *Resource) UnmarshalJSON(b []byte) error {
 
 	// Grab base schema attributes
 	var baseAttrs *core.Complex
-	baseAttrs, err = unmarshalAttrs(baseSchema, parts)
+	baseAttrs, err = baseSchema.Attributes.Unmarshal(parts)
+
 	if err != nil {
 		return err
 	}
@@ -100,7 +86,10 @@ func (r *Resource) UnmarshalJSON(b []byte) error {
 			if extSchema := getSchema(schExt.Schema, r.Common.Schemas); extSchema != nil {
 
 				var attrs *core.Complex
-				attrs, err = unmarshalAttrs(extSchema, extParts)
+				attrs, err = extSchema.Attributes.Unmarshal(extParts)
+				if err != nil {
+					return err
+				}
 				r.Attributes[extSchema.ID] = *attrs
 			}
 

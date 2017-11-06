@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/fabbricadigitale/scimd/schemas"
+	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -74,6 +75,7 @@ func TestUnmarshalResource(t *testing.T) {
 		{"bjensen@example.com", baseAttr["userName"]},
 		{"Babs Jensen", baseAttr["displayName"]},
 		{true, baseAttr["active"]},
+		{"Ms. Barbara J Jensen, III", baseAttr["name"].(core.Complex)["formatted"]},
 
 		{"701984", extAttr["employeeNumber"]},
 		{"4130", extAttr["costCenter"]},
