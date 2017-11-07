@@ -8,8 +8,8 @@ import (
 	"github.com/cheekybits/genny/generic"
 )
 
-//go:generate genny -in=$GOFILE -out=gen_resource_type_$GOFILE gen "Elem=core.ResourceType Generic=ResourceType"
-//go:generate genny -in=$GOFILE -out=gen_schema_$GOFILE gen "Elem=core.Schema Generic=Schema"
+//go:generate genny -in=$GOFILE -out=gen_resource_type_repository.go gen "Elem=core.ResourceType Generic=ResourceType"
+//go:generate genny -in=$GOFILE -out=gen_schema_repository.go gen "Elem=core.Schema Generic=Schema"
 
 // Elem is generic
 type Elem generic.Type
@@ -25,7 +25,7 @@ type repositoryGeneric struct {
 // GenericRepository is the ...
 type GenericRepository interface {
 	Get(key string) *Elem
-	Add(filename string) error
+	Add(filename string) (Elem, error)
 }
 
 func (repo *repositoryGeneric) Get(key string) *Elem {
@@ -37,16 +37,16 @@ func (repo *repositoryGeneric) Get(key string) *Elem {
 	return nil
 }
 
-func (repo *repositoryGeneric) Add(filename string) error {
+func (repo *repositoryGeneric) Add(filename string) (Elem, error) {
 	var data Elem
 
 	bytes, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return err
+		return data, err
 	}
 	err = json.Unmarshal(bytes, &data)
 	if err != nil {
-		return err
+		return data, err
 	}
 
 	repo.mu.Lock()
@@ -54,7 +54,7 @@ func (repo *repositoryGeneric) Add(filename string) error {
 
 	repo.items[interface{}(data).(Identifiable).GetIdentifier()] = data
 
-	return nil
+	return data, nil
 }
 
 var (
