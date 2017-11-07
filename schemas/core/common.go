@@ -9,11 +9,11 @@ type Complex map[string]interface{}
 
 // Meta ...
 type Meta struct {
-	Location     string    `json:"location"`
-	ResourceType string    `json:"resourceType"`
-	Created      time.Time `json:"created"`
-	LastModified time.Time `json:"lastModified"`
-	Version      string    `json:"version"`
+	Location     string     `json:"location"`
+	ResourceType string     `json:"resourceType"`
+	Created      *time.Time `json:"created"`
+	LastModified *time.Time `json:"lastModified"`
+	Version      string     `json:"version"`
 }
 
 // Common ...

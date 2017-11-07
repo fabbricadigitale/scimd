@@ -2,6 +2,7 @@ package schemas
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"sync"
 
@@ -52,7 +53,12 @@ func (repo *repositoryGeneric) Add(filename string) (Elem, error) {
 	repo.mu.Lock()
 	defer repo.mu.Unlock()
 
-	repo.items[interface{}(data).(Identifiable).GetIdentifier()] = data
+	var id string
+	if id = interface{}(data).(Identifiable).GetIdentifier(); id == "" {
+		return data, errors.New("missing identifier")
+	}
+
+	repo.items[id] = data
 
 	return data, nil
 }
