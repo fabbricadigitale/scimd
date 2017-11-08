@@ -128,3 +128,43 @@ func TestSchemaResource(t *testing.T) {
 		SubAttributes: sa,
 	})
 }
+
+// https://tools.ietf.org/html/rfc7643#section-2.2
+func assertAttributeDefaults(t *testing.T, a *Attribute) {
+	assert.False(t, a.Required)
+	assert.Empty(t, a.CanonicalValues)
+	assert.False(t, a.CaseExact)
+	assert.Equal(t, "readWrite", a.Mutability)
+	assert.Equal(t, "default", a.Returned)
+	assert.Equal(t, "none", a.Uniqueness)
+	assert.Equal(t, "string", a.Type)
+}
+
+func TestNewAttribute(t *testing.T) {
+	a := NewAttribute()
+	assertAttributeDefaults(t, a)
+}
+
+func TestAttributeUnmarshalWithDefaults(t *testing.T) {
+
+	data := []byte(`[{},{"type":"integer"}]`)
+	list := make(Attributes, 0)
+
+	if err := json.Unmarshal(data, &list); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	assert.Len(t, list, 2)
+
+	first := list[0]
+	require.IsType(t, (*Attribute)(nil), first)
+	assertAttributeDefaults(t, first)
+
+	second := list[1]
+	require.IsType(t, (*Attribute)(nil), second)
+	assert.Equal(t, "integer", second.Type)
+
+	second.Type = first.Type
+	assertAttributeDefaults(t, first)
+}
