@@ -4,8 +4,12 @@ import (
 	"time"
 )
 
-// Complex ...
-type Complex map[string]interface{}
+// A ScimError is a description of a SCIM error.
+type ScimError struct {
+	Msg string // description of error
+}
+
+func (e *ScimError) Error() string { return e.Msg }
 
 // Meta ...
 type Meta struct {
