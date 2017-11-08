@@ -9,9 +9,3 @@
 
 # output of the go coverage tool
 *.out
-
-# convention for outputs of the go generate tool
-gen_*
-
-# project-local glide cache
-.glide/
