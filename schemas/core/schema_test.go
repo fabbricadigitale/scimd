@@ -146,16 +146,11 @@ func TestNewAttribute(t *testing.T) {
 }
 
 func TestAttributeUnmarshalWithDefaults(t *testing.T) {
-
 	data := []byte(`[{},{"type":"integer"}]`)
 	list := make(Attributes, 0)
 
-	if err := json.Unmarshal(data, &list); err != nil {
-		t.Log(err)
-		t.Fail()
-	}
-
-	assert.Len(t, list, 2)
+	require.NoError(t, json.Unmarshal(data, &list))
+	require.Len(t, list, 2)
 
 	first := list[0]
 	require.IsType(t, (*Attribute)(nil), first)
