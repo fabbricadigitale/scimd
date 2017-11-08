@@ -88,3 +88,44 @@ func TestUnmarshalResource(t *testing.T) {
 	}
 
 }
+
+func TestMarshalResource(t *testing.T) {
+	resTypeRepo := schemas.GetResourceTypeRepository()
+	if _, err := resTypeRepo.Add("../testdata/user.json"); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	schemaRepo := schemas.GetSchemaRepository()
+	if _, err := schemaRepo.Add("../testdata/user_schema.json"); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+	if _, err := schemaRepo.Add("../testdata/enterprise_user_schema.json"); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	// Non-normative of SCIM user resource type [https://tools.ietf.org/html/rfc7643#section-8.2]
+	dat, err := ioutil.ReadFile("testdata/enterprise_user_resource.json")
+
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	require.NotNil(t, dat)
+	require.Nil(t, err)
+
+	res := Resource{}
+	err = json.Unmarshal(dat, &res)
+
+	b, err := json.Marshal(&res)
+
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	t.Logf("%s", string(b[:]))
+}
