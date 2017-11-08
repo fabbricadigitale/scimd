@@ -2,8 +2,12 @@ package core
 
 import (
 	"encoding/json"
-	"time"
 )
+
+// TODO Improve func and case for add empty array
+func isNullMsg(data json.RawMessage) bool {
+	return len(data) == 4 && string(data[0]) == "n" && string(data[1]) == "u" && string(data[2]) == "l" && string(data[3]) == "l"
+}
 
 // Unmarshal a SCIM a complex value by attributes definition
 func (attributes *Attributes) Unmarshal(data map[string]json.RawMessage) (*Complex, error) {
@@ -23,6 +27,11 @@ func (attributes *Attributes) Unmarshal(data map[string]json.RawMessage) (*Compl
 
 // Unmarshal a SCIM simple value by attribute definition
 func (attribute *Attribute) Unmarshal(data json.RawMessage) (interface{}, error) {
+
+	if isNullMsg(data) {
+		return nil, nil
+	}
+
 	if attribute.MultiValued {
 		return unmarshalMulti(attribute, data)
 	}
@@ -32,62 +41,26 @@ func (attribute *Attribute) Unmarshal(data json.RawMessage) (interface{}, error)
 func unmarshalSingular(attr *Attribute, data json.RawMessage) (interface{}, error) {
 
 	var err error
-	var ret interface{}
-	switch attr.Type {
-	case "string", "reference":
-		var s string
-		err = json.Unmarshal(data, &s)
-		ret = s
-	case "boolean":
-		var b bool
-		err = json.Unmarshal(data, &b)
-		ret = b
-	case "decimal":
-		var f float64
-		err = json.Unmarshal(data, &f)
-		ret = f
-	case "integer":
-		var i int64
-		err = json.Unmarshal(data, &i)
-		ret = i
-	case "dateTime":
-		var t time.Time
-		err = json.Unmarshal(data, &t)
-		ret = t
-	case "binary":
-		var b string
-		err = json.Unmarshal(data, &b)
-		ret = []byte(b)
 
-	case "complex":
-		c := Complex{}
+	if attr.Type == ComplexType {
 		var subParts map[string]json.RawMessage
 		err = json.Unmarshal(data, &subParts)
 		if err != nil {
 			return nil, err
 		}
-		for _, subDef := range attr.SubAttributes {
-			if data, ok := subParts[subDef.Name]; ok {
-				value, err := subDef.Unmarshal(data)
-				if err != nil {
-					return nil, err
-				}
-				c[subDef.Name] = value
-			}
-		}
-		ret = c
-
-	default:
-		return nil, &SchemaError{"Invalid type"}
-
+		c, err := attr.SubAttributes.Unmarshal(subParts)
+		return *c, err
 	}
 
-	if err != nil {
+	var p DataType
+	if p, err = NewDataType(attr.Type); err != nil {
 		return nil, err
 	}
 
-	return ret, nil
-
+	if err = json.Unmarshal(data, p); err != nil {
+		return nil, err
+	}
+	return p.Indirect(), nil
 }
 
 func unmarshalMulti(attr *Attribute, data json.RawMessage) ([]interface{}, error) {
@@ -107,4 +80,9 @@ func unmarshalMulti(attr *Attribute, data json.RawMessage) ([]interface{}, error
 	}
 
 	return ret, nil
+}
+
+// Unmarshal SCIM values by schema definition
+func (schema *Schema) Unmarshal(data map[string]json.RawMessage) (*Complex, error) {
+	return schema.Attributes.Unmarshal(data)
 }

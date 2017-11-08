@@ -1,4 +1,4 @@
-package messages
+package resource
 
 import (
 	"encoding/json"
@@ -9,13 +9,6 @@ import (
 
 // Common resource attributes
 type Common core.Common
-
-// A ScimError is a description of a SCIM error.
-type ScimError struct {
-	msg string // description of error
-}
-
-func (e *ScimError) Error() string { return e.msg }
 
 // Resource The data resource structure
 type Resource struct {
@@ -45,13 +38,13 @@ func (r *Resource) UnmarshalJSON(b []byte) error {
 	// Validate and get ResourceType
 	resourceType := repo.Get(r.Common.Meta.ResourceType)
 	if resourceType == nil {
-		return &ScimError{"Unsupported Resource Type"}
+		return &core.ScimError{"Unsupported Resource Type"}
 	}
 
 	// Validate and get schema
 	baseSchema := getSchema(resourceType.Schema, r.Common.Schemas)
 	if baseSchema == nil {
-		return &ScimError{"Unsupported Schema"}
+		return &core.ScimError{"Unsupported Schema"}
 	}
 
 	// Unmarshal other parts

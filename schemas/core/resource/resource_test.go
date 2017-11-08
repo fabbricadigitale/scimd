@@ -1,4 +1,4 @@
-package messages
+package resource
 
 import (
 	"encoding/json"
@@ -7,23 +7,24 @@ import (
 
 	"github.com/fabbricadigitale/scimd/schemas"
 	"github.com/fabbricadigitale/scimd/schemas/core"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestUnmarshalResource(t *testing.T) {
 	resTypeRepo := schemas.GetResourceTypeRepository()
-	if _, err := resTypeRepo.Add("../../schemas/core/testdata/user.json"); err != nil {
+	if _, err := resTypeRepo.Add("../testdata/user.json"); err != nil {
 		t.Log(err)
 		t.Fail()
 	}
 
 	schemaRepo := schemas.GetSchemaRepository()
-	if _, err := schemaRepo.Add("../../schemas/core/testdata/user_schema.json"); err != nil {
+	if _, err := schemaRepo.Add("../testdata/user_schema.json"); err != nil {
 		t.Log(err)
 		t.Fail()
 	}
-	if _, err := schemaRepo.Add("../../schemas/core/testdata/enterprise_user_schema.json"); err != nil {
+	if _, err := schemaRepo.Add("../testdata/enterprise_user_schema.json"); err != nil {
 		t.Log(err)
 		t.Fail()
 	}
@@ -73,13 +74,13 @@ func TestUnmarshalResource(t *testing.T) {
 		value interface{}
 		field interface{}
 	}{
-		{"bjensen@example.com", baseAttr["userName"]},
-		{"Babs Jensen", baseAttr["displayName"]},
-		{true, baseAttr["active"]},
-		{"Ms. Barbara J Jensen, III", baseAttr["name"].(core.Complex)["formatted"]},
+		{core.String("bjensen@example.com"), baseAttr["userName"]},
+		{core.String("Babs Jensen"), baseAttr["displayName"]},
+		{core.Boolean(true), baseAttr["active"]},
+		{core.String("Ms. Barbara J Jensen, III"), baseAttr["name"].(core.Complex)["formatted"]},
 
-		{"701984", extAttr["employeeNumber"]},
-		{"4130", extAttr["costCenter"]},
+		{core.String("701984"), extAttr["employeeNumber"]},
+		{core.String("4130"), extAttr["costCenter"]},
 	}
 
 	for _, row := range attrEqualities {
