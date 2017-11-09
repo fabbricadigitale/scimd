@@ -38,7 +38,7 @@ func (attribute *Attribute) Unmarshal(data json.RawMessage) (interface{}, error)
 	return unmarshalSingular(attribute, data)
 }
 
-func unmarshalSingular(attr *Attribute, data json.RawMessage) (Value, error) {
+func unmarshalSingular(attr *Attribute, data json.RawMessage) (interface{}, error) {
 
 	var err error
 
@@ -63,13 +63,13 @@ func unmarshalSingular(attr *Attribute, data json.RawMessage) (Value, error) {
 	return p.Indirect(), nil
 }
 
-func unmarshalMulti(attr *Attribute, data json.RawMessage) (MultiValue, error) {
+func unmarshalMulti(attr *Attribute, data json.RawMessage) ([]interface{}, error) {
 	var parts []json.RawMessage
 	if err := json.Unmarshal(data, &parts); err != nil {
 		return nil, err
 	}
 
-	ret := make(MultiValue, len(parts))
+	ret := make([]interface{}, len(parts))
 
 	for i, p := range parts {
 		value, err := unmarshalSingular(attr, p)

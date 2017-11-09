@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/json"
+	"reflect"
 	"time"
 )
 
@@ -128,37 +129,42 @@ func (p *Binary) UnmarshalJSON(b []byte) error {
 	return err
 }
 
-// Has key been assigned?
+// IsSingular checks if v holds a single Data Type value
+func IsSingular(v interface{}) bool {
+	switch v.(type) {
+	case String, Boolean, Decimal, Integer, DateTime, Binary, Reference, Complex:
+		return true
+	}
+	return false
+}
+
+// IsMultiValued checks if v holds a slices of Data Type values
+func IsMultiValued(v interface{}) bool {
+	switch v.(type) {
+	case []String, []Boolean, []Decimal, []Integer, []DateTime, []Binary, []Reference, []Complex:
+		return true
+	}
+	return false
+}
+
+func multiValueLen(v interface{}) int {
+	if v != nil && IsMultiValued(v) {
+		// v is a slice always so it does not panic
+		return reflect.ValueOf(v).Len()
+	}
+	return 0
+}
+
+// IsAssigned checks if a key is assigned in a map of values
 // Internal convention of Unassigned and Null Values as per https://tools.ietf.org/html/rfc7643#section-2.5
 // are defined as following:
 //  - when key does not exist in map, it's unassigned
 //  - nil is the "null" value
 //  - zero-length MultiValue is the empty array
+//  - values that are not IsSingular nor IsMultiValued are just ignored (ie. values those are not Data Types)
 // Furthermore, unassigned attributes, the "null" value, or an empty array (in the case
 // of a multi-valued attribute) SHALL be considered to be equivalent in "state" (ie. unassigned).
-func (p *Complex) Has(key string) bool {
-
-	value, ok := (*p)[key]
-
-	// does not exist in map or nil
-	if !ok || value == nil {
-		return false
-	}
-
-	// zero-length MultiValue ?
-	switch value.(type) {
-	case MultiValue:
-		return len(value.(MultiValue)) > 0
-	}
-
-	return true
-}
-
-// Omit value?
-// Assigning an attribute with the value "null" or an empty
-// array (in the case of multi-valued attributes) has the effect of
-// making the attribute "unassigned".
-func (p *Complex) Omit(key string) bool {
-	_, ok := (*p)[key]
-	return ok && !p.Has(key)
+func IsAssigned(m map[string]interface{}, key string) bool {
+	v, ok := m[key]
+	return ok && v != nil && (multiValueLen(v) > 0 || IsSingular(v))
 }
