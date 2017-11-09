@@ -129,8 +129,8 @@ func (p *Binary) UnmarshalJSON(b []byte) error {
 	return err
 }
 
-// IsSingular checks if v holds a single Data Type value
-func IsSingular(v interface{}) bool {
+// IsSingleValue hecks if v holds a single Data Type value
+func IsSingleValue(v interface{}) bool {
 	switch v.(type) {
 	case String, Boolean, Decimal, Integer, DateTime, Binary, Reference, Complex:
 		return true
@@ -138,8 +138,8 @@ func IsSingular(v interface{}) bool {
 	return false
 }
 
-// IsMultiValued checks if v holds a slices of Data Type values
-func IsMultiValued(v interface{}) bool {
+// IsMultiValue checks if v holds a slices of Data Type values
+func IsMultiValue(v interface{}) bool {
 	switch v.(type) {
 	case []String, []Boolean, []Decimal, []Integer, []DateTime, []Binary, []Reference, []Complex:
 		return true
@@ -148,7 +148,7 @@ func IsMultiValued(v interface{}) bool {
 }
 
 func multiValueLen(v interface{}) int {
-	if v != nil && IsMultiValued(v) {
+	if v != nil && IsMultiValue(v) {
 		// v is a slice always so it does not panic
 		return reflect.ValueOf(v).Len()
 	}
@@ -166,5 +166,5 @@ func multiValueLen(v interface{}) int {
 // of a multi-valued attribute) SHALL be considered to be equivalent in "state" (ie. unassigned).
 func IsAssigned(m map[string]interface{}, key string) bool {
 	v, ok := m[key]
-	return ok && v != nil && (multiValueLen(v) > 0 || IsSingular(v))
+	return ok && v != nil && (multiValueLen(v) > 0 || IsSingleValue(v))
 }
