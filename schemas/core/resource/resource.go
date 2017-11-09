@@ -13,7 +13,7 @@ type Common core.Common
 // Resource The data resource structure
 type Resource struct {
 	Common
-	Attributes map[string]core.Complex `json:"-"`
+	Attributes map[string]map[string]interface{} `json:"-"`
 }
 
 func getSchema(schema string, allowedSchemas []string) *core.Schema {
@@ -54,7 +54,7 @@ func (r *Resource) UnmarshalJSON(b []byte) error {
 	}
 
 	var err error
-	r.Attributes = make(map[string]core.Complex)
+	r.Attributes = make(map[string]map[string]interface{})
 
 	// Grab base schema attributes
 	var baseAttrs *core.Complex
