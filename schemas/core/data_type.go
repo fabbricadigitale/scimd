@@ -127,3 +127,38 @@ func (p *Binary) UnmarshalJSON(b []byte) error {
 	*p = Binary(s)
 	return err
 }
+
+// Has key been assigned?
+// Internal convention of Unassigned and Null Values as per https://tools.ietf.org/html/rfc7643#section-2.5
+// are defined as following:
+//  - when key does not exist in map, it's unassigned
+//  - nil is the "null" value
+//  - zero-length MultiValue is the empty array
+// Furthermore, unassigned attributes, the "null" value, or an empty array (in the case
+// of a multi-valued attribute) SHALL be considered to be equivalent in "state" (ie. unassigned).
+func (p *Complex) Has(key string) bool {
+
+	value, ok := (*p)[key]
+
+	// does not exist in map or nil
+	if !ok || value == nil {
+		return false
+	}
+
+	// zero-length MultiValue ?
+	switch value.(type) {
+	case MultiValue:
+		return len(value.(MultiValue)) > 0
+	}
+
+	return true
+}
+
+// Omit value?
+// Assigning an attribute with the value "null" or an empty
+// array (in the case of multi-valued attributes) has the effect of
+// making the attribute "unassigned".
+func (p *Complex) Omit(key string) bool {
+	_, ok := (*p)[key]
+	return ok && !p.Has(key)
+}
