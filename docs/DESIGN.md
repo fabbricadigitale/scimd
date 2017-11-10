@@ -8,9 +8,12 @@ It may not always be completely up to date.
 
 *TBD*
 
-### Attributes
+## Attributes
 
-#### Data Types
+Within `scimd` a `core.Attribute` is the definition of a SCIM attribute. It's can be included within a `core.Schema`, has a name and some characteristics.
+Also, it defines the **Data Type** of the value that can be bound to the attribute.
+
+### Data Types
 
 Mapping from [SCIM Data Types](https://tools.ietf.org/html/rfc7643#section-2.3) to `go` type are defined as following:
 
@@ -25,8 +28,13 @@ Golang `type` 	| SCIM Data Type 	|  SCIM Schema "type" 	| JSON Type 	|
 `string`   | Reference | "reference" | String per Section 7 of [RFC7159]       |
 `map[string]interface{}`   | Complex   | "complex"   | Object per Section 4 of [RFC7159]       |
 
-The [`core`](../schemas/core/data_type.go) package defines the above `type`s with the same name defined by SCIM Data Type, so:
+Rules: 
+* **JSON Type** must be used when encoding/decoding
+* **SCIM Schema "type"** is the set of values that `core.Attribute.Type` can assume
+* **SCIM Data Type** `scimd`'s `type`s *(with the same name)* are also defined within the [`core`](../schemas/core/data_type.go) package
+* **Golang `type`** are just the underlying Go `type` (ie. not use them directly)
 
+Indeed:
 ```go
 package core
 
@@ -49,7 +57,7 @@ type DataType interface {
 }
 ```
 
-#### Singular and Multi-Valued
+### Singular and Multi-Valued
 
 By convention, the `type` of a **single-value** (for *singular attribute*) must be one of:
 ```go
@@ -62,7 +70,7 @@ Instead, the `type` of a **multi-value** (for *multi-valued attribute*) must be 
 
 > A value of another `type` is considered a **Null** value.
 
-#### Unassigned and Null Values
+### Unassigned and Null Values
 
 The internal convention for [Section 2.5 of [RFC7643]](https://tools.ietf.org/html/rfc7643#section-2.5) implements the following rules:
 
@@ -83,16 +91,53 @@ Overriding default values when [Creating Resources](https://tools.ietf.org/html/
 [Replacing with PUT](https://tools.ietf.org/html/rfc7644#section-3.5.1)
 > Clients that want to override a server's defaults MAY specify "null" for a single-valued attribute, or an empty array "[]" for a multi-valued attribute, to clear all values.
 
-Assuming:
+**Unassigned** and **Null** values have particular meaning when using `map` (`core.Complex` is a `map` too). Thus, assuming:
 ```go
 // m is a map[string]interface{}
 v, ok := m[key]
 ```
 
-Use:
+You should use:
 
 * `core.IsNull(v)` to check if a value is **Null**
 * `!core.IsNull(v)` to check if an attribute's value is **Unassigned**
 * `ok && core.IsNull(v)` to check if an attribute's **value must be cleared**
 
 
+## Resources
+
+A resource is an artifact managed by `scimd` that's described by a Resource Type and can holds values. 
+`scimd` implements two different kinds of resources.
+
+### Structured Resources
+
+For performance and simplicity, the resources defined by the followings schemas URI:
+
+* `urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig`
+* `urn:ietf:params:scim:schemas:core:2.0:ResourceType`
+* `urn:ietf:params:scim:schemas:core:2.0:Schema`
+
+are implemented by Go `struct`, which are very simply to use.
+
+For instance, `core.ServiceProviderConfig` (that's a *Structured Resource*) can be used to load a service provider config from a JSON file.
+
+### Mapped Resources
+
+To handle any other type of resource (including *User Resource*, *Group Resource* and new ones may be defined in future), 
+`scimd` uses `core.resource.Resource` that implements a flexible data rapresentation using Go `map` internally.
+
+`core.resource.Resource` implements the following features:
+
+* it's a Go `struct` 
+* common attribures are embedded within the `struct` directly (ie. `Schemas`, `ID`, `Meta`, etc)
+* has a `map` of `core.Complex` indexed by schema URI
+* each `core.Complex` (that's another `map`) can hold values needed by the bound schema
+
+In this way, it can represent data for any schemas (or composition of them in case of extensions).
+
+`core.resource.Resource` is **NOT** responsible to enforce attributes structure and characteristics defined by bound schemas *(other APIs are needed to accomplish that)*.
+
+Finally, you need to know that:
+* it can hold data that may not be consistent with the schemas definition
+* JSON marshalling/unmarshalling will ignore extraneous attributes and will enforce Data Types according to schemas definition
+* to determinate the "state" of an attribute within `map`s use [Unassigned and Null](#unassigned-and-null-values) rules
