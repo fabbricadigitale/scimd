@@ -129,7 +129,7 @@ func (p *Binary) UnmarshalJSON(b []byte) error {
 	return err
 }
 
-// IsSingleValue hecks if v holds a single Data Type value
+// IsSingleValue hecks if v holds a Data Type value
 func IsSingleValue(v interface{}) bool {
 	switch v.(type) {
 	case String, Boolean, Decimal, Integer, DateTime, Binary, Reference, Complex:
@@ -147,24 +147,22 @@ func IsMultiValue(v interface{}) bool {
 	return false
 }
 
+// If v is a multi-value return its length, otherwise zero
 func multiValueLen(v interface{}) int {
-	if v != nil && IsMultiValue(v) {
+	if IsMultiValue(v) {
 		// v is a slice always so it does not panic
 		return reflect.ValueOf(v).Len()
 	}
 	return 0
 }
 
-// IsAssigned checks if a key is assigned in a map of values
-// Internal convention of Unassigned and Null Values as per https://tools.ietf.org/html/rfc7643#section-2.5
-// are defined as following:
-//  - when key does not exist in map, it's unassigned
+// IsNull checks if v holds a Null value
+// Convention for Null values is defined as following:
 //  - nil is the "null" value
-//  - zero-length MultiValue is the empty array
-//  - values that are not IsSingular nor IsMultiValued are just ignored (ie. values those are not Data Types)
-// Furthermore, unassigned attributes, the "null" value, or an empty array (in the case
-// of a multi-valued attribute) SHALL be considered to be equivalent in "state" (ie. unassigned).
-func IsAssigned(m map[string]interface{}, key string) bool {
-	v, ok := m[key]
-	return ok && v != nil && (multiValueLen(v) > 0 || IsSingleValue(v))
+//  - zero-length multi-value is the empty array
+//  - values that are not IsSingleValue nor IsMultiValue (ie. those values are not Data Types)
+//
+// As per https://tools.ietf.org/html/rfc7643#section-2.5
+func IsNull(v interface{}) bool {
+	return v == nil || (multiValueLen(v) == 0 && !IsSingleValue(v))
 }
