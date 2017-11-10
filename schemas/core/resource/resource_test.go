@@ -64,11 +64,11 @@ func TestUnmarshalResource(t *testing.T) {
 		assert.Equal(t, row.value, row.field)
 	}
 
-	baseAttr, baseAttrOk := res.Attributes["urn:ietf:params:scim:schemas:core:2.0:User"]
-	assert.Equal(t, true, baseAttrOk)
+	baseAttr := *res.GetValues("urn:ietf:params:scim:schemas:core:2.0:User")
+	assert.Equal(t, true, !core.IsNull(baseAttr))
 
-	extAttr, extAttrOk := res.Attributes["urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"]
-	assert.Equal(t, true, extAttrOk)
+	extAttr := *res.GetValues("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User")
+	assert.Equal(t, true, !core.IsNull(extAttr))
 
 	attrEqualities := []struct {
 		value interface{}
@@ -127,5 +127,8 @@ func TestMarshalResource(t *testing.T) {
 		t.Fail()
 	}
 
+	assert.NotEqual(t, 0, len(b))
+
 	t.Logf("%s", string(b[:]))
+
 }

@@ -13,7 +13,17 @@ type Common core.Common
 // Resource The data resource structure
 type Resource struct {
 	Common
-	Attributes map[string]map[string]interface{} `json:"-"`
+	data map[string]*core.Complex
+}
+
+// SetValues is the method to set Resource attributes
+func (r *Resource) SetValues(schema string, values *core.Complex) {
+	r.data[schema] = values
+}
+
+// GetValues is the method to access the attributes
+func (r *Resource) GetValues(schema string) *core.Complex {
+	return r.data[schema]
 }
 
 func getSchema(schema string, allowedSchemas []string) *core.Schema {
@@ -27,6 +37,7 @@ func getSchema(schema string, allowedSchemas []string) *core.Schema {
 	return nil
 }
 
+// UnmarshalJSON is the Resource Marshal implementation
 func (r *Resource) UnmarshalJSON(b []byte) error {
 	repo := schemas.GetResourceTypeRepository()
 
@@ -54,7 +65,7 @@ func (r *Resource) UnmarshalJSON(b []byte) error {
 	}
 
 	var err error
-	r.Attributes = make(map[string]map[string]interface{})
+	r.data = make(map[string]*core.Complex)
 
 	// Grab base schema attributes
 	var baseAttrs *core.Complex
@@ -63,7 +74,7 @@ func (r *Resource) UnmarshalJSON(b []byte) error {
 	if err != nil {
 		return err
 	}
-	r.Attributes[baseSchema.GetIdentifier()] = *baseAttrs
+	r.SetValues(baseSchema.GetIdentifier(), baseAttrs)
 
 	// Grab extension schemas attributes
 	for _, schExt := range resourceType.SchemaExtensions {
@@ -82,7 +93,7 @@ func (r *Resource) UnmarshalJSON(b []byte) error {
 				if err != nil {
 					return err
 				}
-				r.Attributes[extSchema.GetIdentifier()] = *attrs
+				r.SetValues(extSchema.GetIdentifier(), attrs)
 			}
 
 		}
@@ -122,7 +133,7 @@ func (r *Resource) MarshalJSON() ([]byte, error) {
 	// ****
 
 	// Bring to the above level core attributes
-	for key, value := range r.Attributes[baseSchema.GetIdentifier()] {
+	for key, value := range *r.GetValues(baseSchema.GetIdentifier()) {
 
 		if msg, err = json.Marshal(value); err != nil {
 			return nil, err
@@ -130,14 +141,17 @@ func (r *Resource) MarshalJSON() ([]byte, error) {
 		out[key] = msg
 	}
 
-	for schema, attrs := range r.Attributes {
-		if schema == baseSchema.GetIdentifier() {
+	for _, extSch := range r.Common.Schemas {
+
+		if extSch == baseSchema.GetIdentifier() {
 			continue
 		}
+
+		attrs := *r.GetValues(extSch)
 		if msg, err = json.Marshal(attrs); err != nil {
 			return nil, err
 		}
-		out[schema] = msg
+		out[extSch] = msg
 	}
 
 	return json.Marshal(out)
