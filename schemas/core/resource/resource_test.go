@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/fabbricadigitale/scimd/schemas"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 
 	"github.com/stretchr/testify/assert"
@@ -13,13 +12,13 @@ import (
 )
 
 func TestUnmarshalResource(t *testing.T) {
-	resTypeRepo := schemas.GetResourceTypeRepository()
+	resTypeRepo := core.GetResourceTypeRepository()
 	if _, err := resTypeRepo.Add("../testdata/user.json"); err != nil {
 		t.Log(err)
 		t.Fail()
 	}
 
-	schemaRepo := schemas.GetSchemaRepository()
+	schemaRepo := core.GetSchemaRepository()
 	if _, err := schemaRepo.Add("../testdata/user_schema.json"); err != nil {
 		t.Log(err)
 		t.Fail()
@@ -90,13 +89,13 @@ func TestUnmarshalResource(t *testing.T) {
 }
 
 func TestMarshalResource(t *testing.T) {
-	resTypeRepo := schemas.GetResourceTypeRepository()
+	resTypeRepo := core.GetResourceTypeRepository()
 	if _, err := resTypeRepo.Add("../testdata/user.json"); err != nil {
 		t.Log(err)
 		t.Fail()
 	}
 
-	schemaRepo := schemas.GetSchemaRepository()
+	schemaRepo := core.GetSchemaRepository()
 	if _, err := schemaRepo.Add("../testdata/user_schema.json"); err != nil {
 		t.Log(err)
 		t.Fail()

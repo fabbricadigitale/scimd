@@ -1,4 +1,4 @@
-package schemas
+package core
 
 import (
 	"encoding/json"
@@ -9,8 +9,8 @@ import (
 	"github.com/cheekybits/genny/generic"
 )
 
-//go:generate genny -in=$GOFILE -out=gen_resource_type_repository.go gen "Elem=core.ResourceType Generic=ResourceType"
-//go:generate genny -in=$GOFILE -out=gen_schema_repository.go gen "Elem=core.Schema Generic=Schema"
+//go:generate genny -in=$GOFILE -out=gen_resource_type_repository.go gen "Elem=ResourceType Generic=ResourceType"
+//go:generate genny -in=$GOFILE -out=gen_schema_repository.go gen "Elem=Schema Generic=Schema"
 
 // Elem is generic
 type Elem generic.Type

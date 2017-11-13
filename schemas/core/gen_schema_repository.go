@@ -2,29 +2,27 @@
 // Any changes will be lost if this file is regenerated.
 // see https://github.com/cheekybits/genny
 
-package schemas
+package core
 
 import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"sync"
-
-	"github.com/fabbricadigitale/scimd/schemas/core"
 )
 
 type repositorySchema struct {
-	items map[string]core.Schema
+	items map[string]Schema
 	mu    sync.RWMutex
 }
 
 // SchemaRepository is the ...
 type SchemaRepository interface {
-	Get(key string) *core.Schema
-	Add(filename string) (core.Schema, error)
+	Get(key string) *Schema
+	Add(filename string) (Schema, error)
 }
 
-func (repo *repositorySchema) Get(key string) *core.Schema {
+func (repo *repositorySchema) Get(key string) *Schema {
 	repo.mu.RLock()
 	defer repo.mu.RUnlock()
 	if item, ok := repo.items[key]; ok {
@@ -33,8 +31,8 @@ func (repo *repositorySchema) Get(key string) *core.Schema {
 	return nil
 }
 
-func (repo *repositorySchema) Add(filename string) (core.Schema, error) {
-	var data core.Schema
+func (repo *repositorySchema) Add(filename string) (Schema, error) {
+	var data Schema
 
 	bytes, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -67,7 +65,7 @@ var (
 func GetSchemaRepository() SchemaRepository {
 	onceSchema.Do(func() {
 		repoSchema = &repositorySchema{
-			items: make(map[string]core.Schema),
+			items: make(map[string]Schema),
 		}
 	})
 

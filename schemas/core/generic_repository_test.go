@@ -1,9 +1,8 @@
-package schemas
+package core
 
 import (
 	"testing"
 
-	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/stretchr/testify/require"
 )
 
@@ -23,7 +22,7 @@ func TestSchemaRepository(t *testing.T) {
 	schemas := GetSchemaRepository()
 
 	// Malformed JSON
-	_, err0 := schemas.Add("core/testdata/malformed.json")
+	_, err0 := schemas.Add("testdata/malformed.json")
 	require.Error(t, err0)
 	// require.Empty(t, data0)
 
@@ -33,14 +32,14 @@ func TestSchemaRepository(t *testing.T) {
 	// require.Empty(t, data1)
 
 	// Wrong structure
-	_, err2 := schemas.Add("core/testdata/service_provider_config.json")
+	_, err2 := schemas.Add("testdata/service_provider_config.json")
 	require.EqualError(t, err2, "missing identifier")
 	// require.Empty(t, data2)
 
-	data3, err3 := schemas.Add("core/testdata/user_schema.json")
+	data3, err3 := schemas.Add("testdata/user_schema.json")
 	require.NoError(t, err3)
 	require.Implements(t, (*Identifiable)(nil), data3)
-	require.IsType(t, core.Schema{}, data3)
+	require.IsType(t, Schema{}, data3)
 
 	key := "urn:ietf:params:scim:schemas:core:2.0:User"
 	schema := schemas.Get(key)

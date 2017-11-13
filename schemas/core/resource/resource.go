@@ -3,7 +3,6 @@ package resource
 import (
 	"encoding/json"
 
-	"github.com/fabbricadigitale/scimd/schemas"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 )
 
@@ -27,7 +26,7 @@ func (r *Resource) GetValues(schema string) *core.Complex {
 }
 
 func getSchema(schema string, allowedSchemas []string) *core.Schema {
-	repo := schemas.GetSchemaRepository()
+	repo := core.GetSchemaRepository()
 	for _, s := range allowedSchemas {
 		if s == schema {
 			return repo.Get(s)
@@ -39,7 +38,7 @@ func getSchema(schema string, allowedSchemas []string) *core.Schema {
 
 // UnmarshalJSON is the Resource Marshal implementation
 func (r *Resource) UnmarshalJSON(b []byte) error {
-	repo := schemas.GetResourceTypeRepository()
+	repo := core.GetResourceTypeRepository()
 
 	// Unmarshal common parts
 	if err := json.Unmarshal(b, &r.Common); err != nil {
@@ -121,7 +120,7 @@ func (r *Resource) MarshalJSON() ([]byte, error) {
 	// Get BaseSchema to encode core attributes
 	// TODO: Generalize this code block
 	// ****
-	repo := schemas.GetResourceTypeRepository()
+	repo := core.GetResourceTypeRepository()
 
 	// Validate and get ResourceType
 	resourceType := repo.Get(r.Common.Meta.ResourceType)

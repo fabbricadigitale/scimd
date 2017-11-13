@@ -2,29 +2,27 @@
 // Any changes will be lost if this file is regenerated.
 // see https://github.com/cheekybits/genny
 
-package schemas
+package core
 
 import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"sync"
-
-	"github.com/fabbricadigitale/scimd/schemas/core"
 )
 
 type repositoryResourceType struct {
-	items map[string]core.ResourceType
+	items map[string]ResourceType
 	mu    sync.RWMutex
 }
 
 // ResourceTypeRepository is the ...
 type ResourceTypeRepository interface {
-	Get(key string) *core.ResourceType
-	Add(filename string) (core.ResourceType, error)
+	Get(key string) *ResourceType
+	Add(filename string) (ResourceType, error)
 }
 
-func (repo *repositoryResourceType) Get(key string) *core.ResourceType {
+func (repo *repositoryResourceType) Get(key string) *ResourceType {
 	repo.mu.RLock()
 	defer repo.mu.RUnlock()
 	if item, ok := repo.items[key]; ok {
@@ -33,8 +31,8 @@ func (repo *repositoryResourceType) Get(key string) *core.ResourceType {
 	return nil
 }
 
-func (repo *repositoryResourceType) Add(filename string) (core.ResourceType, error) {
-	var data core.ResourceType
+func (repo *repositoryResourceType) Add(filename string) (ResourceType, error) {
+	var data ResourceType
 
 	bytes, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -67,7 +65,7 @@ var (
 func GetResourceTypeRepository() ResourceTypeRepository {
 	onceResourceType.Do(func() {
 		repoResourceType = &repositoryResourceType{
-			items: make(map[string]core.ResourceType),
+			items: make(map[string]ResourceType),
 		}
 	})
 

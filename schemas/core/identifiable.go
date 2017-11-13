@@ -1,4 +1,4 @@
-package schemas
+package core
 
 // Identifiable ...
 type Identifiable interface {
