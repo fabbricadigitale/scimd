@@ -121,6 +121,12 @@ are implemented by Go `struct`, which are very simply to use.
 
 For instance, `core.ServiceProviderConfig` (that's a *Structured Resource*) can be used to load a service provider config from a JSON file.
 
+#### Observations
+
+* There is not advantage in storing thos resources into a database
+* Those resources can not be filtered by attribute name since they are not implemented with `map`s
+* The corresponding Endpoint of each of those resources ignores query [parameters](https://tools.ietf.org/html/rfc7644#section-3.4.2) (eg., filtering, sorting) as per [RFC](https://tools.ietf.org/html/rfc7644#section-4)
+
 ### Mapped Resources
 
 To handle any other type of resource (including *User Resource*, *Group Resource* and new ones may be defined in future), 
