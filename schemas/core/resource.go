@@ -2,12 +2,12 @@ package core
 
 type Resource interface {
 	GetResourceType() *ResourceType
-	GetSchemas() *[]string
+	GetSchema() *Schema
+	GetSchemaExtensions() map[string]*Schema
+
 	GetCommon() *Common
-	//
-	Get(path string) DataType
-	GetExtended(ns string, path string) DataType
-	// oppure
-	Data() *Complex
-	ExtData(ns string) *Complex
+
+	// TODO: how to extend this interface to handle both structured and mapped resources?
+	// Data() *Complex
+	// ExtensionsData(ns string) *Complex
 }

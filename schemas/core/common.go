@@ -29,3 +29,28 @@ type Common struct {
 	ExternalID string `json:"externaId,omitempty"`
 	Meta       Meta   `json:"meta"`
 }
+
+func (c *Common) GetCommon() *Common {
+	return c
+}
+
+func (c *Common) GetResourceType() *ResourceType {
+	return GetResourceTypeRepository().Get(c.Meta.ResourceType)
+}
+
+func (c *Common) GetSchema() *Schema {
+	if rt := c.GetResourceType(); rt != nil {
+		return GetSchemaRepository().Get(rt.Schema)
+	}
+	return nil
+}
+
+func (c *Common) GetSchemaExtensions() map[string]*Schema {
+	repo := GetSchemaRepository()
+	schExts := c.GetResourceType().SchemaExtensions
+	schemas := map[string]*Schema{}
+	for _, ext := range schExts {
+		schemas[ext.Schema] = repo.Get(ext.Schema)
+	}
+	return schemas
+}

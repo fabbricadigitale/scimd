@@ -6,54 +6,38 @@ import (
 	"github.com/fabbricadigitale/scimd/schemas/core"
 )
 
-// Common resource attributes
-type Common core.Common
-
 // Resource The data resource structure
 type Resource struct {
-	Common
+	core.Common
 	data map[string]*core.Complex
 }
 
 // SetValues is the method to set Resource attributes
-func (r *Resource) SetValues(schema string, values *core.Complex) {
-	r.data[schema] = values
+func (r *Resource) SetValues(ns string, values *core.Complex) {
+	r.data[ns] = values
 }
 
 // GetValues is the method to access the attributes
-func (r *Resource) GetValues(schema string) *core.Complex {
-	return r.data[schema]
-}
-
-func getSchema(schema string, allowedSchemas []string) *core.Schema {
-	repo := core.GetSchemaRepository()
-	for _, s := range allowedSchemas {
-		if s == schema {
-			return repo.Get(s)
-		}
-	}
-
-	return nil
+func (r *Resource) GetValues(ns string) *core.Complex {
+	return r.data[ns]
 }
 
 // UnmarshalJSON is the Resource Marshal implementation
 func (r *Resource) UnmarshalJSON(b []byte) error {
-	repo := core.GetResourceTypeRepository()
-
 	// Unmarshal common parts
 	if err := json.Unmarshal(b, &r.Common); err != nil {
 		return err
 	}
 
 	// Validate and get ResourceType
-	resourceType := repo.Get(r.Common.Meta.ResourceType)
+	resourceType := r.GetResourceType()
 	if resourceType == nil {
 		return &core.ScimError{"Unsupported Resource Type"}
 	}
 
 	// Validate and get schema
-	baseSchema := getSchema(resourceType.Schema, r.Common.Schemas)
-	if baseSchema == nil {
+	schema := r.GetSchema()
+	if schema == nil {
 		return &core.ScimError{"Unsupported Schema"}
 	}
 
@@ -66,37 +50,27 @@ func (r *Resource) UnmarshalJSON(b []byte) error {
 	var err error
 	r.data = make(map[string]*core.Complex)
 
-	// Grab base schema attributes
-	var baseAttrs *core.Complex
-	baseAttrs, err = baseSchema.Attributes.Unmarshal(parts)
-
-	if err != nil {
+	// Get schema attributes' values
+	var values *core.Complex
+	if values, err = schema.Attributes.Unmarshal(parts); err != nil {
 		return err
 	}
-	r.SetValues(baseSchema.GetIdentifier(), baseAttrs)
+	r.SetValues(schema.GetIdentifier(), values)
 
-	// Grab extension schemas attributes
-	for _, schExt := range resourceType.SchemaExtensions {
+	exts := r.GetSchemaExtensions()
 
-		if extRawMsg, ok := parts[schExt.Schema]; ok {
-
+	for _, schExt := range exts {
+		if extRawMsg, ok := parts[schExt.GetIdentifier()]; ok && schExt != nil {
 			var extParts map[string]json.RawMessage
 			if err := json.Unmarshal(extRawMsg, &extParts); err != nil {
 				return err
 			}
-
-			if extSchema := getSchema(schExt.Schema, r.Common.Schemas); extSchema != nil {
-
-				var attrs *core.Complex
-				attrs, err = extSchema.Attributes.Unmarshal(extParts)
-				if err != nil {
-					return err
-				}
-				r.SetValues(extSchema.GetIdentifier(), attrs)
+			var values *core.Complex
+			if values, err = schExt.Attributes.Unmarshal(extParts); err != nil {
+				return err
 			}
-
+			r.SetValues(schExt.GetIdentifier(), values)
 		}
-
 	}
 
 	return nil
@@ -120,37 +94,38 @@ func (r *Resource) MarshalJSON() ([]byte, error) {
 	// Get BaseSchema to encode core attributes
 	// TODO: Generalize this code block
 	// ****
-	repo := core.GetResourceTypeRepository()
 
 	// Validate and get ResourceType
-	resourceType := repo.Get(r.Common.Meta.ResourceType)
+	resourceType := r.GetResourceType()
 	if resourceType == nil {
 		return nil, &core.ScimError{"Unsupported Resource Type"}
 	}
 	// Validate and get schema
-	baseSchema := getSchema(resourceType.Schema, r.Common.Schemas)
+	schema := r.GetSchema()
+	if schema == nil {
+		return nil, &core.ScimError{"Unsupported Schema"}
+	}
 	// ****
 
-	// Bring to the above level core attributes
-	for key, value := range *r.GetValues(baseSchema.GetIdentifier()) {
-
-		if msg, err = json.Marshal(value); err != nil {
+	// Marshal schema attrs to the top level
+	for key, values := range *r.GetValues(schema.GetIdentifier()) {
+		if msg, err = json.Marshal(values); err != nil {
 			return nil, err
 		}
 		out[key] = msg
 	}
 
-	for _, extSch := range r.Common.Schemas {
-
-		if extSch == baseSchema.GetIdentifier() {
-			continue
+	// Marshal extensions to proper namespace key
+	for _, extSch := range r.GetSchemaExtensions() {
+		if extSch != nil {
+			ns := extSch.GetIdentifier()
+			values := *r.GetValues(ns)
+			if msg, err = json.Marshal(values); err != nil {
+				return nil, err
+			}
+			out[ns] = msg
 		}
 
-		attrs := *r.GetValues(extSch)
-		if msg, err = json.Marshal(attrs); err != nil {
-			return nil, err
-		}
-		out[extSch] = msg
 	}
 
 	return json.Marshal(out)
