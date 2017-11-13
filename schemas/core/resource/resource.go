@@ -52,7 +52,7 @@ func (r *Resource) UnmarshalJSON(b []byte) error {
 
 	// Get schema attributes' values
 	var values *core.Complex
-	if values, err = schema.Attributes.Unmarshal(parts); err != nil {
+	if values, err = schema.Unmarshal(parts); err != nil {
 		return err
 	}
 	r.SetValues(schema.GetIdentifier(), values)
@@ -66,7 +66,7 @@ func (r *Resource) UnmarshalJSON(b []byte) error {
 				return err
 			}
 			var values *core.Complex
-			if values, err = schExt.Attributes.Unmarshal(extParts); err != nil {
+			if values, err = schExt.Unmarshal(extParts); err != nil {
 				return err
 			}
 			r.SetValues(schExt.GetIdentifier(), values)
