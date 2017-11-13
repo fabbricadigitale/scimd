@@ -81,7 +81,7 @@ The internal convention for [Section 2.5 of [RFC7643]](https://tools.ietf.org/ht
 
 **Unassigned** values are:
 * keys of a `map` not set
-* keys of a `map` with **Null** value
+* keys of a `map` holding a **Null** value
 
 Setting **Null** expresses the willing to make the attribute "unassigned" (ie. clear the attribute's value), eg:
 
@@ -100,7 +100,7 @@ v, ok := m[key]
 You should use:
 
 * `core.IsNull(v)` to check if a value is **Null**
-* `!core.IsNull(v)` to check if an attribute's value is **Unassigned**
+* `!core.IsNull(v)` to check if an attribute's value is not **Unassigned**
 * `ok && core.IsNull(v)` to check if an attribute's **value must be cleared**
 
 
