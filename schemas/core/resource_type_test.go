@@ -7,7 +7,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	validator "gopkg.in/go-playground/validator.v9"
 )
+
+var validate *validator.Validate
 
 func TestResourceTypeResource(t *testing.T) {
 	// Non-normative of SCIM user resource type [https: //tools.ietf.org/html/rfc7643#section-8.6]
@@ -42,4 +45,24 @@ func TestResourceTypeResource(t *testing.T) {
 		Required: true,
 		Schema:   "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User",
 	})
+}
+
+func TestResourceTypeValudation(t *testing.T) {
+	validate = validator.New()
+
+	res := ResourceType{}
+
+	errors := validate.Struct(res)
+
+	require.IsType(t, (validator.ValidationErrors)(nil), errors)
+	require.NotNil(t, errors)
+	require.Len(t, errors, 3)
+
+	fields := []string{"Name", "Endpoint", "Schema"}
+
+	for e, err := range errors.(validator.ValidationErrors) {
+		require.Equal(t, "ResourceType."+fields[e], err.Namespace())
+		require.Equal(t, fields[e], err.Field())
+	}
+
 }
