@@ -51,7 +51,7 @@ func TestIsNull(t *testing.T) {
 	assert.False(t, IsNull(String("hello world!")))
 }
 
-func TestSingleValueCheck(t *testing.T) {
+func TestIsSingleValue(t *testing.T) {
 	single := String("one")
 	var emptySingle String
 	multi := []String{"one", "two"}
@@ -101,7 +101,7 @@ func TestSingleValueCheck(t *testing.T) {
 	assert.False(t, IsSingleValue(c))
 }
 
-func TestMultiValueCheck(t *testing.T) {
+func TestIsMultiValue(t *testing.T) {
 	single := String("one")
 
 	var emptySingle String

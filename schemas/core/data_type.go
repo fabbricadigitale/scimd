@@ -6,6 +6,14 @@ import (
 	"time"
 )
 
+// DataType is the interface implemented by SCIM Data Types.
+// DataTypes implement Value() that returns the value that DataType holds,
+// Type() that returns the corrisponding SCIM Schema "type"
+type DataType interface {
+	Value() interface{}
+	Type() string
+}
+
 // SCIM Schema "type" as per https://tools.ietf.org/html/rfc7643#section-2.3
 const (
 	StringType    = "string"
@@ -17,6 +25,86 @@ const (
 	ReferenceType = "reference"
 	ComplexType   = "complex"
 )
+
+// String defines the equivalent SCIM Data Type and attaches the methods of DataType interface to string
+type String string
+
+// Value returns the DataType's value
+func (p String) Value() interface{} { return p }
+
+// Type returns DataType's "type"
+func (p String) Type() string { return StringType }
+
+// Boolean defines the equivalent SCIM Data Type and attaches the methods of DataType interface to bool
+type Boolean bool
+
+// Value returns the DataType's value
+func (p Boolean) Value() interface{} { return p }
+
+// Type returns DataType's "type"
+func (p Boolean) Type() string { return BooleanType }
+
+// Decimal defines the equivalent SCIM Data Type and attaches the methods of DataType interface to float64
+type Decimal float64
+
+// Value returns the DataType's value
+func (p Decimal) Value() interface{} { return p }
+
+// Type returns DataType's "type"
+func (p Decimal) Type() string { return DecimalType }
+
+// Integer defines the equivalent SCIM Data Type and attaches the methods of DataType interface to int64
+type Integer int64
+
+// Value returns the DataType's value
+func (p Integer) Value() interface{} { return p }
+
+// Type returns DataType's "type"
+func (p Integer) Type() string { return IntegerType }
+
+// DateTime defines the equivalent SCIM Data Type and attaches the methods of DataType interface to time.Time
+type DateTime time.Time
+
+// Value returns the DataType's value
+func (p DateTime) Value() interface{} { return p }
+
+// Type returns DataType's "type"
+func (p DateTime) Type() string { return DateTimeType }
+
+// Binary defines the equivalent SCIM Data Type and attaches the methods of DataType interface to []byte
+type Binary []byte
+
+// Value returns the DataType's value
+func (p Binary) Value() interface{} { return p }
+
+// Type returns DataType's "type"
+func (p Binary) Type() string { return BinaryType }
+
+// UnmarshalJSON implements custom logic for Binary
+func (p *Binary) UnmarshalJSON(b []byte) error {
+	var s string
+	err := json.Unmarshal(b, &s)
+	*p = Binary(s)
+	return err
+}
+
+// Reference defines the equivalent SCIM Data Type and attaches the methods of DataType interface to []byte
+type Reference string
+
+// Value returns the DataType's value
+func (p Reference) Value() interface{} { return p }
+
+// Type returns DataType's "type"
+func (p Reference) Type() string { return ReferenceType }
+
+// Complex defines the equivalent SCIM Data Type and attaches the methods of DataType interface to map[string]interface{}
+type Complex map[string]interface{}
+
+// Value returns the DataType's value
+func (p Complex) Value() interface{} { return p }
+
+// Type returns DataType's "type"
+func (p Complex) Type() string { return ComplexType }
 
 // NewDataType function allocates for SCIM Data Types.
 // The first argument is string containing the SCIM Schema "type" as per https://tools.ietf.org/html/rfc7643#section-2.3,
@@ -51,91 +139,10 @@ func (e *dataTypeError) Error() string {
 	return e.msg
 }
 
-// String defines the equivalent SCIM Data Type and attaches the methods of DataType interface to string
-type String string
-
-// Boolean defines the equivalent SCIM Data Type and attaches the methods of DataType interface to bool
-type Boolean bool
-
-// Decimal defines the equivalent SCIM Data Type and attaches the methods of DataType interface to float64
-type Decimal float64
-
-// Integer defines the equivalent SCIM Data Type and attaches the methods of DataType interface to int64
-type Integer int64
-
-// DateTime defines the equivalent SCIM Data Type and attaches the methods of DataType interface to time.Time
-type DateTime time.Time
-
-// Binary defines the equivalent SCIM Data Type and attaches the methods of DataType interface to []byte
-type Binary []byte
-
-// Reference defines the equivalent SCIM Data Type and attaches the methods of DataType interface to []byte
-type Reference string
-
-// Complex defines the equivalent SCIM Data Type and attaches the methods of DataType interface to map[string]interface{}
-type Complex map[string]interface{}
-
-// DataType is the interface implemented by SCIM Data Types.
-// DataTypes implement Indirect() returns the value that the current DataType points to.
-type DataType interface {
-	Indirect() interface{}
-}
-
-// Indirect returns the String value that DataType points to.
-func (p *String) Indirect() interface{} {
-	return *p
-}
-
-// Indirect returns the Boolean value that DataType points to.
-func (p *Boolean) Indirect() interface{} {
-	return *p
-}
-
-// Indirect returns the Decimal value that DataType points to.
-func (p *Decimal) Indirect() interface{} {
-	return *p
-}
-
-// Indirect returns the Integer value that DataType points to.
-func (p *Integer) Indirect() interface{} {
-	return *p
-}
-
-// Indirect returns the DateTime value that DataType points to.
-func (p *DateTime) Indirect() interface{} {
-	return *p
-}
-
-// Indirect returns the Binary value that DataType points to.
-func (p *Binary) Indirect() interface{} {
-	return *p
-}
-
-// Indirect returns the Reference value that DataType points to.
-func (p *Reference) Indirect() interface{} {
-	return *p
-}
-
-// Indirect returns the Complex value that DataType points to.
-func (p *Complex) Indirect() interface{} {
-	return *p
-}
-
-// UnmarshalJSON implements custom logic for Binary
-func (p *Binary) UnmarshalJSON(b []byte) error {
-	var s string
-	err := json.Unmarshal(b, &s)
-	*p = Binary(s)
-	return err
-}
-
 // IsSingleValue hecks if v holds a Data Type value
 func IsSingleValue(v interface{}) bool {
-	switch v.(type) {
-	case String, Boolean, Decimal, Integer, DateTime, Binary, Reference, Complex:
-		return true
-	}
-	return false
+	_, ok := v.(DataType)
+	return ok
 }
 
 // IsMultiValue checks if v holds a slices of Data Type values

@@ -60,7 +60,7 @@ func unmarshalSingular(attr *Attribute, data json.RawMessage) (interface{}, erro
 	if err = json.Unmarshal(data, p); err != nil {
 		return nil, err
 	}
-	return p.Indirect(), nil
+	return p.Value(), nil
 }
 
 func unmarshalMulti(attr *Attribute, data json.RawMessage) ([]interface{}, error) {
