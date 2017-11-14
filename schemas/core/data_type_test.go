@@ -52,6 +52,53 @@ func TestIsNull(t *testing.T) {
 }
 
 func TestSingleValueCheck(t *testing.T) {
+	single := String("one")
+	var emptySingle String
+	multi := []String{"one", "two"}
+	var emptyMulti []String
+
+	// nil
+	assert.False(t, IsSingleValue(nil), "nil")
+
+	// multi Data Type
+	assert.False(t, IsSingleValue(multi))
+
+	// empty Data Type
+	assert.True(t, IsSingleValue(emptySingle), "empty")
+	assert.False(t, IsSingleValue(emptyMulti))
+
+	// Data Type String
+	assert.True(t, IsSingleValue(String(single)), "valued")
+	assert.False(t, IsSingleValue("test"))
+
+	// Data type Boolean
+	assert.True(t, IsSingleValue(Boolean(false)))
+	assert.False(t, IsSingleValue(true))
+
+	//Data type Decimal
+	assert.True(t, IsSingleValue(Decimal(3.14)))
+	assert.False(t, IsSingleValue(3.14))
+
+	// Data Type Integer
+	assert.True(t, IsSingleValue(Integer(123)))
+	assert.False(t, IsSingleValue(123))
+
+	// Data Type DateTime
+	assert.True(t, IsSingleValue(DateTime(time.Now())))
+	assert.False(t, IsSingleValue(time.Now()))
+
+	// Data Type Binary
+	assert.True(t, IsSingleValue(Binary([]byte{1, 2})))
+	assert.False(t, IsSingleValue([]byte{1, 2}))
+
+	// Data Type Reference
+	assert.True(t, IsSingleValue(Reference("https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646")))
+	assert.False(t, IsSingleValue("https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646"))
+
+	// Data Type Complex
+	var c = map[string]interface{}{}
+	assert.True(t, IsSingleValue(Complex(c)))
+	assert.False(t, IsSingleValue(c))
 }
 
 func TestMultiValueCheck(t *testing.T) {
