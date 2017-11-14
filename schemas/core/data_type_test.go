@@ -2,6 +2,7 @@ package core
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -54,4 +55,55 @@ func TestSingleValueCheck(t *testing.T) {
 }
 
 func TestMultiValueCheck(t *testing.T) {
+	single := String("one")
+
+	var emptySingle String
+
+	multi := []String{"one", "two"}
+
+	var emptyMulti []String
+
+	// nil
+	assert.False(t, IsMultiValue(nil), "nil")
+
+	// Data type empty
+	assert.True(t, IsMultiValue(emptyMulti))
+	assert.False(t, IsMultiValue(emptySingle), "empty")
+
+	// Data type String
+	assert.True(t, IsMultiValue(multi))
+	assert.False(t, IsMultiValue(single), "valued")
+
+	// Data type Boolean
+	assert.True(t, IsMultiValue([]Boolean{true, false}))
+	assert.False(t, IsMultiValue(Boolean(true)))
+
+	// Data type Decimal
+	assert.True(t, IsMultiValue([]Decimal{1.23, 4.56}))
+	assert.False(t, IsMultiValue(Decimal(6.78)))
+
+	// Data type Integer
+	assert.True(t, IsMultiValue([]Integer{1, 2}))
+	assert.False(t, IsMultiValue(Integer(3)))
+
+	// Data type DateTime
+	dt1 := DateTime(time.Now())
+	dt2 := DateTime(time.Now())
+
+	assert.True(t, IsMultiValue([]DateTime{dt1, dt2}))
+	assert.False(t, IsMultiValue(DateTime(dt1)))
+
+	// Data type Binary
+	assert.True(t, IsMultiValue([]Binary{Binary([]byte{1}), Binary([]byte{2})}))
+	assert.False(t, IsMultiValue(Binary([]byte{1})))
+
+	// Data type Reference
+	assert.True(t, IsMultiValue([]Reference{"urn", "URL"}))
+	assert.False(t, IsMultiValue(Reference("urn")))
+
+	// Data type Complex
+	var c1 = map[string]interface{}{}
+	var c2 = map[string]interface{}{}
+	assert.True(t, IsMultiValue([]Complex{c1, c2}))
+	assert.False(t, IsMultiValue(Complex(c1)))
 }
