@@ -10,7 +10,7 @@ type SchemaExtension struct {
 type ResourceType struct {
 	Common
 	Name             string            `json:"name" validate:"required"`
-	Endpoint         string            `json:"endpoint" validate:"required"`
+	Endpoint         string            `json:"endpoint" validate:"startswith=/,required"`
 	Description      string            `json:"description"`
 	Schema           string            `json:"schema" validate:"uri,required"`
 	SchemaExtensions []SchemaExtension `json:"schemaExtensions"`

@@ -2,15 +2,17 @@ package core
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"testing"
 
+	"github.com/fabbricadigitale/scimd/validation"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	validator "gopkg.in/go-playground/validator.v9"
 )
 
-var validate *validator.Validate
+//var validate *validator.Validate
 
 func TestResourceTypeResource(t *testing.T) {
 	// Non-normative of SCIM user resource type [https: //tools.ietf.org/html/rfc7643#section-8.6]
@@ -48,21 +50,61 @@ func TestResourceTypeResource(t *testing.T) {
 }
 
 func TestResourceTypeValudation(t *testing.T) {
-	validate = validator.New()
+	res := &ResourceType{}
 
-	res := ResourceType{}
-
-	errors := validate.Struct(res)
-
-	require.IsType(t, (validator.ValidationErrors)(nil), errors)
+	errors := validation.Validator.Struct(res)
 	require.NotNil(t, errors)
+	require.IsType(t, (validator.ValidationErrors)(nil), errors)
+
 	require.Len(t, errors, 3)
 
 	fields := []string{"Name", "Endpoint", "Schema"}
+	failtags := []string{"required", "startswith", "uri"}
 
 	for e, err := range errors.(validator.ValidationErrors) {
 		require.Equal(t, "ResourceType."+fields[e], err.Namespace())
 		require.Equal(t, fields[e], err.Field())
+		require.Equal(t, failtags[e], err.ActualTag())
 	}
 
+	//
+	res.Name = "User"
+
+	errors = validation.Validator.Struct(res)
+
+	require.Len(t, errors, 2)
+
+	fields = fields[1:]
+	failtags = failtags[1:]
+
+	for e, err := range errors.(validator.ValidationErrors) {
+		require.Equal(t, "ResourceType."+fields[e], err.Namespace())
+		require.Equal(t, fields[e], err.Field())
+		require.Equal(t, failtags[e], err.ActualTag())
+	}
+
+	//
+	res.Endpoint = "WrongEndpoint"
+
+	errors = validation.Validator.Struct(res)
+	require.Len(t, errors, 2)
+
+	for e, err := range errors.(validator.ValidationErrors) {
+		require.Equal(t, "ResourceType."+fields[e], err.Namespace())
+		require.Equal(t, fields[e], err.Field())
+		require.Equal(t, failtags[e], err.ActualTag())
+	}
+
+	res.Endpoint = "/Users"
+	errors = validation.Validator.Struct(res)
+	require.Len(t, errors, 1)
+
+	fields = fields[1:]
+	failtags = failtags[1:]
+
+	fmt.Println(errors)
+
+	// (todo):> try a non uri on schema
+
+	// (todo):> try a uri on schema
 }
