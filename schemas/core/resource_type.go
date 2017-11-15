@@ -6,7 +6,7 @@ type SchemaExtension struct {
 	Required bool   `json:"required" validate:"required"`
 }
 
-// ResourceType is a structured resource "urn:ietf:params:scim:schemas:core:2.0:ResourceType"
+// ResourceType is a structured resource for "urn:ietf:params:scim:schemas:core:2.0:ResourceType"
 type ResourceType struct {
 	Common
 	Name             string            `json:"name" validate:"required"`

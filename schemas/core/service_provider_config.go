@@ -41,7 +41,7 @@ type authenticationScheme struct {
 	Primary          bool   `json:"primary,omitempty" default:"false"`
 }
 
-// ServiceProviderConfig is a structured resource "urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig"
+// ServiceProviderConfig is a structured resource for "urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig"
 type ServiceProviderConfig struct {
 	Common
 	DocumentationURI      string                 `json:"documentationUri"`
