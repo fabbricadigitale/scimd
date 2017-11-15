@@ -36,6 +36,7 @@ type AuthenticationSchema struct {
 	Primary          bool   `json:"primary,omitempty"`
 }
 
+// ServiceProviderConfig is a structured resource "urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig"
 type ServiceProviderConfig struct {
 	ID string `json:"id,omitempty"`
 	Common
@@ -48,3 +49,5 @@ type ServiceProviderConfig struct {
 	Etag                  Etag                   `json:"etag"`
 	AuthenticationSchemas []AuthenticationSchema `json:"authenticationSchemas"`
 }
+
+var _ Resource = (*ServiceProviderConfig)(nil)

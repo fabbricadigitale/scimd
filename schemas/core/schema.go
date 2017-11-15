@@ -52,13 +52,15 @@ func (a *Attribute) UnmarshalJSON(data []byte) error {
 	return err
 }
 
-// Schema ...
+// Schema is a structured resource for "urn:ietf:params:scim:schemas:core:2.0:Schema"
 type Schema struct {
 	Common
 	Name        string     `json:"name,omitempty"`
 	Description string     `json:"description,omitempty"`
 	Attributes  Attributes `json:"attributes,omitempty"`
 }
+
+var _ Resource = (*Schema)(nil)
 
 // GetIdentifier ...
 func (s Schema) GetIdentifier() string {
