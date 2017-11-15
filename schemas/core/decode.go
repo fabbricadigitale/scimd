@@ -38,14 +38,13 @@ func (attribute *Attribute) Unmarshal(data json.RawMessage) (interface{}, error)
 	return unmarshalSingular(attribute, data)
 }
 
-func unmarshalSingular(attr *Attribute, data json.RawMessage) (interface{}, error) {
+func unmarshalSingular(attr *Attribute, data json.RawMessage) (DataType, error) {
 
 	var err error
 
 	if attr.Type == ComplexType {
 		var subParts map[string]json.RawMessage
-		err = json.Unmarshal(data, &subParts)
-		if err != nil {
+		if err = json.Unmarshal(data, &subParts); err != nil {
 			return nil, err
 		}
 		c, err := attr.SubAttributes.Unmarshal(subParts)
@@ -63,13 +62,13 @@ func unmarshalSingular(attr *Attribute, data json.RawMessage) (interface{}, erro
 	return p.Value(), nil
 }
 
-func unmarshalMulti(attr *Attribute, data json.RawMessage) ([]interface{}, error) {
+func unmarshalMulti(attr *Attribute, data json.RawMessage) ([]DataType, error) {
 	var parts []json.RawMessage
 	if err := json.Unmarshal(data, &parts); err != nil {
 		return nil, err
 	}
 
-	ret := make([]interface{}, len(parts))
+	ret := make([]DataType, len(parts))
 
 	for i, p := range parts {
 		value, err := unmarshalSingular(attr, p)

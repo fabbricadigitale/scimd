@@ -2,7 +2,6 @@ package core
 
 import (
 	"encoding/json"
-	"reflect"
 	"time"
 )
 
@@ -10,7 +9,7 @@ import (
 // DataTypes implement Value() that returns the value that DataType holds,
 // Type() that returns the corrisponding SCIM Schema "type"
 type DataType interface {
-	Value() interface{}
+	Value() DataType
 	Type() string
 }
 
@@ -30,7 +29,7 @@ const (
 type String string
 
 // Value returns the DataType's value
-func (p String) Value() interface{} { return p }
+func (p String) Value() DataType { return p }
 
 // Type returns DataType's "type"
 func (p String) Type() string { return StringType }
@@ -39,7 +38,7 @@ func (p String) Type() string { return StringType }
 type Boolean bool
 
 // Value returns the DataType's value
-func (p Boolean) Value() interface{} { return p }
+func (p Boolean) Value() DataType { return p }
 
 // Type returns DataType's "type"
 func (p Boolean) Type() string { return BooleanType }
@@ -48,7 +47,7 @@ func (p Boolean) Type() string { return BooleanType }
 type Decimal float64
 
 // Value returns the DataType's value
-func (p Decimal) Value() interface{} { return p }
+func (p Decimal) Value() DataType { return p }
 
 // Type returns DataType's "type"
 func (p Decimal) Type() string { return DecimalType }
@@ -57,7 +56,7 @@ func (p Decimal) Type() string { return DecimalType }
 type Integer int64
 
 // Value returns the DataType's value
-func (p Integer) Value() interface{} { return p }
+func (p Integer) Value() DataType { return p }
 
 // Type returns DataType's "type"
 func (p Integer) Type() string { return IntegerType }
@@ -66,7 +65,7 @@ func (p Integer) Type() string { return IntegerType }
 type DateTime time.Time
 
 // Value returns the DataType's value
-func (p DateTime) Value() interface{} { return p }
+func (p DateTime) Value() DataType { return p }
 
 // Type returns DataType's "type"
 func (p DateTime) Type() string { return DateTimeType }
@@ -75,7 +74,7 @@ func (p DateTime) Type() string { return DateTimeType }
 type Binary []byte
 
 // Value returns the DataType's value
-func (p Binary) Value() interface{} { return p }
+func (p Binary) Value() DataType { return p }
 
 // Type returns DataType's "type"
 func (p Binary) Type() string { return BinaryType }
@@ -92,7 +91,7 @@ func (p *Binary) UnmarshalJSON(b []byte) error {
 type Reference string
 
 // Value returns the DataType's value
-func (p Reference) Value() interface{} { return p }
+func (p Reference) Value() DataType { return p }
 
 // Type returns DataType's "type"
 func (p Reference) Type() string { return ReferenceType }
@@ -101,7 +100,7 @@ func (p Reference) Type() string { return ReferenceType }
 type Complex map[string]interface{}
 
 // Value returns the DataType's value
-func (p Complex) Value() interface{} { return p }
+func (p Complex) Value() DataType { return p }
 
 // Type returns DataType's "type"
 func (p Complex) Type() string { return ComplexType }
@@ -147,18 +146,14 @@ func IsSingleValue(v interface{}) bool {
 
 // IsMultiValue checks if v holds a slices of Data Type values
 func IsMultiValue(v interface{}) bool {
-	switch v.(type) {
-	case []String, []Boolean, []Decimal, []Integer, []DateTime, []Binary, []Reference, []Complex:
-		return true
-	}
-	return false
+	_, ok := v.([]DataType)
+	return ok
 }
 
 // If v is a multi-value return its length, otherwise zero
 func multiValueLen(v interface{}) int {
-	if IsMultiValue(v) {
-		// v is a slice always so it does not panic
-		return reflect.ValueOf(v).Len()
+	if dt, ok := v.([]DataType); ok {
+		return len(dt)
 	}
 	return 0
 }

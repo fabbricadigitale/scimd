@@ -59,16 +59,16 @@ type DataType interface {
 
 ### Singular and Multi-Valued
 
-By convention, the `type` of a **single-value** (for *singular attribute*) must be one of:
+By convention, the `type` of a **single-value** (for *singular attribute*) is any `type` that implements `DataType`, `type` thus must be one of:
 ```go
 String, Boolean, Decimal, Integer, DateTime, Binary, Reference, Complex
 ```
-Instead, the `type` of a **multi-value** (for *multi-valued attribute*) must be on of:
-```go
-[]String, []Boolean, []Decimal, []Integer, []DateTime, []Binary, []Reference, []Complex
-```
 
-> A value of another `type` is considered a **Null** value.
+Instead, the `type` of a **multi-value** (for *multi-valued attribute*) must be `[]DataType`.
+
+To check if a value is **single** or **multi** 
+
+> A value that's not a `DataType` nor `[]DataType` is considered a **Null** value.
 
 ### Unassigned and Null Values
 
@@ -107,17 +107,23 @@ You should use:
 ## Resources
 
 A resource is an artifact managed by `scimd` that's described by a Resource Type and can holds values. 
+
+All resources:
+* are `struct`
+* embed `core.Common` for common attribures (ie. `Schemas`, `ID`, `Meta`, etc)
+> Members of `core.Common` use Go primitive `type`s, not *Data Types*
+
 `scimd` implements two different kinds of resources.
 
 ### Structured Resources
+
+All members of *strucutred resource* are Go primitive `type`s, not *Data Types*.
 
 For performance and simplicity, the resources defined by the followings schemas URI:
 
 * `urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig`
 * `urn:ietf:params:scim:schemas:core:2.0:ResourceType`
 * `urn:ietf:params:scim:schemas:core:2.0:Schema`
-
-are implemented by Go `struct`, which are very simply to use.
 
 For instance, `core.ServiceProviderConfig` (that's a *Structured Resource*) can be used to load a service provider config from a JSON file.
 
@@ -132,16 +138,18 @@ For instance, `core.ServiceProviderConfig` (that's a *Structured Resource*) can 
 To handle any other type of resource (including *User Resource*, *Group Resource* and new ones may be defined in future), 
 `scimd` uses `core.resource.Resource` that implements a flexible data rapresentation using Go `map` internally.
 
-`core.resource.Resource` implements the following features:
+A *mapped resource*:
 
-* it's a Go `struct` 
-* common attribures are embedded within the `struct` directly (ie. `Schemas`, `ID`, `Meta`, etc)
+* still embed `core.Common` for common attribures (ie. `Schemas`, `ID`, `Meta`, etc)
 * has a `map` of `core.Complex` indexed by schema URI
 * each `core.Complex` (that's another `map`) can hold values needed by the bound schema
 
-In this way, it can represent data for any schemas (or composition of them in case of extensions).
+Notes:
+> Members of `core.Common` use Go primitive `type`s, instead `map`s hold *Data Types*
 
-`core.resource.Resource` is **NOT** responsible to enforce attributes structure and characteristics defined by bound schemas *(other APIs are needed to accomplish that)*.
+> `core.resource.Resource` is **NOT** responsible to enforce attributes structure and characteristics defined by bound schemas *(other APIs are needed to accomplish that)*.
+
+In this way, it can represent data for any schemas (or composition of them in case of extensions).
 
 Finally, you need to know that:
 * it can hold data that may not be consistent with the schemas definition

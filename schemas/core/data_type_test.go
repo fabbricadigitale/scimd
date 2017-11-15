@@ -34,7 +34,7 @@ func TestUnassigned(t *testing.T) {
 	c["existent-key"] = String("val")
 	assert.False(t, IsNull(c["existent-key"]))
 
-	c["empty-multivalue-key"] = make([]String, 2)
+	c["empty-multivalue-key"] = make([]DataType, 2)
 	assert.False(t, IsNull(c["empty-multivalue-key"]))
 }
 
@@ -43,8 +43,8 @@ func TestIsNull(t *testing.T) {
 	assert.True(t, IsNull(nil))
 
 	// multi-value type with length equals to 0
-	assert.True(t, IsNull(make([]Integer, 0)))
-	assert.False(t, IsNull(make([]Integer, 1)))
+	assert.True(t, IsNull(make([]DataType, 0)))
+	assert.False(t, IsNull(make([]DataType, 1)))
 
 	// values of types not included in single-value nor multi-value ones
 	assert.True(t, IsNull("hello world!"))
@@ -106,9 +106,9 @@ func TestIsMultiValue(t *testing.T) {
 
 	var emptySingle String
 
-	multi := []String{"one", "two"}
+	multi := []DataType{String("one"), String("two")}
 
-	var emptyMulti []String
+	var emptyMulti []DataType
 
 	// nil
 	assert.False(t, IsMultiValue(nil), "nil")
@@ -122,35 +122,35 @@ func TestIsMultiValue(t *testing.T) {
 	assert.False(t, IsMultiValue(single), "valued")
 
 	// Data type Boolean
-	assert.True(t, IsMultiValue([]Boolean{true, false}))
+	assert.True(t, IsMultiValue([]DataType{Boolean(true), Boolean(false)}))
 	assert.False(t, IsMultiValue(Boolean(true)))
 
 	// Data type Decimal
-	assert.True(t, IsMultiValue([]Decimal{1.23, 4.56}))
+	assert.True(t, IsMultiValue([]DataType{Decimal(1.23), Decimal(4.56)}))
 	assert.False(t, IsMultiValue(Decimal(6.78)))
 
 	// Data type Integer
-	assert.True(t, IsMultiValue([]Integer{1, 2}))
+	assert.True(t, IsMultiValue([]DataType{Integer(1), Integer(2)}))
 	assert.False(t, IsMultiValue(Integer(3)))
 
 	// Data type DateTime
 	dt1 := DateTime(time.Now())
 	dt2 := DateTime(time.Now())
 
-	assert.True(t, IsMultiValue([]DateTime{dt1, dt2}))
+	assert.True(t, IsMultiValue([]DataType{DateTime(dt1), DateTime(dt2)}))
 	assert.False(t, IsMultiValue(DateTime(dt1)))
 
 	// Data type Binary
-	assert.True(t, IsMultiValue([]Binary{Binary([]byte{1}), Binary([]byte{2})}))
+	assert.True(t, IsMultiValue([]DataType{Binary([]byte{1}), Binary([]byte{2})}))
 	assert.False(t, IsMultiValue(Binary([]byte{1})))
 
 	// Data type Reference
-	assert.True(t, IsMultiValue([]Reference{"urn", "URL"}))
+	assert.True(t, IsMultiValue([]DataType{Reference("urn"), Reference("URL")}))
 	assert.False(t, IsMultiValue(Reference("urn")))
 
 	// Data type Complex
 	var c1 = map[string]interface{}{}
 	var c2 = map[string]interface{}{}
-	assert.True(t, IsMultiValue([]Complex{c1, c2}))
+	assert.True(t, IsMultiValue([]DataType{Complex(c1), Complex(c2)}))
 	assert.False(t, IsMultiValue(Complex(c1)))
 }
