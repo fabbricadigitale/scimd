@@ -2,12 +2,8 @@ package core
 
 import (
 	"encoding/json"
+	"strings"
 )
-
-// TODO Improve func and case for add empty array
-func isNullMsg(data json.RawMessage) bool {
-	return len(data) == 4 && string(data[0]) == "n" && string(data[1]) == "u" && string(data[2]) == "l" && string(data[3]) == "l"
-}
 
 // Unmarshal a SCIM a complex value by attributes definition
 func (attributes *Attributes) Unmarshal(data map[string]json.RawMessage) (*Complex, error) {
@@ -16,7 +12,7 @@ func (attributes *Attributes) Unmarshal(data map[string]json.RawMessage) (*Compl
 		if part, ok := data[aDef.Name]; ok {
 			value, err := aDef.Unmarshal(part)
 			if err != nil {
-				return nil, err
+				return &ret, err
 			}
 			ret[aDef.Name] = value
 		}
@@ -28,17 +24,18 @@ func (attributes *Attributes) Unmarshal(data map[string]json.RawMessage) (*Compl
 // Unmarshal a SCIM simple value by attribute definition
 func (attribute *Attribute) Unmarshal(data json.RawMessage) (interface{}, error) {
 
-	if isNullMsg(data) {
-		return nil, nil
-	}
-
 	if attribute.MultiValued {
 		return unmarshalMulti(attribute, data)
 	}
+
 	return unmarshalSingular(attribute, data)
 }
 
 func unmarshalSingular(attr *Attribute, data json.RawMessage) (DataType, error) {
+
+	if len(data) == 4 && strings.ToLower(string(data)) == "null" {
+		return nil, nil
+	}
 
 	var err error
 
@@ -48,7 +45,10 @@ func unmarshalSingular(attr *Attribute, data json.RawMessage) (DataType, error) 
 			return nil, err
 		}
 		c, err := attr.SubAttributes.Unmarshal(subParts)
-		return *c, err
+		if c != nil {
+			return *c, err
+		}
+		return nil, err
 	}
 
 	var p DataType

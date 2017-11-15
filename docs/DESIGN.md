@@ -100,7 +100,7 @@ v, ok := m[key]
 You should use:
 
 * `core.IsNull(v)` to check if a value is **Null**
-* `!core.IsNull(v)` to check if an attribute's value is not **Unassigned**
+* `!core.IsNull(v)` to check if an attribute's value is NOT **Unassigned** (ie. is assigned)
 * `ok && core.IsNull(v)` to check if an attribute's **value must be cleared**
 
 
