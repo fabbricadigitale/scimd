@@ -1,53 +1,78 @@
 package core
 
-type Patch struct {
-	Supported bool `json:"supported"`
+import (
+	"encoding/json"
+
+	defaults "github.com/mcuadros/go-defaults"
+)
+
+type patch struct {
+	Supported bool `json:"supported" validate:"required"`
 }
 
-type Bulk struct {
-	Supported      bool `json:"supported"`
-	MaxOperations  int  `json:"maxOperations"`
-	MaxPayloadSize int  `json:"maxPayloadSize"`
+type bulk struct {
+	Supported      bool `json:"supported" validate:"required"`
+	MaxOperations  int  `json:"maxOperations" validate:"required"`
+	MaxPayloadSize int  `json:"maxPayloadSize" validate:"required"`
 }
 
-type Filter struct {
-	Supported  bool `json:"supported"`
-	MaxResults int  `json:"maxResults"`
+type filter struct {
+	Supported  bool `json:"supported" validate:"required"`
+	MaxResults int  `json:"maxResults" validate:"required"`
+}
+type changePassword struct {
+	Supported bool `json:"supported" validate:"required"`
 }
 
-type ChangePassword struct {
-	Supported bool `json:"supported"`
+type sort struct {
+	Supported bool `json:"supported" validate:"required"`
 }
 
-type Sort struct {
-	Supported bool `json:"supported"`
+type etag struct {
+	Supported bool `json:"supported" validate:"required"`
 }
 
-type Etag struct {
-	Supported bool `json:"supported"`
-}
-
-type AuthenticationSchema struct {
-	Name             string `json:"name"`
-	Description      string `json:"description"`
+type authenticationScheme struct {
+	Type             string `json:"type" validate:"required"`
+	Name             string `json:"name" validate:"required"`
+	Description      string `json:"description" validate:"required"`
 	SpecURI          string `json:"specUri"`
 	DocumentationURI string `json:"documentationUri"`
-	Type             string `json:"type"`
-	Primary          bool   `json:"primary,omitempty"`
+	Primary          bool   `json:"primary,omitempty" default:"false"`
 }
 
 // ServiceProviderConfig is a structured resource "urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig"
 type ServiceProviderConfig struct {
-	ID string `json:"id,omitempty"`
 	Common
 	DocumentationURI      string                 `json:"documentationUri"`
-	Patch                 Patch                  `json:"patch"`
-	Bulk                  Bulk                   `json:"bulk"`
-	Filter                Filter                 `json:"filter"`
-	ChangePassword        ChangePassword         `json:"changePassword"`
-	Sort                  Sort                   `json:"sort"`
-	Etag                  Etag                   `json:"etag"`
-	AuthenticationSchemas []AuthenticationSchema `json:"authenticationSchemas"`
+	Patch                 patch                  `json:"patch" validate:"required"`
+	Bulk                  bulk                   `json:"bulk" validate:"required"`
+	Filter                filter                 `json:"filter" validate:"required"`
+	ChangePassword        changePassword         `json:"changePassword" validate:"required"`
+	Sort                  sort                   `json:"sort" validate:"required"`
+	Etag                  etag                   `json:"etag" validate:"required"`
+	AuthenticationSchemes []authenticationScheme `json:"authenticationSchemes" validate:"required"`
+}
+
+// NewServiceProviderConfig returns a new NewServiceProviderConfig filled with defaults
+func NewServiceProviderConfig() *ServiceProviderConfig {
+	spc := new(ServiceProviderConfig)
+	defaults.SetDefaults(spc)
+	return spc
 }
 
 var _ Resource = (*ServiceProviderConfig)(nil)
+
+// UnmarshalJSON unmarshals an Attribute taking into account defaults
+func (spc *ServiceProviderConfig) UnmarshalJSON(data []byte) error {
+	defaults.SetDefaults(spc)
+
+	type aliasType ServiceProviderConfig
+	alias := aliasType(*spc)
+	err := json.Unmarshal(data, &alias)
+
+	*spc = ServiceProviderConfig(alias)
+	return err
+}
+
+// (todo)> complete and test validation tags

@@ -49,7 +49,7 @@ func TestResourceTypeResource(t *testing.T) {
 	})
 }
 
-func TestResourceTypeValudation(t *testing.T) {
+func TestResourceTypeValidation(t *testing.T) {
 	res := &ResourceType{}
 
 	errors := validation.Validator.Struct(res)
@@ -104,7 +104,9 @@ func TestResourceTypeValudation(t *testing.T) {
 
 	fmt.Println(errors)
 
-	// (todo):> try a non uri on schema
+	// (todo)> try a non uri on schema
 
-	// (todo):> try a uri on schema
+	// (todo)> try a uri on schema
+
+	// (todo)> nested struct schemaext
 }

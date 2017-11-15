@@ -24,7 +24,7 @@
     "etag": {
       "supported": true
     },
-    "authenticationSchemas": [
+    "authenticationSchemes": [
       {
         "name": "OAuth Bearer Token",
         "description": "Authentication scheme using the OAuth Bearer Token Standard",
