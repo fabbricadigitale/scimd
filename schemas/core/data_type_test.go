@@ -1,6 +1,7 @@
 package core
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
 
@@ -153,4 +154,30 @@ func TestIsMultiValue(t *testing.T) {
 	var c2 = map[string]interface{}{}
 	assert.True(t, IsMultiValue([]DataType{Complex(c1), Complex(c2)}))
 	assert.False(t, IsMultiValue(Complex(c1)))
+}
+
+func TestDateTimeMarshal(t *testing.T) {
+
+	tt := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
+	data := (json.RawMessage)(`"` + tt.Format(time.RFC3339Nano) + `"`)
+
+	d := &DateTime{}
+	err := d.UnmarshalJSON(data)
+
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	assert.Equal(t, tt.Format(time.RFC3339Nano), (time.Time)(*d).Format(time.RFC3339Nano))
+
+	byt, err := json.Marshal((time.Time)(*d))
+
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	assert.Equal(t, []byte(data), []byte(byt))
+
 }
