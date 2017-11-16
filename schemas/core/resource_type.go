@@ -2,7 +2,7 @@ package core
 
 // SchemaExtension ...
 type SchemaExtension struct {
-	Schema   string `json:"schema" validate:"required"`
+	Schema   string `json:"schema" validate:"urn,required"`
 	Required bool   `json:"required" validate:"required"`
 }
 
@@ -11,9 +11,9 @@ type ResourceType struct {
 	Common
 	Name             string            `json:"name" validate:"required"`
 	Endpoint         string            `json:"endpoint" validate:"startswith=/,required"`
-	Description      string            `json:"description"`
-	Schema           string            `json:"schema" validate:"uri,required"`
-	SchemaExtensions []SchemaExtension `json:"schemaExtensions"`
+	Description      string            `json:"description,omitempty"`
+	Schema           string            `json:"schema" validate:"urn,required"`
+	SchemaExtensions []SchemaExtension `json:"schemaExtensions,omitempty"`
 }
 
 var _ Resource = (*ResourceType)(nil)

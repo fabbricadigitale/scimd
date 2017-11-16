@@ -94,3 +94,41 @@ func TestServiceProviderConfigValidation(t *testing.T) {
 
 	// (todo) > complete test with positive and negative cases when (and if) struct'll have other validations other than required
 }
+
+func TestAuthenticationSchemeValidation(t *testing.T) {
+	x := &authenticationScheme{}
+
+	errors := validation.Validator.Struct(x)
+
+	fields := []string{"Type", "Name", "Description"}
+	failtags := []string{"required", "required", "required"}
+
+	for e, err := range errors.(validator.ValidationErrors) {
+		exp := "authenticationScheme." + fields[e]
+		require.Equal(t, exp, err.Namespace())
+		require.Equal(t, fields[e], err.Field())
+		require.Equal(t, failtags[e], err.ActualTag())
+	}
+
+	x.Name = "name"
+	x.Description = "descr"
+	x.Type = "xxx"
+
+	errors = validation.Validator.Struct(x)
+
+	fields = fields[:1]
+	failtags = []string{"eq=oauth|eq=oauth2|eq=oauthbearertoken|eq=httpbasic|eq=httpdigest"}
+
+	for e, err := range errors.(validator.ValidationErrors) {
+		exp := "authenticationScheme." + fields[e]
+		require.Equal(t, exp, err.Namespace())
+		require.Equal(t, fields[e], err.Field())
+		require.Equal(t, failtags[e], err.ActualTag())
+	}
+
+	x.Type = "oauth2"
+
+	errors = validation.Validator.Struct(x)
+
+	require.Nil(t, errors)
+}

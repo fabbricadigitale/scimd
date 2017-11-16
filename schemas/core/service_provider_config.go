@@ -33,18 +33,18 @@ type etag struct {
 }
 
 type authenticationScheme struct {
-	Type             string `json:"type" validate:"required"`
+	Type             string `json:"type" validate:"required,eq=oauth|eq=oauth2|eq=oauthbearertoken|eq=httpbasic|eq=httpdigest"`
 	Name             string `json:"name" validate:"required"`
 	Description      string `json:"description" validate:"required"`
-	SpecURI          string `json:"specUri"`
-	DocumentationURI string `json:"documentationUri"`
+	SpecURI          string `json:"specUri,omitempty" validate:"omitempty,uri"`
+	DocumentationURI string `json:"documentationUri,omitempty" validate:"omitempty,uri"`
 	Primary          bool   `json:"primary,omitempty" default:"false"`
 }
 
 // ServiceProviderConfig is a structured resource for "urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig"
 type ServiceProviderConfig struct {
 	Common
-	DocumentationURI      string                 `json:"documentationUri"`
+	DocumentationURI      string                 `json:"documentationUri,omitempty" validate:"omitempty,uri"`
 	Patch                 patch                  `json:"patch" validate:"required"`
 	Bulk                  bulk                   `json:"bulk" validate:"required"`
 	Filter                filter                 `json:"filter" validate:"required"`

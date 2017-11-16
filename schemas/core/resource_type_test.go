@@ -59,7 +59,7 @@ func TestResourceTypeValidation(t *testing.T) {
 	require.Len(t, errors, 3)
 
 	fields := []string{"Name", "Endpoint", "Schema"}
-	failtags := []string{"required", "startswith", "uri"}
+	failtags := []string{"required", "startswith", "required"}
 
 	for e, err := range errors.(validator.ValidationErrors) {
 		require.Equal(t, "ResourceType."+fields[e], err.Namespace())
@@ -104,9 +104,9 @@ func TestResourceTypeValidation(t *testing.T) {
 
 	fmt.Println(errors)
 
-	// (todo)> try a non uri on schema
+	// (todo)> try a non urn on schema
 
-	// (todo)> try a uri on schema
+	// (todo)> try a urn on schema
 
 	// (todo)> nested struct schemaext
 }
