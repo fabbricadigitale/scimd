@@ -4,7 +4,7 @@ import (
 	"github.com/fabbricadigitale/scimd/schemas/core/resource"
 )
 
-const LIST_RESPONSE_URN = "urn:ietf:params:scim:api:messages:2.0:ListResponse"
+const ListResponseURN = "urn:ietf:params:scim:api:messages:2.0:ListResponse"
 
 // ListResponse ...
 type ListResponse struct {

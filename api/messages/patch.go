@@ -1,6 +1,6 @@
 package messages
 
-const PATCH_OP_URN = "urn:ietf:params:scim:api:messages:2.0:PatchOp"
+const PatchOpURN = "urn:ietf:params:scim:api:messages:2.0:PatchOp"
 
 type PatchOp struct {
 	Schemas    []string `json:"schemas"`
