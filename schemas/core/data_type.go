@@ -70,6 +70,11 @@ func (p DateTime) Value() DataType { return p }
 // Type returns DataType's "type"
 func (p DateTime) Type() string { return DateTimeType }
 
+// UnmarshalJSON implements custom logic for DateTime
+func (p *DateTime) UnmarshalJSON(b []byte) error {
+	return (*time.Time)(p).UnmarshalJSON(b)
+}
+
 // Binary defines the equivalent SCIM Data Type and attaches the methods of DataType interface to []byte
 type Binary []byte
 

@@ -3,6 +3,7 @@ package core
 import (
 	"encoding/json"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -149,8 +150,10 @@ func TestDecodeValuedWhenSingle(t *testing.T) {
 
 	assert.Equal(t, Integer(123), v)
 
-	//Datetime
-	/* data = (json.RawMessage)(`{"e": "2009-11-10 23:00:00 +0000 UTC"}`)
+	//DateTime
+	t2 := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
+	data = (json.RawMessage)(`{"e": "` + t2.Format(time.RFC3339Nano) + `"}`)
+
 	r, err = attributes[4].Unmarshal(data)
 	if err != nil {
 		t.Log(err)
@@ -163,12 +166,11 @@ func TestDecodeValuedWhenSingle(t *testing.T) {
 
 	assert.True(t, ok)
 	assert.True(t, IsSingleValue(v))
-
-	tt := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
-	assert.Equal(t, DateTime(tt.Local()), v) */
+	assert.Equal(t, DateTime(t2), v)
 
 	//Binary
-	/* data = (json.RawMessage)(`{"f": []byte{1, 2}}`)
+	b := []byte{'g'}
+	data = (json.RawMessage)(`{"f": "` + string(b) + `"}`)
 	r, err = attributes[5].Unmarshal(data)
 	if err != nil {
 		t.Log(err)
@@ -182,7 +184,7 @@ func TestDecodeValuedWhenSingle(t *testing.T) {
 	assert.True(t, ok)
 	assert.True(t, IsSingleValue(v))
 
-	assert.Equal(t, Binary([]byte{1, 2}), v) */
+	assert.Equal(t, Binary(b), v)
 
 	//Reference
 	data = (json.RawMessage)(`{"g": "https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646"}`)
@@ -352,7 +354,9 @@ func TestDecodeValuedWhenMulti(t *testing.T) {
 	assert.Contains(t, v, Integer(456))
 
 	// DateTime
-	/* data = (json.RawMessage)(`{"e": ["2009-11-10 23:00:00 +0000 UTC", "2009-11-10 22:00:00 +0000 UTC"]}`)
+	t2 := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
+	t3 := time.Date(2009, time.November, 10, 22, 0, 0, 0, time.UTC)
+	data = (json.RawMessage)(`{"e": ["` + t2.Format(time.RFC3339Nano) + `","` + t3.Format(time.RFC3339Nano) + `"]}`)
 	r, err = attributes[4].Unmarshal(data)
 	if err != nil {
 		t.Log(err)
@@ -366,13 +370,13 @@ func TestDecodeValuedWhenMulti(t *testing.T) {
 	assert.True(t, ok)
 	assert.True(t, IsMultiValue(v))
 
-	tt := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
-	tt2 := time.Date(2009, time.November, 10, 22, 0, 0, 0, time.UTC)
-	assert.Contains(t, v, tt.Local())
-	assert.Contains(t, v, tt2.Local()) */
+	assert.Contains(t, v, DateTime(t2))
+	assert.Contains(t, v, DateTime(t3))
 
 	// Binary
-	/* data = (json.RawMessage)(`{"f": [[]byte{1, 2}, []byte{3, 4}]}`)
+	b := []byte{'g'}
+	b2 := []byte{'g', 'o'}
+	data = (json.RawMessage)(`{"e": ["` + string(b) + `","` + string(b2) + `"]}`)
 	r, err = attributes[5].Unmarshal(data)
 	if err != nil {
 		t.Log(err)
@@ -386,8 +390,8 @@ func TestDecodeValuedWhenMulti(t *testing.T) {
 	assert.True(t, ok)
 	assert.True(t, IsMultiValue(v))
 
-	assert.Contains(t, v, Binary([]byte{1, 2}))
-	assert.Contains(t, v, Binary([]byte{3, 4})) */
+	assert.Contains(t, v, Binary(b))
+	assert.Contains(t, v, Binary(b2))
 
 	// Reference
 	data = (json.RawMessage)(`{"g": ["https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646", "https://example.com/v2/Users/2819c223-7f76-453a-919d-413861906464" ]}`)
