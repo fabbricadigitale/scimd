@@ -86,10 +86,12 @@ func (p Binary) Type() string { return BinaryType }
 
 // UnmarshalJSON implements custom logic for Binary
 func (p *Binary) UnmarshalJSON(b []byte) error {
-	var s string
-	err := json.Unmarshal(b, &s)
-	*p = Binary(s)
-	return err
+	return json.Unmarshal(b, (*[]byte)(p))
+}
+
+// MarshalJSON implements custom logic for Binary
+func (p *Binary) MarshalJSON() ([]byte, error) {
+	return json.Marshal((*[]byte)(p))
 }
 
 // Reference defines the equivalent SCIM Data Type and attaches the methods of DataType interface to []byte
