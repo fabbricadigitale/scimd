@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -156,7 +158,7 @@ func TestIsMultiValue(t *testing.T) {
 	assert.False(t, IsMultiValue(Complex(c1)))
 }
 
-func TestDateTimeMarshal(t *testing.T) {
+func TestDateTimeUnmarshalMarshal(t *testing.T) {
 
 	tt := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
 	data := (json.RawMessage)(`"` + tt.Format(time.RFC3339Nano) + `"`)
@@ -180,4 +182,22 @@ func TestDateTimeMarshal(t *testing.T) {
 
 	assert.Equal(t, []byte(data), []byte(byt))
 
+}
+
+func TestBinaryUnmarshalMarshal(t *testing.T) {
+	b := []byte(`"R28gR28gR29sYW5nIQ=="`)
+
+	d := &Binary{}
+	err := d.UnmarshalJSON(b)
+
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	require.Equal(t, "Go Go Golang!", string(*d))
+
+	byt, err := json.Marshal(*d)
+
+	require.Equal(t, b, byt)
 }
