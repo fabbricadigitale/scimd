@@ -74,5 +74,3 @@ func (spc *ServiceProviderConfig) UnmarshalJSON(data []byte) error {
 	*spc = ServiceProviderConfig(alias)
 	return err
 }
-
-// (todo)> complete and test validation tags

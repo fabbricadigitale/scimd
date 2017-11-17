@@ -13,21 +13,21 @@ func (e *ScimError) Error() string { return e.Msg }
 
 // Meta ...
 type Meta struct {
-	Location     string     `json:"location"`
-	ResourceType string     `json:"resourceType"`
-	Created      *time.Time `json:"created"`
-	LastModified *time.Time `json:"lastModified"`
-	Version      string     `json:"version"`
+	Location     string     `json:"location" validate:"uri,required"`
+	ResourceType string     `json:"resourceType" validate:"required"`
+	Created      *time.Time `json:"created" validate:"required"`
+	LastModified *time.Time `json:"lastModified" validate:"required"`
+	Version      string     `json:"version,omitempty"`
 }
 
 // Common ...
 type Common struct {
-	Schemas []string `json:"schemas"`
+	Schemas []string `json:"schemas" validate:"gt=0,dive,urn,required"`
 
 	// Common attributes
-	ID         string `json:"id"`
+	ID         string `json:"id" validate:"excludes=bulkId,required"`
 	ExternalID string `json:"externaId,omitempty"`
-	Meta       Meta   `json:"meta"`
+	Meta       Meta   `json:"meta" validate:"required"`
 }
 
 func (c *Common) GetCommon() *Common {

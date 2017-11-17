@@ -99,6 +99,8 @@ func TestAuthenticationSchemeValidation(t *testing.T) {
 	x := &authenticationScheme{}
 
 	errors := validation.Validator.Struct(x)
+	require.NotNil(t, errors)
+	require.IsType(t, (validator.ValidationErrors)(nil), errors)
 
 	fields := []string{"Type", "Name", "Description"}
 	failtags := []string{"required", "required", "required"}
