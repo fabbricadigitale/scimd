@@ -411,3 +411,31 @@ func TestDecodeValuedWhenMulti(t *testing.T) {
 	assert.Contains(t, v, Reference("https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646"))
 	assert.Contains(t, v, Reference("https://example.com/v2/Users/2819c223-7f76-453a-919d-413861906464"))
 }
+
+func TestUnmarshalAttributes(t *testing.T) {
+
+	attributes := &Attributes{
+		&Attribute{
+			Name:          "Name",
+			Type:          "complex",
+			SubAttributes: Attributes{&Attribute{Type: "string", Name: "givenName"}, &Attribute{Type: "string", Name: "familyName"}},
+		},
+	}
+
+	values := map[string]json.RawMessage{}
+
+	values["Name"] = (json.RawMessage)(`{ "givenName": "Bill", "familyName": "Cow"}`)
+
+	r, err := attributes.Unmarshal(values)
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+	require.IsType(t, &Complex{}, r)
+
+	name := (*r)["Name"].(Complex)
+
+	require.Equal(t, String("Bill"), name["givenName"])
+	require.Equal(t, String("Cow"), name["familyName"])
+
+}
