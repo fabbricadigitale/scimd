@@ -1,4 +1,4 @@
-package path
+package attr
 
 import (
 	"testing"
