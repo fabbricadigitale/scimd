@@ -6,6 +6,9 @@ import (
 	"github.com/mcuadros/go-defaults"
 )
 
+// URIExpr is the source text used to compile a regular expression matching a SCIM "schema" URI
+const URIExpr = `urn:[A-Za-z0-9][A-Za-z0-9-]{0,31}:[A-Za-z0-9()+,\-.:=@;$_!*'%\/?#]+` // TODO double check, should match SCIM "schema" URI only?
+
 // A SchemaError is a description of a SCIM error.
 type SchemaError struct {
 	msg string // description of error
