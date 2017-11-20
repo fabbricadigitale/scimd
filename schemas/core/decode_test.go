@@ -374,22 +374,24 @@ func TestDecodeValuedWhenMulti(t *testing.T) {
 	assert.Contains(t, v, DateTime(t3))
 
 	// Binary
-	/* 	b := []byte(`"g"`)
-	   	data = (json.RawMessage)(`{"e": "["Zw==","Z28="]"}`)
-	   	r, err = attributes[5].Unmarshal(data)
-	   	if err != nil {
-	   		t.Log(err)
-	   		t.Fail()
-	   	}
-	   	require.IsType(t, Complex{}, r)
+	b := []byte(`g`)
+	b1 := []byte(`go`)
+	data = (json.RawMessage)(`{"f": ["Zw==","Z28="]}`)
+	r, err = attributes[5].Unmarshal(data)
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+	require.IsType(t, Complex{}, r)
 
-	   	c = r.(Complex)
-	   	v, ok = c[attributes[5].SubAttributes[0].Name]
+	c = r.(Complex)
+	v, ok = c[attributes[5].SubAttributes[0].Name]
 
-	   	assert.True(t, ok)
-	   	assert.True(t, IsMultiValue(v))
+	assert.True(t, ok)
+	assert.True(t, IsMultiValue(v))
 
-	   	assert.Contains(t, v, Binary(b)) */
+	assert.Contains(t, v, Binary(b))
+	assert.Contains(t, v, Binary(b1))
 
 	// Reference
 	data = (json.RawMessage)(`{"g": ["https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646", "https://example.com/v2/Users/2819c223-7f76-453a-919d-413861906464" ]}`)
