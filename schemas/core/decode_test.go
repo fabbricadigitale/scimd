@@ -416,15 +416,27 @@ func TestUnmarshalAttributes(t *testing.T) {
 
 	attributes := &Attributes{
 		&Attribute{
+			Name: "UserName",
+			Type: "string",
+		},
+		&Attribute{
 			Name:          "Name",
 			Type:          "complex",
 			SubAttributes: Attributes{&Attribute{Type: "string", Name: "givenName"}, &Attribute{Type: "string", Name: "familyName"}},
+		},
+		&Attribute{
+			Name:          "Emails",
+			Type:          "complex",
+			MultiValued:   true,
+			SubAttributes: Attributes{&Attribute{Type: "string", Name: "value"}, &Attribute{Type: "string", Name: "type"}},
 		},
 	}
 
 	values := map[string]json.RawMessage{}
 
 	values["Name"] = (json.RawMessage)(`{ "givenName": "Bill", "familyName": "Cow"}`)
+	values["UserName"] = (json.RawMessage)(`"Billy123"`)
+	values["Emails"] = (json.RawMessage)(`[{"value": "billthecow@email.com", "type": "work"}, { "value": "billthegoat@email.com", "type": "home"}]`)
 
 	r, err := attributes.Unmarshal(values)
 	if err != nil {
@@ -433,9 +445,20 @@ func TestUnmarshalAttributes(t *testing.T) {
 	}
 	require.IsType(t, &Complex{}, r)
 
+	username := (*r)["UserName"]
 	name := (*r)["Name"].(Complex)
+	mails := (*r)["Emails"].([]DataType)
+
+	require.Equal(t, String("Billy123"), username)
 
 	require.Equal(t, String("Bill"), name["givenName"])
 	require.Equal(t, String("Cow"), name["familyName"])
 
+	mail1 := mails[0].(Complex)
+	require.Equal(t, String("billthecow@email.com"), mail1["value"])
+	require.Equal(t, String("work"), mail1["type"])
+
+	mail2 := mails[1].(Complex)
+	require.Equal(t, String("billthegoat@email.com"), mail2["value"])
+	require.Equal(t, String("home"), mail2["type"])
 }
