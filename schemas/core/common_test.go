@@ -44,7 +44,9 @@ func TestMetaValidation(t *testing.T) {
 }
 
 func TestCommonValidation(t *testing.T) {
-	c := &Common{}
+	c := NewCommon()
+
+	fmt.Println(c)
 
 	errors := validation.Validator.StructExcept(c, "Meta")
 	require.NotNil(t, errors)
