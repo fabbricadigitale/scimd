@@ -75,6 +75,11 @@ func (p *DateTime) UnmarshalJSON(b []byte) error {
 	return (*time.Time)(p).UnmarshalJSON(b)
 }
 
+// MarshalJSON implements custom logic for DateTime
+func (p *DateTime) MarshalJSON() ([]byte, error) {
+	return json.Marshal((time.Time)(*p))
+}
+
 // Binary defines the equivalent SCIM Data Type and attaches the methods of DataType interface to []byte
 type Binary []byte
 

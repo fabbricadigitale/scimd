@@ -158,7 +158,7 @@ func TestIsMultiValue(t *testing.T) {
 	assert.False(t, IsMultiValue(Complex(c1)))
 }
 
-func TestDateTimeUnmarshalMarshal(t *testing.T) {
+func TestDateTimeUnmarshal(t *testing.T) {
 
 	tt := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
 	data := (json.RawMessage)(`"` + tt.Format(time.RFC3339Nano) + `"`)
@@ -182,6 +182,24 @@ func TestDateTimeUnmarshalMarshal(t *testing.T) {
 
 	assert.Equal(t, []byte(data), []byte(byt))
 
+}
+
+func TestDateTimeMarshal(t *testing.T) {
+
+	tt := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
+	data := (json.RawMessage)(`"` + tt.Format(time.RFC3339Nano) + `"`)
+
+	d := &DateTime{}
+	(*d) = DateTime(tt)
+
+	byt, err := json.Marshal(d)
+
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	require.Equal(t, data, json.RawMessage(byt))
 }
 
 func TestBinaryUnmarshalMarshal(t *testing.T) {
