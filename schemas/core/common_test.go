@@ -44,7 +44,7 @@ func TestMetaValidation(t *testing.T) {
 }
 
 func TestCommonValidation(t *testing.T) {
-	c := NewCommon()
+	c := Common{}
 
 	fmt.Println(c)
 
@@ -55,7 +55,7 @@ func TestCommonValidation(t *testing.T) {
 	require.Len(t, errors, 2)
 
 	fields := []string{"Schemas", "ID"}
-	failtags := []string{"gt", "required"}
+	failtags := []string{"gt", "required", "excludes"}
 
 	for e, err := range errors.(validator.ValidationErrors) {
 		exp := "Common." + fields[e]
@@ -65,8 +65,15 @@ func TestCommonValidation(t *testing.T) {
 	}
 
 	c.Schemas = []string{"not-a-urn"}
-
 	errors = validation.Validator.StructExcept(c, "Meta")
+
+	c.ID = "bulkId"
+	errors = validation.Validator.StructExcept(c, "Meta")
+	require.NotNil(t, errors)
+
+	c.ID = "bulkID"
+	errors = validation.Validator.StructExcept(c, "Meta")
+	require.Nil(t, errors)
 
 	// (todo) > complete when urn validator will be done
 	fmt.Println(errors)
