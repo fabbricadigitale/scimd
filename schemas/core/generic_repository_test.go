@@ -51,4 +51,33 @@ func TestSchemaRepository(t *testing.T) {
 
 func TestResourceTypeRepository(t *testing.T) {
 	// (todo)
+
+	rType := GetResourceTypeRepository()
+
+	// Malformed JSON
+	_, err0 := rType.Add("testdata/malformed.json")
+	require.Error(t, err0)
+	// require.Empty(t, data0)
+
+	// Wrong path
+	_, err1 := rType.Add("WRONG/urt.json")
+	require.Error(t, err1)
+	// require.Empty(t, data1)
+
+	// Wrong structure
+	_, err2 := rType.Add("testdata/service_provider_config.json")
+	require.EqualError(t, err2, "missing identifier")
+	// require.Empty(t, data2)
+
+	data3, err3 := rType.Add("testdata/user.json")
+	require.NoError(t, err3)
+	require.Implements(t, (*Identifiable)(nil), data3)
+	require.IsType(t, ResourceType{}, data3)
+
+	key := "User"
+	rT := rType.Get(key)
+
+	require.Equal(t, rT.GetIdentifier(), key)
+
+	// (todo): test lock
 }
