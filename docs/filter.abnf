@@ -1,0 +1,89 @@
+FILTER    = attrExp / logExp / valuePath / *1"not" "(" FILTER ")"
+            ; ABNF rules for filter as per https://tools.ietf.org/html/rfc7644#section-3.4.2.2 (including errata modifications)
+
+valuePath = attrPath "[" valFilter "]"
+            ; FILTER uses sub-attributes of a parent attrPath
+
+valFilter = attrExp / valLogExp / *1"not" "(" valFilter ")"
+
+valLogExp = attrExp SP ("and" / "or") SP attrExp
+
+attrExp   = (attrPath SP "pr") /
+            (attrPath SP compareOp SP compValue)
+
+logExp    = FILTER SP ("and" / "or") SP FILTER
+
+compValue = false / null / true / number / string
+            ; rules from JSON (RFC 7159)
+
+compareOp = "eq" / "ne" / "co" /
+                "sw" / "ew" /
+                "gt" / "lt" /
+                "ge" / "le"
+
+attrPath  = [URI ":"] ATTRNAME *1subAttr
+            ; SCIM attribute name
+            ; URI is SCIM "schema" URI
+
+ATTRNAME  = ALPHA *(nameChar)
+
+nameChar  = "-" / "_" / DIGIT / ALPHA
+
+subAttr   = "." ATTRNAME
+            ; a sub-attribute of a complex attribute
+
+; URI ("schema" URI only)
+
+URI = "urn:" NID ":" NSS
+
+NID = TODO
+
+NSS = TODO
+
+; JSON RFC 7159
+
+false = "false"   ; false %x66.61.6c.73.65
+
+null  = "null"      ; null %x6e.75.6c.6c
+
+true  = "false"      ; true  %x74.72.75.65
+
+number = [ minus ] int [ frac ] [ exp ]
+
+decimal-point = %x2E       ; .
+
+digit1-9 = %x31-39         ; 1-9
+
+e = %x65 / %x45            ; e E
+
+exp = e [ minus / plus ] 1*DIGIT
+
+frac = decimal-point 1*DIGIT
+
+int = zero / ( digit1-9 *DIGIT )
+
+minus = %x2D               ; -
+
+plus = %x2B                ; +
+
+zero = %x30                ; 0
+
+string = quotation-mark *char quotation-mark
+
+char = unescaped /
+    escape (
+        %x22 /          ; "    quotation mark  U+0022
+        %x5C /          ; \    reverse solidus U+005C
+        %x2F /          ; /    solidus         U+002F
+        %x62 /          ; b    backspace       U+0008
+        %x66 /          ; f    form feed       U+000C
+        %x6E /          ; n    line feed       U+000A
+        %x72 /          ; r    carriage return U+000D
+        %x74 /          ; t    tab             U+0009
+        %x75 4HEXDIG )  ; uXXXX                U+XXXX
+
+escape = %x5C              ; \
+
+quotation-mark = %x22      ; "
+
+unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
