@@ -8,11 +8,13 @@ import (
 	"github.com/fabbricadigitale/scimd/schemas/core"
 )
 
+//ErrorURN error message urn
 const ErrorURN = "urn:ietf:params:scim:api:messages:2.0:Error"
 
+//Error is a struct for wrapping scim error
 type Error struct {
 	Schemas  []string `json:"schemas"`
-	Status   string   `json:"status"`
+	Status   string   `json:"status,required"`
 	ScimType string   `json:"scimType,omitempty"`
 	Detail   string   `json:"detail,omitempty"`
 }
