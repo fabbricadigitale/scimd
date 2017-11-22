@@ -1,5 +1,31 @@
 user eq "bjensen"
 eq eq true
-userName pr
+title pr
+pr pr
 emails.type ne true
 true eq true
+name.familyName co "O'Malley"
+userName sw "J"
+meta.lastModified gt "2011-05-13T04:42:34Z"
+meta.lastModified ge "2011-05-13T04:42:34Z"
+meta.lastModified lt "2011-05-13T04:42:34Z"
+meta.lastModified le "2011-05-13T04:42:34Z"
+title pr and userType eq "Employee"
+title pr or userType eq "Intern"
+a1 pr or a2 pr and a3 pr
+a2 pr and a3 pr or a1 pr
+emails[type eq "work" and value co "@example.com"] or ims[type eq "xmpp" and value co "@foo.com"]
+userType eq "Employee" and (emails co "example.com" or emails.value co "example.org")
+userType ne "Employee" and not (emails co "example.com" or emails.value co "example.org")
+userType eq "Employee" and emails[type eq "work" and value co "@example.com"]
+userType eq "Employee" and (emails.type eq "work")
+and pr and and pr
+and eq true or or eq "null" or and eq true and (and.or ne true)
+not (userName eq "strings")
+not(userName.Child eq "strings")
+(not eq "stringsss")
+not (not co "stringsss")
+emails[not (type sw null)]
+emails[not(type sw null)]
+emails[not (not co "")]
+emails[not(not co "")]
