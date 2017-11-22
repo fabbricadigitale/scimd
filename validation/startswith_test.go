@@ -1,7 +1,6 @@
 package validation
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -9,8 +8,8 @@ import (
 )
 
 type TestSW struct {
-	Text string `validate:"startswith=b"`
-	// Integer int    `validate:"startswith=b"`
+	Text    string `validate:"startswith=b"`
+	Integer int    `validate:"startswith=b"`
 }
 
 func TestStartswith(t *testing.T) {
@@ -21,7 +20,7 @@ func TestStartswith(t *testing.T) {
 
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Println("Panic recovered: ", r)
+			require.NotNil(t, r)
 		}
 	}()
 
@@ -42,4 +41,5 @@ func TestStartswith(t *testing.T) {
 		require.Equal(t, fields[e], err.Field())
 		require.Equal(t, failtags[e], err.ActualTag())
 	}
+
 }

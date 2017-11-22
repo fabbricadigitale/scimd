@@ -1,7 +1,6 @@
 package validation
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -9,8 +8,8 @@ import (
 )
 
 type TestEW struct {
-	Text    string `json:"text" validate:"endswith=r"`
-	Integer int    `json:"integer" validate:"endswith=r"`
+	Text    string `validate:"endswith=r"`
+	Integer int    `validate:"endswith=r"`
 }
 
 func TestEndswith(t *testing.T) {
@@ -21,7 +20,7 @@ func TestEndswith(t *testing.T) {
 
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Println("Panic recovered: ", r)
+			require.NotNil(t, r)
 		}
 	}()
 
