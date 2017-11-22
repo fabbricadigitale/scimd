@@ -19,9 +19,9 @@ func TestStartswith(t *testing.T) {
 	failtags := []string{"startswith", "startswith"}
 
 	defer func() {
-		if r := recover(); r != nil {
-			require.NotNil(t, r)
-		}
+		r := recover()
+		require.NotNil(t, r)
+		require.Equal(t, "Bad field type int", r)
 	}()
 
 	// Starts with
