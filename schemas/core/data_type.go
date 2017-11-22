@@ -139,14 +139,15 @@ func NewDataType(t string) (DataType, error) {
 	case ComplexType:
 		return &Complex{}, nil
 	}
-	return nil, &dataTypeError{"Invalid type"}
+	return nil, &DataTypeError{"Invalid type"}
 }
 
-type dataTypeError struct {
+// DataTypeError is a generic invalid type error
+type DataTypeError struct {
 	msg string
 }
 
-func (e *dataTypeError) Error() string {
+func (e *DataTypeError) Error() string {
 	return e.msg
 }
 
