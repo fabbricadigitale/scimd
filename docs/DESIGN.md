@@ -155,3 +155,32 @@ Finally, you need to know that:
 * it can hold data that may not be consistent with the schemas definition
 * JSON marshalling/unmarshalling will ignore extraneous attributes and will enforce Data Types according to schemas definition
 * to determinate the "state" of an attribute within `map`s use [Unassigned and Null](#unassigned-and-null-values) rules
+
+
+
+## Error handling
+
+In [RFC 7644](https://tools.ietf.org/html/rfc7644#section-3.12) are defined the following detail error types.
+
+| scimType | Description | Applicability | Status Code |
+|----------|-------------|---------------|-------------|
+| **invalidFilter** | The specified filter syntax was invalid or the specified attribute and filter comparison combination is not supported | GET, POST (Search), PATCH | 400 |
+| **invalidPath** | The "path" attribute was invalid or malformed  | PATCH | 400 |
+| **invalidSyntax** | The request body message is invalid or not conform to the request schema | POST (Search, Create and Bulk), PUT | 400 |
+| **invalidValue** | A required value was missing, or the value specified was not compatible with the operation or attribute type | GET, POST (Create, Query), PUT, PATCH | 400 |
+| **invalidVers** | The specified SCIM protocol version is not supported | ALL | 400 |
+| **mutability** | The attempted modification is not compatible with the target attribute's mutability or current state (modification of an "immutable" attribute with an existing value) | PUT, PATCH | 400 |
+| **noTarget** | The specified "path" did not yield an attribute or a valid attribute value. This occurs when the specified "path" value contains a filter that yields no match | PATCH | 400 |
+| **sensitive** | The request cannot be completed if it contains sensitive information | GET | 403 |
+| **tooMany** | The specified filter yields many more results than the server is willing to calculate or process | GET, POST (Search) | 400 |
+| **uniqueness** | One or more of the attribute values are already in use or are reserved | POST (Create), PUT, PATCH | 409 |
+
+Other errors with the related to status code
+
+| Status Code | Applicability | Description |
+|-------------|---------------|-------------|
+| 404 (Bad Request) | ALL | The request is unparsable, syntatically incorrect or violates schema |
+| 401 (Unauthorized) | ALL | Authorization failed. Authorization header is invalid or missing |
+| 403 (Forbidden) | ALL | Operation is not permitted based on the supplied authorization |
+| 404 (Not Found)| ALL | Specified Resource or Endpoint doesn't exist |
+
