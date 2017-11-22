@@ -22,5 +22,5 @@ func (l *TreeShapeListener) EnterEveryRule(ctx antlr.ParserRuleContext) {
 }
 
 func (s *TreeShapeListener) VisitErrorNode(node antlr.ErrorNode) {
-	fmt.Printf("error: %s\n", node.GetSymbol())
+	fmt.Printf("%s => \x1b[31;1merror\x1b[0m\n", node.GetSymbol())
 }
