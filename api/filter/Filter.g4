@@ -7,6 +7,13 @@ grammar Filter;
 }
 
 @parser::members {
+var debug = false
+
+func log(format string, a ...interface{}) {
+    if debug {
+        fmt.Printf(format + "\n", a...)
+    }
+}
 }
 
 root
@@ -15,6 +22,11 @@ root
 
 filter
         : attributeExpression
+        | LxFilter=filter LogicalOperator=AndOperator RxFilter=filter { log("%s => (%s) AND (%s)", $text, $LxFilter.text, $RxFilter.text); }
+        | LxFilter=filter LogicalOperator=OrOperator RxFilter=filter { log("%s => (%s) OR (%s)", $text, $LxFilter.text, $RxFilter.text); }
+        | valueExpression
+        | NotOperator filter ')'
+        | '(' filter ')'
         ;
 
 attributeExpression
@@ -24,6 +36,18 @@ attributeExpression
 
 attributePath
         : (Urn ':')? AttributeName ('.' SubAttributeName=AttributeName)?
+        ;
+
+valueExpression
+        : attributePath '[' valueFilter ']'
+        ;
+
+valueFilter
+        : attributeExpression
+        | LxAttributeExpression=attributeExpression LogicalOperator=AndOperator RxAttributeExpression=attributeExpression { log("%s => (%s) AND (%s)", $text, $LxAttributeExpression.text, $RxAttributeExpression.text); }
+        | LxAttributeExpression=attributeExpression LogicalOperator=OrOperator RxAttributeExpression=attributeExpression { log("%s => (%s) AND (%s)", $text, $LxAttributeExpression.text, $RxAttributeExpression.text); }
+        | NotOperator valueFilter ')'
+        | '(' valueFilter ')'
         ;
 
 /*
@@ -90,6 +114,19 @@ LeOperator
         : ' le'
         ;
 
+AndOperator
+        : ' and '
+        ;
+
+OrOperator
+        : ' or '
+        ;
+
+NotOperator
+        : 'not ('
+        | 'not('
+        ;
+
 fragment Alpha
         : 'a'..'z'
         | 'A'..'Z'
@@ -103,7 +140,6 @@ fragment Char
  * Part of the JSON grammar.
  * Source: "The Definitive ANTLR 4 Reference", Terence Parr
  */
-
 fragment STRING
    : '"' (ESC | ~ ["\\])* '"'
    ;
