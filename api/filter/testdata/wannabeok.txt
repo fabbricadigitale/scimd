@@ -1,4 +1,3 @@
-userName eq "bjensen"
 name.familyName co "O'Malley"
 userName sw "J"
 urn:ietf:params:scim:schemas:core:2.0:User:userName sw "J"

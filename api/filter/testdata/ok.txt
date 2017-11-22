@@ -1,0 +1,5 @@
+user eq "bjensen"
+eq eq true
+userName pr
+emails.type ne true
+true eq true
