@@ -40,6 +40,9 @@ type AttrExpr struct {
 }
 
 func (e AttrExpr) String() string {
+	if e.Op == "pr" {
+		return e.Path.String() + " " + e.Op
+	}
 	compValue, _ := json.Marshal(e.Value)
 	return e.Path.String() + " " + e.Op + " " + string(compValue)
 }
