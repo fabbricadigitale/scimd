@@ -175,7 +175,7 @@ In [RFC 7644](https://tools.ietf.org/html/rfc7644#section-3.12) are defined the 
 | **tooMany** | The specified filter yields many more results than the server is willing to calculate or process | GET, POST (Search) | 400 |
 | **uniqueness** | One or more of the attribute values are already in use or are reserved | POST (Create), PUT, PATCH | 409 |
 
-Other errors with the related to status code
+Other errors with the related status code
 
 | Status Code | Applicability | Description |
 |-------------|---------------|-------------|
@@ -183,4 +183,8 @@ Other errors with the related to status code
 | 401 (Unauthorized) | ALL | Authorization failed. Authorization header is invalid or missing |
 | 403 (Forbidden) | ALL | Operation is not permitted based on the supplied authorization |
 | 404 (Not Found)| ALL | Specified Resource or Endpoint doesn't exist |
-
+| 409 (Conflict) | POST, PUT, PATCH, DELETE | The specified version number does not match the resource's latest version number, or service provide refuse to create a new duplicate resource |
+| 412 (Preconditon Failed) | PUT, PATCH, DELETE | Resource has changed on the server |
+| 413 (Payload to large) | POST | {"maxOperations": 1000,"maxPayloadSize": 1048576} |
+| 500 (Internal error) | ALL | An Internal error |
+| 501 (Not Implemented) | ALL | Service provider doesn't support the request operation |
