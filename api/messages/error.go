@@ -25,6 +25,9 @@ func ErrorWrapper(e error) Error {
 	var scimError Error
 
 	switch e.(type) {
+	case *json.SyntaxError:
+		scimError.Status = string(http.StatusBadRequest)
+		scimError.ScimType = "invalidSyntax"
 	case *core.DataTypeError:
 		scimError.Status = string(http.StatusBadRequest)
 		scimError.ScimType = "invalidValue"
