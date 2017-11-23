@@ -12,4 +12,5 @@ func init() {
 	Validator.RegisterValidation("startswith", startsWith)
 	Validator.RegisterValidation("endswith", endsWith)
 	Validator.RegisterValidation("urn", urn)
+	Validator.RegisterValidation("attrname", attrName)
 }
