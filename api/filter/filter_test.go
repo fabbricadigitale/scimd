@@ -7,9 +7,11 @@ import (
 	"testing"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
+
+	"github.com/stretchr/testify/require"
 )
 
-func TestX(t *testing.T) {
+func TestParser(t *testing.T) {
 	inFile, _ := os.Open("testdata/ok.txt")
 	defer inFile.Close()
 	scanner := bufio.NewScanner(inFile)
@@ -38,8 +40,6 @@ func TestX(t *testing.T) {
 			fmt.Printf("%+v \t\t => %s\n", tkn, sym)
 		}
 
-		fmt.Println()
-
-		antlr.ParseTreeWalkerDefault.Walk(NewTreeShapeListener(), tree)
+		require.Equal(t, 2, tree.GetChildCount()) // filter <EOF>
 	}
 }
