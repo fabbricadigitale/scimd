@@ -25,16 +25,18 @@ const (
 	OpLessThan           = "lt"
 	OpGreaterOrEqualThan = "ge"
 	OpLessOrEqualThan    = "le"
+	OpPresent            = "pr"
 )
 
 var _ Filter = (*AttrExpr)(nil)
 var _ ValueFilter = (*AttrExpr)(nil)
 
 // AttrExpr is an attribute expression
+// When OpPresent is used, value should be nil
 type AttrExpr struct {
 	Path  attr.Path
-	Op    string
-	Value interface{}
+	Op    string      // Should be an Attribute Operator
+	Value interface{} // Type allowed: nil, bool, string, int64 or float64
 }
 
 func (e AttrExpr) String() string {
