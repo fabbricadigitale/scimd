@@ -27,9 +27,9 @@ func TestErrorWrapper(t *testing.T) {
 		Num string `json:"num"`
 	}
 	p := Prova{}
-	byt := []byte(`{"num": 13}`)
+	byt := `{"num": 13}`
 
-	err = json.Unmarshal(byt, &p)
+	err = json.Unmarshal([]byte(byt), &p)
 
 	require.Equal(t, Error{
 		Schemas:  append([]string{}, ErrorURN),
@@ -37,5 +37,32 @@ func TestErrorWrapper(t *testing.T) {
 		ScimType: "invalidValue",
 		Detail:   err.Error(),
 	}, ErrorWrapper(err))
+
+	// Error in json syntax
+	byt = `{num: 17}`
+
+	err = json.Unmarshal([]byte(byt), &p)
+
+	require.Equal(t, Error{
+		Schemas:  append([]string{}, ErrorURN),
+		Status:   string(http.StatusBadRequest),
+		ScimType: "invalidSyntax",
+		Detail:   err.Error(),
+	}, ErrorWrapper(err))
+
+	// ErrorWrapper returns a correct json format
+	e := ErrorWrapper(err)
+	byt2, _ := json.Marshal(e)
+
+	require.JSONEq(t, `{
+		"schemas":["urn:ietf:params:scim:api:messages:2.0:Error"],
+		"status":"Ɛ",
+		"scimType":"invalidSyntax",
+		"detail":"invalid character 'n' looking for beginning of object key string"
+		}`, string(byt2))
+
+	// todo InvalidPathError
+
+	// todo InvalidFilterError
 
 }
