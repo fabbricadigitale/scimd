@@ -10,8 +10,8 @@ import (
 // URIExpr is the source text used to compile a regular expression matching a SCIM "schema" URI
 const URIExpr = `urn:[A-Za-z0-9][A-Za-z0-9-]{0,31}:[A-Za-z0-9()+,\-.:=@;$_!*'%\/?#]+` // TODO double check, should match SCIM "schema" URI only?
 
-// AttrNameExpr is the source test used to compile a regular expression macching a SCIM attribute name
-const AttrNameExpr = `[A-Za-z][$-_0-9A-Za-z]*`
+// AttrNameExpr is the source text used to compile a regular expression macching a SCIM attribute name
+const AttrNameExpr = `[A-Za-z][\-$_0-9A-Za-z]*`
 
 // AttrNameRegexp is the compiled Regexp built from AttrNameExpr
 var AttrNameRegexp = regexp.MustCompile("^" + AttrNameExpr + "$")

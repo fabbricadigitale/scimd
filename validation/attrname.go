@@ -9,7 +9,7 @@ import (
 )
 
 // AttrNameExpr is the source text used to compile a regular expression macching a SCIM attribute name
-const AttrNameExpr = `[A-Za-z][$-_0-9A-Za-z]*`
+const AttrNameExpr = `[A-Za-z][\-$_0-9A-Za-z]*`
 
 // AttrNameRegexp is the compiled Regexp built from AttrNameExpr
 var AttrNameRegexp = regexp.MustCompile("^" + AttrNameExpr + "$")
