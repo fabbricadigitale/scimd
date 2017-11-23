@@ -33,15 +33,15 @@ attributePath
         ;
 
 valueExpression
-        : attributePath '[' valueFilter ']'
+        : Path=attributePath '[' InnerFilter=valueFilter ']'
         ;
 
 valueFilter
-        : AttributeExpr=attributeExpression
-        | Left=attributeExpression Op=AndOperator Right=attributeExpression
-        | Left=attributeExpression Op=OrOperator Right=attributeExpression
-        | NotOperator InnerFilter=valueFilter ')'
-        | '(' InnerFilter=valueFilter ')'
+        : AttributeExpr=attributeExpression # AttributeExprValueFilter
+        | Left=attributeExpression Op=AndOperator Right=attributeExpression # AndValueFilter
+        | Left=attributeExpression Op=OrOperator Right=attributeExpression # OrValueFilter
+        | NotOperator InnerFilter=valueFilter ')' # NotValueFilter
+        | '(' InnerFilter=valueFilter ')' # GroupValueFilter
         ;
 
 /*

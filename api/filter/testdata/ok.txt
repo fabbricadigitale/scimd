@@ -22,10 +22,7 @@ userType eq "Employee" and (emails.type eq "work")
 and pr and and pr
 and eq true or or eq "null" or and eq true and (and.or ne true)
 not (userName eq "strings")
-not(userName.Child eq "strings")
 (not eq "stringsss")
 not (not co "stringsss")
 emails[not (type sw null)]
-emails[not(type sw null)]
 emails[not (not co "")]
-emails[not(not co "")]

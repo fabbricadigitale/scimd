@@ -1,0 +1,3 @@
+not(userName.Child eq "strings")
+emails[not(type sw null)]
+emails[not(not co "")]
