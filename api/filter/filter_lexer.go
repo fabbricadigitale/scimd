@@ -1,4 +1,4 @@
-// Generated from /home/leodido/workspaces/go/src/github.com/fabbricadigitale/scimd/api/filter/Filter.g4 by ANTLR 4.6.
+// Generated from /Users/leogr/code/github.com/fabbricadigitale/scimd/api/filter/Filter.g4 by ANTLR 4.6.
 
 package filter
 import (

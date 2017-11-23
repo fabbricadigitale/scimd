@@ -1,4 +1,4 @@
-// Generated from /home/leodido/workspaces/go/src/github.com/fabbricadigitale/scimd/api/filter/Filter.g4 by ANTLR 4.6.
+// Generated from /Users/leogr/code/github.com/fabbricadigitale/scimd/api/filter/Filter.g4 by ANTLR 4.6.
 
 package filter // Filter
 import (
@@ -20,43 +20,41 @@ var _ = strconv.Itoa
 
 
 var parserATN = []uint16{
-	3, 1072, 54993, 33286, 44333, 17431, 44785, 36224, 43741, 3, 25, 92, 4, 
+	3, 1072, 54993, 33286, 44333, 17431, 44785, 36224, 43741, 3, 25, 86, 4, 
 	2, 9, 2, 4, 3, 9, 3, 4, 4, 9, 4, 4, 5, 9, 5, 4, 6, 9, 6, 4, 7, 9, 7, 3, 
 	2, 5, 2, 16, 10, 2, 3, 2, 3, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 5, 3, 31, 10, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 7, 3, 43, 10, 3, 12, 3, 14, 3, 46, 11, 
-	3, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 5, 4, 55, 10, 4, 3, 5, 3, 
-	5, 5, 5, 59, 10, 5, 3, 5, 3, 5, 3, 5, 5, 5, 64, 10, 5, 3, 6, 3, 6, 3, 6, 
-	3, 6, 3, 6, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 
-	3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 5, 7, 90, 10, 7, 
-	3, 7, 2, 3, 4, 8, 2, 4, 6, 8, 10, 12, 2, 3, 3, 2, 14, 22, 98, 2, 15, 3, 
-	2, 2, 2, 4, 30, 3, 2, 2, 2, 6, 54, 3, 2, 2, 2, 8, 58, 3, 2, 2, 2, 10, 65, 
-	3, 2, 2, 2, 12, 89, 3, 2, 2, 2, 14, 16, 5, 4, 3, 2, 15, 14, 3, 2, 2, 2, 
-	15, 16, 3, 2, 2, 2, 16, 17, 3, 2, 2, 2, 17, 18, 7, 2, 2, 3, 18, 3, 3, 2, 
-	2, 2, 19, 20, 8, 3, 1, 2, 20, 31, 5, 6, 4, 2, 21, 31, 5, 10, 6, 2, 22, 
-	23, 7, 25, 2, 2, 23, 24, 5, 4, 3, 2, 24, 25, 7, 3, 2, 2, 25, 31, 3, 2, 
-	2, 2, 26, 27, 7, 4, 2, 2, 27, 28, 5, 4, 3, 2, 28, 29, 7, 3, 2, 2, 29, 31, 
-	3, 2, 2, 2, 30, 19, 3, 2, 2, 2, 30, 21, 3, 2, 2, 2, 30, 22, 3, 2, 2, 2, 
-	30, 26, 3, 2, 2, 2, 31, 44, 3, 2, 2, 2, 32, 33, 12, 7, 2, 2, 33, 34, 7, 
-	23, 2, 2, 34, 35, 5, 4, 3, 8, 35, 36, 8, 3, 1, 2, 36, 43, 3, 2, 2, 2, 37, 
-	38, 12, 6, 2, 2, 38, 39, 7, 24, 2, 2, 39, 40, 5, 4, 3, 7, 40, 41, 8, 3, 
-	1, 2, 41, 43, 3, 2, 2, 2, 42, 32, 3, 2, 2, 2, 42, 37, 3, 2, 2, 2, 43, 46, 
-	3, 2, 2, 2, 44, 42, 3, 2, 2, 2, 44, 45, 3, 2, 2, 2, 45, 5, 3, 2, 2, 2, 
-	46, 44, 3, 2, 2, 2, 47, 48, 5, 8, 5, 2, 48, 49, 7, 13, 2, 2, 49, 55, 3, 
-	2, 2, 2, 50, 51, 5, 8, 5, 2, 51, 52, 9, 2, 2, 2, 52, 53, 7, 11, 2, 2, 53, 
-	55, 3, 2, 2, 2, 54, 47, 3, 2, 2, 2, 54, 50, 3, 2, 2, 2, 55, 7, 3, 2, 2, 
-	2, 56, 57, 7, 10, 2, 2, 57, 59, 7, 5, 2, 2, 58, 56, 3, 2, 2, 2, 58, 59, 
-	3, 2, 2, 2, 59, 60, 3, 2, 2, 2, 60, 63, 7, 9, 2, 2, 61, 62, 7, 6, 2, 2, 
-	62, 64, 7, 9, 2, 2, 63, 61, 3, 2, 2, 2, 63, 64, 3, 2, 2, 2, 64, 9, 3, 2, 
-	2, 2, 65, 66, 5, 8, 5, 2, 66, 67, 7, 7, 2, 2, 67, 68, 5, 12, 7, 2, 68, 
-	69, 7, 8, 2, 2, 69, 11, 3, 2, 2, 2, 70, 90, 5, 6, 4, 2, 71, 72, 5, 6, 4, 
-	2, 72, 73, 7, 23, 2, 2, 73, 74, 5, 6, 4, 2, 74, 75, 8, 7, 1, 2, 75, 90, 
-	3, 2, 2, 2, 76, 77, 5, 6, 4, 2, 77, 78, 7, 24, 2, 2, 78, 79, 5, 6, 4, 2, 
-	79, 80, 8, 7, 1, 2, 80, 90, 3, 2, 2, 2, 81, 82, 7, 25, 2, 2, 82, 83, 5, 
-	12, 7, 2, 83, 84, 7, 3, 2, 2, 84, 90, 3, 2, 2, 2, 85, 86, 7, 4, 2, 2, 86, 
-	87, 5, 12, 7, 2, 87, 88, 7, 3, 2, 2, 88, 90, 3, 2, 2, 2, 89, 70, 3, 2, 
-	2, 2, 89, 71, 3, 2, 2, 2, 89, 76, 3, 2, 2, 2, 89, 81, 3, 2, 2, 2, 89, 85, 
-	3, 2, 2, 2, 90, 13, 3, 2, 2, 2, 10, 15, 30, 42, 44, 54, 58, 63, 89,
+	3, 3, 3, 7, 3, 39, 10, 3, 12, 3, 14, 3, 42, 11, 3, 3, 4, 3, 4, 3, 4, 3, 
+	4, 3, 4, 3, 4, 3, 4, 5, 4, 51, 10, 4, 3, 5, 3, 5, 5, 5, 55, 10, 5, 3, 5, 
+	3, 5, 3, 5, 5, 5, 60, 10, 5, 3, 6, 3, 6, 3, 6, 3, 6, 3, 6, 3, 7, 3, 7, 
+	3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 
+	3, 7, 3, 7, 3, 7, 5, 7, 84, 10, 7, 3, 7, 2, 3, 4, 8, 2, 4, 6, 8, 10, 12, 
+	2, 3, 3, 2, 14, 22, 92, 2, 15, 3, 2, 2, 2, 4, 30, 3, 2, 2, 2, 6, 50, 3, 
+	2, 2, 2, 8, 54, 3, 2, 2, 2, 10, 61, 3, 2, 2, 2, 12, 83, 3, 2, 2, 2, 14, 
+	16, 5, 4, 3, 2, 15, 14, 3, 2, 2, 2, 15, 16, 3, 2, 2, 2, 16, 17, 3, 2, 2, 
+	2, 17, 18, 7, 2, 2, 3, 18, 3, 3, 2, 2, 2, 19, 20, 8, 3, 1, 2, 20, 31, 5, 
+	6, 4, 2, 21, 31, 5, 10, 6, 2, 22, 23, 7, 25, 2, 2, 23, 24, 5, 4, 3, 2, 
+	24, 25, 7, 3, 2, 2, 25, 31, 3, 2, 2, 2, 26, 27, 7, 4, 2, 2, 27, 28, 5, 
+	4, 3, 2, 28, 29, 7, 3, 2, 2, 29, 31, 3, 2, 2, 2, 30, 19, 3, 2, 2, 2, 30, 
+	21, 3, 2, 2, 2, 30, 22, 3, 2, 2, 2, 30, 26, 3, 2, 2, 2, 31, 40, 3, 2, 2, 
+	2, 32, 33, 12, 7, 2, 2, 33, 34, 7, 23, 2, 2, 34, 39, 5, 4, 3, 8, 35, 36, 
+	12, 6, 2, 2, 36, 37, 7, 24, 2, 2, 37, 39, 5, 4, 3, 7, 38, 32, 3, 2, 2, 
+	2, 38, 35, 3, 2, 2, 2, 39, 42, 3, 2, 2, 2, 40, 38, 3, 2, 2, 2, 40, 41, 
+	3, 2, 2, 2, 41, 5, 3, 2, 2, 2, 42, 40, 3, 2, 2, 2, 43, 44, 5, 8, 5, 2, 
+	44, 45, 7, 13, 2, 2, 45, 51, 3, 2, 2, 2, 46, 47, 5, 8, 5, 2, 47, 48, 9, 
+	2, 2, 2, 48, 49, 7, 11, 2, 2, 49, 51, 3, 2, 2, 2, 50, 43, 3, 2, 2, 2, 50, 
+	46, 3, 2, 2, 2, 51, 7, 3, 2, 2, 2, 52, 53, 7, 10, 2, 2, 53, 55, 7, 5, 2, 
+	2, 54, 52, 3, 2, 2, 2, 54, 55, 3, 2, 2, 2, 55, 56, 3, 2, 2, 2, 56, 59, 
+	7, 9, 2, 2, 57, 58, 7, 6, 2, 2, 58, 60, 7, 9, 2, 2, 59, 57, 3, 2, 2, 2, 
+	59, 60, 3, 2, 2, 2, 60, 9, 3, 2, 2, 2, 61, 62, 5, 8, 5, 2, 62, 63, 7, 7, 
+	2, 2, 63, 64, 5, 12, 7, 2, 64, 65, 7, 8, 2, 2, 65, 11, 3, 2, 2, 2, 66, 
+	84, 5, 6, 4, 2, 67, 68, 5, 6, 4, 2, 68, 69, 7, 23, 2, 2, 69, 70, 5, 6, 
+	4, 2, 70, 84, 3, 2, 2, 2, 71, 72, 5, 6, 4, 2, 72, 73, 7, 24, 2, 2, 73, 
+	74, 5, 6, 4, 2, 74, 84, 3, 2, 2, 2, 75, 76, 7, 25, 2, 2, 76, 77, 5, 12, 
+	7, 2, 77, 78, 7, 3, 2, 2, 78, 84, 3, 2, 2, 2, 79, 80, 7, 4, 2, 2, 80, 81, 
+	5, 12, 7, 2, 81, 82, 7, 3, 2, 2, 82, 84, 3, 2, 2, 2, 83, 66, 3, 2, 2, 2, 
+	83, 67, 3, 2, 2, 2, 83, 71, 3, 2, 2, 2, 83, 75, 3, 2, 2, 2, 83, 79, 3, 
+	2, 2, 2, 84, 13, 3, 2, 2, 2, 10, 15, 30, 38, 40, 50, 54, 59, 83,
 }
 
 var deserializer = antlr.NewATNDeserializer(nil)
@@ -107,13 +105,7 @@ func NewFilterParser(input antlr.TokenStream) *FilterParser {
 }
 
 
-var debug = false
 
-func log(format string, a ...interface{}) {
-    if debug {
-        fmt.Printf(format + "\n", a...)
-    }
-}
 
 
 
@@ -216,19 +208,6 @@ func (s *RootContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) s
 }
 
 
-func (s *RootContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(FilterListener); ok {
-		listenerT.EnterRoot(s)
-	}
-}
-
-func (s *RootContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(FilterListener); ok {
-		listenerT.ExitRoot(s)
-	}
-}
-
-
 
 
 func (p *FilterParser) Root() (localctx IRootContext) {
@@ -284,28 +263,6 @@ type IFilterContext interface {
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
-	// GetLogicalOperator returns the LogicalOperator token.
-	GetLogicalOperator() antlr.Token 
-
-
-	// SetLogicalOperator sets the LogicalOperator token.
-	SetLogicalOperator(antlr.Token) 
-
-
-	// GetLxFilter returns the LxFilter rule contexts.
-	GetLxFilter() IFilterContext
-
-	// GetRxFilter returns the RxFilter rule contexts.
-	GetRxFilter() IFilterContext
-
-
-	// SetLxFilter sets the LxFilter rule contexts.
-	SetLxFilter(IFilterContext)
-
-	// SetRxFilter sets the RxFilter rule contexts.
-	SetRxFilter(IFilterContext)
-
-
 	// IsFilterContext differentiates from other interfaces.
 	IsFilterContext()
 }
@@ -313,9 +270,6 @@ type IFilterContext interface {
 type FilterContext struct {
 	*antlr.BaseParserRuleContext
 	parser antlr.Parser
-	LxFilter IFilterContext 
-	LogicalOperator antlr.Token
-	RxFilter IFilterContext 
 }
 
 func NewEmptyFilterContext() *FilterContext {
@@ -340,47 +294,57 @@ func NewFilterContext(parser antlr.Parser, parent antlr.ParserRuleContext, invok
 
 func (s *FilterContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *FilterContext) GetLogicalOperator() antlr.Token { return s.LogicalOperator }
-
-
-func (s *FilterContext) SetLogicalOperator(v antlr.Token) { s.LogicalOperator = v }
-
-
-func (s *FilterContext) GetLxFilter() IFilterContext { return s.LxFilter }
-
-func (s *FilterContext) GetRxFilter() IFilterContext { return s.RxFilter }
-
-
-func (s *FilterContext) SetLxFilter(v IFilterContext) { s.LxFilter = v }
-
-func (s *FilterContext) SetRxFilter(v IFilterContext) { s.RxFilter = v }
-
-
-func (s *FilterContext) AttributeExpression() IAttributeExpressionContext {
-	var t = s.GetTypedRuleContext(reflect.TypeOf((*IAttributeExpressionContext)(nil)).Elem(), 0)
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IAttributeExpressionContext)
+func (s *FilterContext) CopyFrom(ctx *FilterContext) {
+	s.BaseParserRuleContext.CopyFrom(ctx.BaseParserRuleContext)
 }
 
-func (s *FilterContext) ValueExpression() IValueExpressionContext {
-	var t = s.GetTypedRuleContext(reflect.TypeOf((*IValueExpressionContext)(nil)).Elem(), 0)
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IValueExpressionContext)
+func (s *FilterContext) GetRuleContext() antlr.RuleContext {
+	return s
 }
 
-func (s *FilterContext) NotOperator() antlr.TerminalNode {
-	return s.GetToken(FilterParserNotOperator, 0)
+func (s *FilterContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-func (s *FilterContext) AllFilter() []IFilterContext {
+
+
+
+
+type AndFilterContext struct {
+	*FilterContext
+	Left IFilterContext 
+	Right IFilterContext 
+}
+
+func NewAndFilterContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *AndFilterContext {
+	var p = new(AndFilterContext)
+
+	p.FilterContext = NewEmptyFilterContext()
+	p.parser = parser
+	p.CopyFrom(ctx.(*FilterContext))
+
+	return p
+}
+
+
+func (s *AndFilterContext) GetLeft() IFilterContext { return s.Left }
+
+func (s *AndFilterContext) GetRight() IFilterContext { return s.Right }
+
+
+func (s *AndFilterContext) SetLeft(v IFilterContext) { s.Left = v }
+
+func (s *AndFilterContext) SetRight(v IFilterContext) { s.Right = v }
+
+func (s *AndFilterContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *AndFilterContext) AndOperator() antlr.TerminalNode {
+	return s.GetToken(FilterParserAndOperator, 0)
+}
+
+func (s *AndFilterContext) AllFilter() []IFilterContext {
 	var ts = s.GetTypedRuleContexts(reflect.TypeOf((*IFilterContext)(nil)).Elem())
 	var tst = make([]IFilterContext, len(ts))
 
@@ -393,7 +357,7 @@ func (s *FilterContext) AllFilter() []IFilterContext {
 	return tst
 }
 
-func (s *FilterContext) Filter(i int) IFilterContext {
+func (s *AndFilterContext) Filter(i int) IFilterContext {
 	var t = s.GetTypedRuleContext(reflect.TypeOf((*IFilterContext)(nil)).Elem(), i)
 
 	if t == nil {
@@ -403,35 +367,216 @@ func (s *FilterContext) Filter(i int) IFilterContext {
 	return t.(IFilterContext)
 }
 
-func (s *FilterContext) AndOperator() antlr.TerminalNode {
-	return s.GetToken(FilterParserAndOperator, 0)
+
+
+type ValueExprFilterContext struct {
+	*FilterContext
+	ValueExpr IValueExpressionContext 
 }
 
-func (s *FilterContext) OrOperator() antlr.TerminalNode {
-	return s.GetToken(FilterParserOrOperator, 0)
+func NewValueExprFilterContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *ValueExprFilterContext {
+	var p = new(ValueExprFilterContext)
+
+	p.FilterContext = NewEmptyFilterContext()
+	p.parser = parser
+	p.CopyFrom(ctx.(*FilterContext))
+
+	return p
 }
 
-func (s *FilterContext) GetRuleContext() antlr.RuleContext {
+
+func (s *ValueExprFilterContext) GetValueExpr() IValueExpressionContext { return s.ValueExpr }
+
+
+func (s *ValueExprFilterContext) SetValueExpr(v IValueExpressionContext) { s.ValueExpr = v }
+
+func (s *ValueExprFilterContext) GetRuleContext() antlr.RuleContext {
 	return s
 }
 
-func (s *FilterContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
-	return antlr.TreesStringTree(s, ruleNames, recog)
-}
+func (s *ValueExprFilterContext) ValueExpression() IValueExpressionContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IValueExpressionContext)(nil)).Elem(), 0)
 
-
-func (s *FilterContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(FilterListener); ok {
-		listenerT.EnterFilter(s)
+	if t == nil {
+		return nil
 	}
+
+	return t.(IValueExpressionContext)
 }
 
-func (s *FilterContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(FilterListener); ok {
-		listenerT.ExitFilter(s)
+
+
+type NotFilterContext struct {
+	*FilterContext
+	InnerFilter IFilterContext 
+}
+
+func NewNotFilterContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *NotFilterContext {
+	var p = new(NotFilterContext)
+
+	p.FilterContext = NewEmptyFilterContext()
+	p.parser = parser
+	p.CopyFrom(ctx.(*FilterContext))
+
+	return p
+}
+
+
+func (s *NotFilterContext) GetInnerFilter() IFilterContext { return s.InnerFilter }
+
+
+func (s *NotFilterContext) SetInnerFilter(v IFilterContext) { s.InnerFilter = v }
+
+func (s *NotFilterContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *NotFilterContext) NotOperator() antlr.TerminalNode {
+	return s.GetToken(FilterParserNotOperator, 0)
+}
+
+func (s *NotFilterContext) Filter() IFilterContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IFilterContext)(nil)).Elem(), 0)
+
+	if t == nil {
+		return nil
 	}
+
+	return t.(IFilterContext)
 }
 
+
+
+type GroupFilterContext struct {
+	*FilterContext
+	InnerFilter IFilterContext 
+}
+
+func NewGroupFilterContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *GroupFilterContext {
+	var p = new(GroupFilterContext)
+
+	p.FilterContext = NewEmptyFilterContext()
+	p.parser = parser
+	p.CopyFrom(ctx.(*FilterContext))
+
+	return p
+}
+
+
+func (s *GroupFilterContext) GetInnerFilter() IFilterContext { return s.InnerFilter }
+
+
+func (s *GroupFilterContext) SetInnerFilter(v IFilterContext) { s.InnerFilter = v }
+
+func (s *GroupFilterContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *GroupFilterContext) Filter() IFilterContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IFilterContext)(nil)).Elem(), 0)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IFilterContext)
+}
+
+
+
+type AttributeExprFilterContext struct {
+	*FilterContext
+	AttributeExpr IAttributeExpressionContext 
+}
+
+func NewAttributeExprFilterContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *AttributeExprFilterContext {
+	var p = new(AttributeExprFilterContext)
+
+	p.FilterContext = NewEmptyFilterContext()
+	p.parser = parser
+	p.CopyFrom(ctx.(*FilterContext))
+
+	return p
+}
+
+
+func (s *AttributeExprFilterContext) GetAttributeExpr() IAttributeExpressionContext { return s.AttributeExpr }
+
+
+func (s *AttributeExprFilterContext) SetAttributeExpr(v IAttributeExpressionContext) { s.AttributeExpr = v }
+
+func (s *AttributeExprFilterContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *AttributeExprFilterContext) AttributeExpression() IAttributeExpressionContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IAttributeExpressionContext)(nil)).Elem(), 0)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IAttributeExpressionContext)
+}
+
+
+
+type OrFilterContext struct {
+	*FilterContext
+	Left IFilterContext 
+	Right IFilterContext 
+}
+
+func NewOrFilterContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *OrFilterContext {
+	var p = new(OrFilterContext)
+
+	p.FilterContext = NewEmptyFilterContext()
+	p.parser = parser
+	p.CopyFrom(ctx.(*FilterContext))
+
+	return p
+}
+
+
+func (s *OrFilterContext) GetLeft() IFilterContext { return s.Left }
+
+func (s *OrFilterContext) GetRight() IFilterContext { return s.Right }
+
+
+func (s *OrFilterContext) SetLeft(v IFilterContext) { s.Left = v }
+
+func (s *OrFilterContext) SetRight(v IFilterContext) { s.Right = v }
+
+func (s *OrFilterContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *OrFilterContext) OrOperator() antlr.TerminalNode {
+	return s.GetToken(FilterParserOrOperator, 0)
+}
+
+func (s *OrFilterContext) AllFilter() []IFilterContext {
+	var ts = s.GetTypedRuleContexts(reflect.TypeOf((*IFilterContext)(nil)).Elem())
+	var tst = make([]IFilterContext, len(ts))
+
+	for i, t := range ts {
+		if t != nil {
+			tst[i] = t.(IFilterContext)
+		}
+	}
+
+	return tst
+}
+
+func (s *OrFilterContext) Filter(i int) IFilterContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IFilterContext)(nil)).Elem(), i)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IFilterContext)
+}
 
 
 
@@ -472,27 +617,48 @@ func (p *FilterParser) filter(_p int) (localctx IFilterContext) {
 	p.GetErrorHandler().Sync(p)
 	switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 1, p.GetParserRuleContext()) {
 	case 1:
+		localctx = NewAttributeExprFilterContext(p, localctx)
+		p.SetParserRuleContext(localctx)
+		_prevctx = localctx
+
 		{
 			p.SetState(18)
-			p.AttributeExpression()
+
+			var _x = p.AttributeExpression()
+
+
+			localctx.(*AttributeExprFilterContext).AttributeExpr = _x
 		}
 
 
 	case 2:
+		localctx = NewValueExprFilterContext(p, localctx)
+		p.SetParserRuleContext(localctx)
+		_prevctx = localctx
 		{
 			p.SetState(19)
-			p.ValueExpression()
+
+			var _x = p.ValueExpression()
+
+
+			localctx.(*ValueExprFilterContext).ValueExpr = _x
 		}
 
 
 	case 3:
+		localctx = NewNotFilterContext(p, localctx)
+		p.SetParserRuleContext(localctx)
+		_prevctx = localctx
 		{
 			p.SetState(20)
 			p.Match(FilterParserNotOperator)
 		}
 		{
 			p.SetState(21)
-			p.filter(0)
+
+			var _x = p.filter(0)
+
+			localctx.(*NotFilterContext).InnerFilter = _x
 		}
 		{
 			p.SetState(22)
@@ -501,13 +667,19 @@ func (p *FilterParser) filter(_p int) (localctx IFilterContext) {
 
 
 	case 4:
+		localctx = NewGroupFilterContext(p, localctx)
+		p.SetParserRuleContext(localctx)
+		_prevctx = localctx
 		{
 			p.SetState(24)
 			p.Match(FilterParserT__1)
 		}
 		{
 			p.SetState(25)
-			p.filter(0)
+
+			var _x = p.filter(0)
+
+			localctx.(*GroupFilterContext).InnerFilter = _x
 		}
 		{
 			p.SetState(26)
@@ -516,7 +688,7 @@ func (p *FilterParser) filter(_p int) (localctx IFilterContext) {
 
 	}
 	p.GetParserRuleContext().SetStop(p.GetTokenStream().LT(-1))
-	p.SetState(42)
+	p.SetState(38)
 	p.GetErrorHandler().Sync(p)
 	_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 3, p.GetParserRuleContext())
 
@@ -526,12 +698,14 @@ func (p *FilterParser) filter(_p int) (localctx IFilterContext) {
 				p.TriggerExitRuleEvent()
 			}
 			_prevctx = localctx
-			p.SetState(40)
+			p.SetState(36)
 			p.GetErrorHandler().Sync(p)
 			switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 2, p.GetParserRuleContext()) {
 			case 1:
-				localctx = NewFilterContext(p, _parentctx, _parentState)
-				localctx.(*FilterContext).LxFilter = _prevctx
+				localctx = NewAndFilterContext(p, NewFilterContext(p, _parentctx, _parentState))
+				localctx.(*AndFilterContext).Left = _prevctx
+
+
 				p.PushNewRecursionContext(localctx, _startState, FilterParserRULE_filter)
 				p.SetState(30)
 
@@ -540,50 +714,44 @@ func (p *FilterParser) filter(_p int) (localctx IFilterContext) {
 				}
 				{
 					p.SetState(31)
-
-					var _m = p.Match(FilterParserAndOperator)
-
-					localctx.(*FilterContext).LogicalOperator = _m
+					p.Match(FilterParserAndOperator)
 				}
 				{
 					p.SetState(32)
 
 					var _x = p.filter(6)
 
-					localctx.(*FilterContext).RxFilter = _x
+					localctx.(*AndFilterContext).Right = _x
 				}
-				 log("%s => (%s) AND (%s)", p.GetTokenStream().GetTextFromTokens(localctx.GetStart(), p.GetTokenStream().LT(-1)), (func() string { if localctx.(*FilterContext).GetLxFilter() == nil { return "" } else { return p.GetTokenStream().GetTextFromTokens(localctx.(*FilterContext).GetLxFilter().GetStart(), localctx.(*FilterContext).LxFilter.GetStop()) }}()), (func() string { if localctx.(*FilterContext).GetRxFilter() == nil { return "" } else { return p.GetTokenStream().GetTextFromTokens(localctx.(*FilterContext).GetRxFilter().GetStart(), localctx.(*FilterContext).RxFilter.GetStop()) }}())); 
 
 
 			case 2:
-				localctx = NewFilterContext(p, _parentctx, _parentState)
-				localctx.(*FilterContext).LxFilter = _prevctx
+				localctx = NewOrFilterContext(p, NewFilterContext(p, _parentctx, _parentState))
+				localctx.(*OrFilterContext).Left = _prevctx
+
+
 				p.PushNewRecursionContext(localctx, _startState, FilterParserRULE_filter)
-				p.SetState(35)
+				p.SetState(33)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 4)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 4)", ""))
 				}
 				{
-					p.SetState(36)
-
-					var _m = p.Match(FilterParserOrOperator)
-
-					localctx.(*FilterContext).LogicalOperator = _m
+					p.SetState(34)
+					p.Match(FilterParserOrOperator)
 				}
 				{
-					p.SetState(37)
+					p.SetState(35)
 
 					var _x = p.filter(5)
 
-					localctx.(*FilterContext).RxFilter = _x
+					localctx.(*OrFilterContext).Right = _x
 				}
-				 log("%s => (%s) OR (%s)", p.GetTokenStream().GetTextFromTokens(localctx.GetStart(), p.GetTokenStream().LT(-1)), (func() string { if localctx.(*FilterContext).GetLxFilter() == nil { return "" } else { return p.GetTokenStream().GetTextFromTokens(localctx.(*FilterContext).GetLxFilter().GetStart(), localctx.(*FilterContext).LxFilter.GetStop()) }}()), (func() string { if localctx.(*FilterContext).GetRxFilter() == nil { return "" } else { return p.GetTokenStream().GetTextFromTokens(localctx.(*FilterContext).GetRxFilter().GetStart(), localctx.(*FilterContext).RxFilter.GetStop()) }}())); 
 
 			}
 
 		}
-		p.SetState(44)
+		p.SetState(40)
 		p.GetErrorHandler().Sync(p)
 		_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 3, p.GetParserRuleContext())
 	}
@@ -601,12 +769,26 @@ type IAttributeExpressionContext interface {
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
-	// GetComparisonOperator returns the ComparisonOperator token.
-	GetComparisonOperator() antlr.Token 
+	// GetOp returns the Op token.
+	GetOp() antlr.Token 
+
+	// GetValue returns the Value token.
+	GetValue() antlr.Token 
 
 
-	// SetComparisonOperator sets the ComparisonOperator token.
-	SetComparisonOperator(antlr.Token) 
+	// SetOp sets the Op token.
+	SetOp(antlr.Token) 
+
+	// SetValue sets the Value token.
+	SetValue(antlr.Token) 
+
+
+	// GetPath returns the Path rule contexts.
+	GetPath() IAttributePathContext
+
+
+	// SetPath sets the Path rule contexts.
+	SetPath(IAttributePathContext)
 
 
 	// IsAttributeExpressionContext differentiates from other interfaces.
@@ -616,7 +798,9 @@ type IAttributeExpressionContext interface {
 type AttributeExpressionContext struct {
 	*antlr.BaseParserRuleContext
 	parser antlr.Parser
-	ComparisonOperator antlr.Token
+	Path IAttributePathContext 
+	Op antlr.Token
+	Value antlr.Token
 }
 
 func NewEmptyAttributeExpressionContext() *AttributeExpressionContext {
@@ -641,10 +825,20 @@ func NewAttributeExpressionContext(parser antlr.Parser, parent antlr.ParserRuleC
 
 func (s *AttributeExpressionContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *AttributeExpressionContext) GetComparisonOperator() antlr.Token { return s.ComparisonOperator }
+func (s *AttributeExpressionContext) GetOp() antlr.Token { return s.Op }
+
+func (s *AttributeExpressionContext) GetValue() antlr.Token { return s.Value }
 
 
-func (s *AttributeExpressionContext) SetComparisonOperator(v antlr.Token) { s.ComparisonOperator = v }
+func (s *AttributeExpressionContext) SetOp(v antlr.Token) { s.Op = v }
+
+func (s *AttributeExpressionContext) SetValue(v antlr.Token) { s.Value = v }
+
+
+func (s *AttributeExpressionContext) GetPath() IAttributePathContext { return s.Path }
+
+
+func (s *AttributeExpressionContext) SetPath(v IAttributePathContext) { s.Path = v }
 
 
 func (s *AttributeExpressionContext) AttributePath() IAttributePathContext {
@@ -710,19 +904,6 @@ func (s *AttributeExpressionContext) ToStringTree(ruleNames []string, recog antl
 }
 
 
-func (s *AttributeExpressionContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(FilterListener); ok {
-		listenerT.EnterAttributeExpression(s)
-	}
-}
-
-func (s *AttributeExpressionContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(FilterListener); ok {
-		listenerT.ExitAttributeExpression(s)
-	}
-}
-
-
 
 
 func (p *FilterParser) AttributeExpression() (localctx IAttributeExpressionContext) {
@@ -747,46 +928,60 @@ func (p *FilterParser) AttributeExpression() (localctx IAttributeExpressionConte
 		}
 	}()
 
-	p.SetState(52)
+	p.SetState(48)
 	p.GetErrorHandler().Sync(p)
 	switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 4, p.GetParserRuleContext()) {
 	case 1:
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(45)
-			p.AttributePath()
+			p.SetState(41)
+
+			var _x = p.AttributePath()
+
+
+			localctx.(*AttributeExpressionContext).Path = _x
 		}
 		{
-			p.SetState(46)
-			p.Match(FilterParserPrOperator)
+			p.SetState(42)
+
+			var _m = p.Match(FilterParserPrOperator)
+
+			localctx.(*AttributeExpressionContext).Op = _m
 		}
 
 
 	case 2:
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(48)
-			p.AttributePath()
+			p.SetState(44)
+
+			var _x = p.AttributePath()
+
+
+			localctx.(*AttributeExpressionContext).Path = _x
 		}
-		p.SetState(49)
+		p.SetState(45)
 
 		var _lt = p.GetTokenStream().LT(1)
 
-		localctx.(*AttributeExpressionContext).ComparisonOperator = _lt
+		localctx.(*AttributeExpressionContext).Op = _lt
 
 		_la = p.GetTokenStream().LA(1)
 
 		if !((((_la) & -(0x1f+1)) == 0 && ((1 << uint(_la)) & ((1 << FilterParserEqOperator) | (1 << FilterParserNeOperator) | (1 << FilterParserCoOperator) | (1 << FilterParserSwOperator) | (1 << FilterParserEwOperator) | (1 << FilterParserGtOperator) | (1 << FilterParserGeOperator) | (1 << FilterParserLtOperator) | (1 << FilterParserLeOperator))) != 0)) {
 			var _ri = p.GetErrorHandler().RecoverInline(p)
 
-			localctx.(*AttributeExpressionContext).ComparisonOperator = _ri
+			localctx.(*AttributeExpressionContext).Op = _ri
 		} else {
 		    p.GetErrorHandler().ReportMatch(p)
 			p.Consume()
 		}
 		{
-			p.SetState(50)
-			p.Match(FilterParserComparisonValue)
+			p.SetState(46)
+
+			var _m = p.Match(FilterParserComparisonValue)
+
+			localctx.(*AttributeExpressionContext).Value = _m
 		}
 
 	}
@@ -803,12 +998,24 @@ type IAttributePathContext interface {
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
-	// GetSubAttributeName returns the SubAttributeName token.
-	GetSubAttributeName() antlr.Token 
+	// GetURI returns the URI token.
+	GetURI() antlr.Token 
+
+	// GetName returns the Name token.
+	GetName() antlr.Token 
+
+	// GetSub returns the Sub token.
+	GetSub() antlr.Token 
 
 
-	// SetSubAttributeName sets the SubAttributeName token.
-	SetSubAttributeName(antlr.Token) 
+	// SetURI sets the URI token.
+	SetURI(antlr.Token) 
+
+	// SetName sets the Name token.
+	SetName(antlr.Token) 
+
+	// SetSub sets the Sub token.
+	SetSub(antlr.Token) 
 
 
 	// IsAttributePathContext differentiates from other interfaces.
@@ -818,7 +1025,9 @@ type IAttributePathContext interface {
 type AttributePathContext struct {
 	*antlr.BaseParserRuleContext
 	parser antlr.Parser
-	SubAttributeName antlr.Token
+	URI antlr.Token
+	Name antlr.Token
+	Sub antlr.Token
 }
 
 func NewEmptyAttributePathContext() *AttributePathContext {
@@ -843,10 +1052,18 @@ func NewAttributePathContext(parser antlr.Parser, parent antlr.ParserRuleContext
 
 func (s *AttributePathContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *AttributePathContext) GetSubAttributeName() antlr.Token { return s.SubAttributeName }
+func (s *AttributePathContext) GetURI() antlr.Token { return s.URI }
+
+func (s *AttributePathContext) GetName() antlr.Token { return s.Name }
+
+func (s *AttributePathContext) GetSub() antlr.Token { return s.Sub }
 
 
-func (s *AttributePathContext) SetSubAttributeName(v antlr.Token) { s.SubAttributeName = v }
+func (s *AttributePathContext) SetURI(v antlr.Token) { s.URI = v }
+
+func (s *AttributePathContext) SetName(v antlr.Token) { s.Name = v }
+
+func (s *AttributePathContext) SetSub(v antlr.Token) { s.Sub = v }
 
 
 func (s *AttributePathContext) AllAttributeName() []antlr.TerminalNode {
@@ -867,19 +1084,6 @@ func (s *AttributePathContext) GetRuleContext() antlr.RuleContext {
 
 func (s *AttributePathContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
 	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-
-func (s *AttributePathContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(FilterListener); ok {
-		listenerT.EnterAttributePath(s)
-	}
-}
-
-func (s *AttributePathContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(FilterListener); ok {
-		listenerT.ExitAttributePath(s)
-	}
 }
 
 
@@ -908,42 +1112,48 @@ func (p *FilterParser) AttributePath() (localctx IAttributePathContext) {
 	}()
 
 	p.EnterOuterAlt(localctx, 1)
-	p.SetState(56)
+	p.SetState(52)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
 
 	if _la == FilterParserUrn {
 		{
-			p.SetState(54)
-			p.Match(FilterParserUrn)
+			p.SetState(50)
+
+			var _m = p.Match(FilterParserUrn)
+
+			localctx.(*AttributePathContext).URI = _m
 		}
 		{
-			p.SetState(55)
+			p.SetState(51)
 			p.Match(FilterParserT__2)
 		}
 
 	}
 	{
-		p.SetState(58)
-		p.Match(FilterParserAttributeName)
+		p.SetState(54)
+
+		var _m = p.Match(FilterParserAttributeName)
+
+		localctx.(*AttributePathContext).Name = _m
 	}
-	p.SetState(61)
+	p.SetState(57)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
 
 	if _la == FilterParserT__3 {
 		{
-			p.SetState(59)
+			p.SetState(55)
 			p.Match(FilterParserT__3)
 		}
 		{
-			p.SetState(60)
+			p.SetState(56)
 
 			var _m = p.Match(FilterParserAttributeName)
 
-			localctx.(*AttributePathContext).SubAttributeName = _m
+			localctx.(*AttributePathContext).Sub = _m
 		}
 
 	}
@@ -1021,19 +1231,6 @@ func (s *ValueExpressionContext) ToStringTree(ruleNames []string, recog antlr.Re
 }
 
 
-func (s *ValueExpressionContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(FilterListener); ok {
-		listenerT.EnterValueExpression(s)
-	}
-}
-
-func (s *ValueExpressionContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(FilterListener); ok {
-		listenerT.ExitValueExpression(s)
-	}
-}
-
-
 
 
 func (p *FilterParser) ValueExpression() (localctx IValueExpressionContext) {
@@ -1058,19 +1255,19 @@ func (p *FilterParser) ValueExpression() (localctx IValueExpressionContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(63)
+		p.SetState(59)
 		p.AttributePath()
 	}
 	{
-		p.SetState(64)
+		p.SetState(60)
 		p.Match(FilterParserT__4)
 	}
 	{
-		p.SetState(65)
+		p.SetState(61)
 		p.ValueFilter()
 	}
 	{
-		p.SetState(66)
+		p.SetState(62)
 		p.Match(FilterParserT__5)
 	}
 
@@ -1087,26 +1284,38 @@ type IValueFilterContext interface {
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
-	// GetLogicalOperator returns the LogicalOperator token.
-	GetLogicalOperator() antlr.Token 
+	// GetOp returns the Op token.
+	GetOp() antlr.Token 
 
 
-	// SetLogicalOperator sets the LogicalOperator token.
-	SetLogicalOperator(antlr.Token) 
+	// SetOp sets the Op token.
+	SetOp(antlr.Token) 
 
 
-	// GetLxAttributeExpression returns the LxAttributeExpression rule contexts.
-	GetLxAttributeExpression() IAttributeExpressionContext
+	// GetAttributeExpr returns the AttributeExpr rule contexts.
+	GetAttributeExpr() IAttributeExpressionContext
 
-	// GetRxAttributeExpression returns the RxAttributeExpression rule contexts.
-	GetRxAttributeExpression() IAttributeExpressionContext
+	// GetLeft returns the Left rule contexts.
+	GetLeft() IAttributeExpressionContext
+
+	// GetRight returns the Right rule contexts.
+	GetRight() IAttributeExpressionContext
+
+	// GetInnerFilter returns the InnerFilter rule contexts.
+	GetInnerFilter() IValueFilterContext
 
 
-	// SetLxAttributeExpression sets the LxAttributeExpression rule contexts.
-	SetLxAttributeExpression(IAttributeExpressionContext)
+	// SetAttributeExpr sets the AttributeExpr rule contexts.
+	SetAttributeExpr(IAttributeExpressionContext)
 
-	// SetRxAttributeExpression sets the RxAttributeExpression rule contexts.
-	SetRxAttributeExpression(IAttributeExpressionContext)
+	// SetLeft sets the Left rule contexts.
+	SetLeft(IAttributeExpressionContext)
+
+	// SetRight sets the Right rule contexts.
+	SetRight(IAttributeExpressionContext)
+
+	// SetInnerFilter sets the InnerFilter rule contexts.
+	SetInnerFilter(IValueFilterContext)
 
 
 	// IsValueFilterContext differentiates from other interfaces.
@@ -1116,9 +1325,11 @@ type IValueFilterContext interface {
 type ValueFilterContext struct {
 	*antlr.BaseParserRuleContext
 	parser antlr.Parser
-	LxAttributeExpression IAttributeExpressionContext 
-	LogicalOperator antlr.Token
-	RxAttributeExpression IAttributeExpressionContext 
+	AttributeExpr IAttributeExpressionContext 
+	Left IAttributeExpressionContext 
+	Op antlr.Token
+	Right IAttributeExpressionContext 
+	InnerFilter IValueFilterContext 
 }
 
 func NewEmptyValueFilterContext() *ValueFilterContext {
@@ -1143,20 +1354,28 @@ func NewValueFilterContext(parser antlr.Parser, parent antlr.ParserRuleContext, 
 
 func (s *ValueFilterContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *ValueFilterContext) GetLogicalOperator() antlr.Token { return s.LogicalOperator }
+func (s *ValueFilterContext) GetOp() antlr.Token { return s.Op }
 
 
-func (s *ValueFilterContext) SetLogicalOperator(v antlr.Token) { s.LogicalOperator = v }
+func (s *ValueFilterContext) SetOp(v antlr.Token) { s.Op = v }
 
 
-func (s *ValueFilterContext) GetLxAttributeExpression() IAttributeExpressionContext { return s.LxAttributeExpression }
+func (s *ValueFilterContext) GetAttributeExpr() IAttributeExpressionContext { return s.AttributeExpr }
 
-func (s *ValueFilterContext) GetRxAttributeExpression() IAttributeExpressionContext { return s.RxAttributeExpression }
+func (s *ValueFilterContext) GetLeft() IAttributeExpressionContext { return s.Left }
+
+func (s *ValueFilterContext) GetRight() IAttributeExpressionContext { return s.Right }
+
+func (s *ValueFilterContext) GetInnerFilter() IValueFilterContext { return s.InnerFilter }
 
 
-func (s *ValueFilterContext) SetLxAttributeExpression(v IAttributeExpressionContext) { s.LxAttributeExpression = v }
+func (s *ValueFilterContext) SetAttributeExpr(v IAttributeExpressionContext) { s.AttributeExpr = v }
 
-func (s *ValueFilterContext) SetRxAttributeExpression(v IAttributeExpressionContext) { s.RxAttributeExpression = v }
+func (s *ValueFilterContext) SetLeft(v IAttributeExpressionContext) { s.Left = v }
+
+func (s *ValueFilterContext) SetRight(v IAttributeExpressionContext) { s.Right = v }
+
+func (s *ValueFilterContext) SetInnerFilter(v IValueFilterContext) { s.InnerFilter = v }
 
 
 func (s *ValueFilterContext) AllAttributeExpression() []IAttributeExpressionContext {
@@ -1213,19 +1432,6 @@ func (s *ValueFilterContext) ToStringTree(ruleNames []string, recog antlr.Recogn
 }
 
 
-func (s *ValueFilterContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(FilterListener); ok {
-		listenerT.EnterValueFilter(s)
-	}
-}
-
-func (s *ValueFilterContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(FilterListener); ok {
-		listenerT.ExitValueFilter(s)
-	}
-}
-
-
 
 
 func (p *FilterParser) ValueFilter() (localctx IValueFilterContext) {
@@ -1248,33 +1454,64 @@ func (p *FilterParser) ValueFilter() (localctx IValueFilterContext) {
 		}
 	}()
 
-	p.SetState(87)
+	p.SetState(81)
 	p.GetErrorHandler().Sync(p)
 	switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 7, p.GetParserRuleContext()) {
 	case 1:
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(68)
-			p.AttributeExpression()
+			p.SetState(64)
+
+			var _x = p.AttributeExpression()
+
+
+			localctx.(*ValueFilterContext).AttributeExpr = _x
 		}
 
 
 	case 2:
 		p.EnterOuterAlt(localctx, 2)
 		{
+			p.SetState(65)
+
+			var _x = p.AttributeExpression()
+
+
+			localctx.(*ValueFilterContext).Left = _x
+		}
+		{
+			p.SetState(66)
+
+			var _m = p.Match(FilterParserAndOperator)
+
+			localctx.(*ValueFilterContext).Op = _m
+		}
+		{
+			p.SetState(67)
+
+			var _x = p.AttributeExpression()
+
+
+			localctx.(*ValueFilterContext).Right = _x
+		}
+
+
+	case 3:
+		p.EnterOuterAlt(localctx, 3)
+		{
 			p.SetState(69)
 
 			var _x = p.AttributeExpression()
 
 
-			localctx.(*ValueFilterContext).LxAttributeExpression = _x
+			localctx.(*ValueFilterContext).Left = _x
 		}
 		{
 			p.SetState(70)
 
-			var _m = p.Match(FilterParserAndOperator)
+			var _m = p.Match(FilterParserOrOperator)
 
-			localctx.(*ValueFilterContext).LogicalOperator = _m
+			localctx.(*ValueFilterContext).Op = _m
 		}
 		{
 			p.SetState(71)
@@ -1282,51 +1519,26 @@ func (p *FilterParser) ValueFilter() (localctx IValueFilterContext) {
 			var _x = p.AttributeExpression()
 
 
-			localctx.(*ValueFilterContext).RxAttributeExpression = _x
+			localctx.(*ValueFilterContext).Right = _x
 		}
-		 log("%s => (%s) AND (%s)", p.GetTokenStream().GetTextFromTokens(localctx.GetStart(), p.GetTokenStream().LT(-1)), (func() string { if localctx.(*ValueFilterContext).GetLxAttributeExpression() == nil { return "" } else { return p.GetTokenStream().GetTextFromTokens(localctx.(*ValueFilterContext).GetLxAttributeExpression().GetStart(), localctx.(*ValueFilterContext).LxAttributeExpression.GetStop()) }}()), (func() string { if localctx.(*ValueFilterContext).GetRxAttributeExpression() == nil { return "" } else { return p.GetTokenStream().GetTextFromTokens(localctx.(*ValueFilterContext).GetRxAttributeExpression().GetStart(), localctx.(*ValueFilterContext).RxAttributeExpression.GetStop()) }}())); 
-
-
-	case 3:
-		p.EnterOuterAlt(localctx, 3)
-		{
-			p.SetState(74)
-
-			var _x = p.AttributeExpression()
-
-
-			localctx.(*ValueFilterContext).LxAttributeExpression = _x
-		}
-		{
-			p.SetState(75)
-
-			var _m = p.Match(FilterParserOrOperator)
-
-			localctx.(*ValueFilterContext).LogicalOperator = _m
-		}
-		{
-			p.SetState(76)
-
-			var _x = p.AttributeExpression()
-
-
-			localctx.(*ValueFilterContext).RxAttributeExpression = _x
-		}
-		 log("%s => (%s) AND (%s)", p.GetTokenStream().GetTextFromTokens(localctx.GetStart(), p.GetTokenStream().LT(-1)), (func() string { if localctx.(*ValueFilterContext).GetLxAttributeExpression() == nil { return "" } else { return p.GetTokenStream().GetTextFromTokens(localctx.(*ValueFilterContext).GetLxAttributeExpression().GetStart(), localctx.(*ValueFilterContext).LxAttributeExpression.GetStop()) }}()), (func() string { if localctx.(*ValueFilterContext).GetRxAttributeExpression() == nil { return "" } else { return p.GetTokenStream().GetTextFromTokens(localctx.(*ValueFilterContext).GetRxAttributeExpression().GetStart(), localctx.(*ValueFilterContext).RxAttributeExpression.GetStop()) }}())); 
 
 
 	case 4:
 		p.EnterOuterAlt(localctx, 4)
 		{
-			p.SetState(79)
+			p.SetState(73)
 			p.Match(FilterParserNotOperator)
 		}
 		{
-			p.SetState(80)
-			p.ValueFilter()
+			p.SetState(74)
+
+			var _x = p.ValueFilter()
+
+
+			localctx.(*ValueFilterContext).InnerFilter = _x
 		}
 		{
-			p.SetState(81)
+			p.SetState(75)
 			p.Match(FilterParserT__0)
 		}
 
@@ -1334,15 +1546,19 @@ func (p *FilterParser) ValueFilter() (localctx IValueFilterContext) {
 	case 5:
 		p.EnterOuterAlt(localctx, 5)
 		{
-			p.SetState(83)
+			p.SetState(77)
 			p.Match(FilterParserT__1)
 		}
 		{
-			p.SetState(84)
-			p.ValueFilter()
+			p.SetState(78)
+
+			var _x = p.ValueFilter()
+
+
+			localctx.(*ValueFilterContext).InnerFilter = _x
 		}
 		{
-			p.SetState(85)
+			p.SetState(79)
 			p.Match(FilterParserT__0)
 		}
 

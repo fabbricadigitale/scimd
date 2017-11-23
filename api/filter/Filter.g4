@@ -7,13 +7,7 @@ grammar Filter;
 }
 
 @parser::members {
-var debug = false
 
-func log(format string, a ...interface{}) {
-    if debug {
-        fmt.Printf(format + "\n", a...)
-    }
-}
 }
 
 root
@@ -21,21 +15,21 @@ root
         ;
 
 filter
-        : attributeExpression
-        | LxFilter=filter LogicalOperator=AndOperator RxFilter=filter { log("%s => (%s) AND (%s)", $text, $LxFilter.text, $RxFilter.text); }
-        | LxFilter=filter LogicalOperator=OrOperator RxFilter=filter { log("%s => (%s) OR (%s)", $text, $LxFilter.text, $RxFilter.text); }
-        | valueExpression
-        | NotOperator filter ')'
-        | '(' filter ')'
+        : AttributeExpr=attributeExpression # AttributeExprFilter
+        | Left=filter AndOperator Right=filter # AndFilter
+        | Left=filter OrOperator Right=filter # OrFilter
+        | ValueExpr=valueExpression # ValueExprFilter
+        | NotOperator InnerFilter=filter ')' # NotFilter
+        | '(' InnerFilter=filter ')' # GroupFilter
         ;
 
 attributeExpression
-        : attributePath PrOperator
-        | attributePath ComparisonOperator=(EqOperator|NeOperator|CoOperator|SwOperator|EwOperator|GtOperator|LtOperator|GeOperator|LeOperator) ComparisonValue
+        : Path=attributePath Op=PrOperator
+        | Path=attributePath Op=(EqOperator|NeOperator|CoOperator|SwOperator|EwOperator|GtOperator|LtOperator|GeOperator|LeOperator) Value=ComparisonValue
         ;
 
 attributePath
-        : (Urn ':')? AttributeName ('.' SubAttributeName=AttributeName)?
+        : (URI=Urn ':')? Name=AttributeName ('.' Sub=AttributeName)?
         ;
 
 valueExpression
@@ -43,11 +37,11 @@ valueExpression
         ;
 
 valueFilter
-        : attributeExpression
-        | LxAttributeExpression=attributeExpression LogicalOperator=AndOperator RxAttributeExpression=attributeExpression { log("%s => (%s) AND (%s)", $text, $LxAttributeExpression.text, $RxAttributeExpression.text); }
-        | LxAttributeExpression=attributeExpression LogicalOperator=OrOperator RxAttributeExpression=attributeExpression { log("%s => (%s) AND (%s)", $text, $LxAttributeExpression.text, $RxAttributeExpression.text); }
-        | NotOperator valueFilter ')'
-        | '(' valueFilter ')'
+        : AttributeExpr=attributeExpression
+        | Left=attributeExpression Op=AndOperator Right=attributeExpression
+        | Left=attributeExpression Op=OrOperator Right=attributeExpression
+        | NotOperator InnerFilter=valueFilter ')'
+        | '(' InnerFilter=valueFilter ')'
         ;
 
 /*
