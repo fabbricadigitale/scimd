@@ -27,10 +27,10 @@ func ErrorWrapper(e error) Error {
 	switch e.(type) {
 	case *core.DataTypeError:
 		scimError.Status = string(http.StatusBadRequest)
-		scimError.ScimType = "invalidType"
+		scimError.ScimType = "invalidValue"
 	case *json.UnmarshalTypeError:
 		scimError.Status = string(http.StatusBadRequest)
-		scimError.ScimType = "invalidType"
+		scimError.ScimType = "invalidValue"
 	case *api.InvalidPathError:
 		scimError.Status = string(http.StatusBadRequest)
 		scimError.ScimType = "invalidPath"
