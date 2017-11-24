@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestErrorWrapper(t *testing.T) {
+func TestNewError(t *testing.T) {
 
 	// Unexpected Data Type
 	var s = "randomvalue"
@@ -20,13 +20,13 @@ func TestErrorWrapper(t *testing.T) {
 		Status:   string(http.StatusBadRequest),
 		ScimType: "invalidValue",
 		Detail:   err.Error(),
-	}, ErrorWrapper(err))
+	}, NewError(err))
 
 	// Unmarshal type error
-	type Prova struct {
+	type WrongValueAttr struct {
 		Num string `json:"num"`
 	}
-	p := Prova{}
+	p := WrongValueAttr{}
 	byt := `{"num": 13}`
 
 	err = json.Unmarshal([]byte(byt), &p)
@@ -36,7 +36,7 @@ func TestErrorWrapper(t *testing.T) {
 		Status:   string(http.StatusBadRequest),
 		ScimType: "invalidValue",
 		Detail:   err.Error(),
-	}, ErrorWrapper(err))
+	}, NewError(err))
 
 	// Error in json syntax
 	byt = `{num: 17}`
@@ -48,10 +48,10 @@ func TestErrorWrapper(t *testing.T) {
 		Status:   string(http.StatusBadRequest),
 		ScimType: "invalidSyntax",
 		Detail:   err.Error(),
-	}, ErrorWrapper(err))
+	}, NewError(err))
 
-	// ErrorWrapper returns a correct json format
-	e := ErrorWrapper(err)
+	// NewError returns a correct json format
+	e := NewError(err)
 	byt2, _ := json.Marshal(e)
 
 	require.JSONEq(t, `{

@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 )
 
@@ -139,16 +140,16 @@ func NewDataType(t string) (DataType, error) {
 	case ComplexType:
 		return &Complex{}, nil
 	}
-	return nil, &DataTypeError{"Invalid type"}
+	return nil, &InvalidaDataTypeError{t}
 }
 
-// DataTypeError is a generic invalid type error
-type DataTypeError struct {
-	msg string
+// InvalidaDataTypeError is a generic invalid type error
+type InvalidaDataTypeError struct {
+	t string
 }
 
-func (e *DataTypeError) Error() string {
-	return e.msg
+func (e *InvalidaDataTypeError) Error() string {
+	return fmt.Sprintf("Invalid type %s", e.t)
 }
 
 // IsSingleValue hecks if v holds a Data Type value

@@ -19,8 +19,8 @@ type Error struct {
 	Detail   string   `json:"detail,omitempty"`
 }
 
-// ErrorWrapper wraps error in a scim Error struct
-func ErrorWrapper(e error) Error {
+// NewError wraps error in a scim Error struct
+func NewError(e error) Error {
 
 	var scimError Error
 
@@ -28,7 +28,7 @@ func ErrorWrapper(e error) Error {
 	case *json.SyntaxError:
 		scimError.Status = string(http.StatusBadRequest)
 		scimError.ScimType = "invalidSyntax"
-	case *core.DataTypeError:
+	case *core.InvalidaDataTypeError:
 		scimError.Status = string(http.StatusBadRequest)
 		scimError.ScimType = "invalidValue"
 	case *json.UnmarshalTypeError:
