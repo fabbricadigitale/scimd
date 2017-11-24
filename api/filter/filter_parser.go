@@ -1,4 +1,4 @@
-// Generated from /Users/leogr/code/github.com/fabbricadigitale/scimd/api/filter/Filter.g4 by ANTLR 4.6.
+// Generated from /home/leodido/workspaces/go/src/github.com/fabbricadigitale/scimd/api/filter/Filter.g4 by ANTLR 4.7.
 
 package filter // Filter
 import (
@@ -20,7 +20,7 @@ var _ = strconv.Itoa
 
 
 var parserATN = []uint16{
-	3, 1072, 54993, 33286, 44333, 17431, 44785, 36224, 43741, 3, 25, 86, 4, 
+	3, 24715, 42794, 33075, 47597, 16764, 15335, 30598, 22884, 3, 25, 86, 4, 
 	2, 9, 2, 4, 3, 9, 3, 4, 4, 9, 4, 4, 5, 9, 5, 4, 6, 9, 6, 4, 7, 9, 7, 3, 
 	2, 5, 2, 16, 10, 2, 3, 2, 3, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 5, 3, 31, 10, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
@@ -29,25 +29,25 @@ var parserATN = []uint16{
 	3, 5, 3, 5, 5, 5, 60, 10, 5, 3, 6, 3, 6, 3, 6, 3, 6, 3, 6, 3, 7, 3, 7, 
 	3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 
 	3, 7, 3, 7, 3, 7, 5, 7, 84, 10, 7, 3, 7, 2, 3, 4, 8, 2, 4, 6, 8, 10, 12, 
-	2, 3, 3, 2, 14, 22, 92, 2, 15, 3, 2, 2, 2, 4, 30, 3, 2, 2, 2, 6, 50, 3, 
-	2, 2, 2, 8, 54, 3, 2, 2, 2, 10, 61, 3, 2, 2, 2, 12, 83, 3, 2, 2, 2, 14, 
-	16, 5, 4, 3, 2, 15, 14, 3, 2, 2, 2, 15, 16, 3, 2, 2, 2, 16, 17, 3, 2, 2, 
-	2, 17, 18, 7, 2, 2, 3, 18, 3, 3, 2, 2, 2, 19, 20, 8, 3, 1, 2, 20, 31, 5, 
-	6, 4, 2, 21, 31, 5, 10, 6, 2, 22, 23, 7, 25, 2, 2, 23, 24, 5, 4, 3, 2, 
-	24, 25, 7, 3, 2, 2, 25, 31, 3, 2, 2, 2, 26, 27, 7, 4, 2, 2, 27, 28, 5, 
-	4, 3, 2, 28, 29, 7, 3, 2, 2, 29, 31, 3, 2, 2, 2, 30, 19, 3, 2, 2, 2, 30, 
-	21, 3, 2, 2, 2, 30, 22, 3, 2, 2, 2, 30, 26, 3, 2, 2, 2, 31, 40, 3, 2, 2, 
-	2, 32, 33, 12, 7, 2, 2, 33, 34, 7, 23, 2, 2, 34, 39, 5, 4, 3, 8, 35, 36, 
-	12, 6, 2, 2, 36, 37, 7, 24, 2, 2, 37, 39, 5, 4, 3, 7, 38, 32, 3, 2, 2, 
-	2, 38, 35, 3, 2, 2, 2, 39, 42, 3, 2, 2, 2, 40, 38, 3, 2, 2, 2, 40, 41, 
-	3, 2, 2, 2, 41, 5, 3, 2, 2, 2, 42, 40, 3, 2, 2, 2, 43, 44, 5, 8, 5, 2, 
-	44, 45, 7, 13, 2, 2, 45, 51, 3, 2, 2, 2, 46, 47, 5, 8, 5, 2, 47, 48, 9, 
-	2, 2, 2, 48, 49, 7, 11, 2, 2, 49, 51, 3, 2, 2, 2, 50, 43, 3, 2, 2, 2, 50, 
-	46, 3, 2, 2, 2, 51, 7, 3, 2, 2, 2, 52, 53, 7, 10, 2, 2, 53, 55, 7, 5, 2, 
-	2, 54, 52, 3, 2, 2, 2, 54, 55, 3, 2, 2, 2, 55, 56, 3, 2, 2, 2, 56, 59, 
-	7, 9, 2, 2, 57, 58, 7, 6, 2, 2, 58, 60, 7, 9, 2, 2, 59, 57, 3, 2, 2, 2, 
-	59, 60, 3, 2, 2, 2, 60, 9, 3, 2, 2, 2, 61, 62, 5, 8, 5, 2, 62, 63, 7, 7, 
-	2, 2, 63, 64, 5, 12, 7, 2, 64, 65, 7, 8, 2, 2, 65, 11, 3, 2, 2, 2, 66, 
+	2, 3, 3, 2, 14, 22, 2, 92, 2, 15, 3, 2, 2, 2, 4, 30, 3, 2, 2, 2, 6, 50, 
+	3, 2, 2, 2, 8, 54, 3, 2, 2, 2, 10, 61, 3, 2, 2, 2, 12, 83, 3, 2, 2, 2, 
+	14, 16, 5, 4, 3, 2, 15, 14, 3, 2, 2, 2, 15, 16, 3, 2, 2, 2, 16, 17, 3, 
+	2, 2, 2, 17, 18, 7, 2, 2, 3, 18, 3, 3, 2, 2, 2, 19, 20, 8, 3, 1, 2, 20, 
+	31, 5, 6, 4, 2, 21, 31, 5, 10, 6, 2, 22, 23, 7, 25, 2, 2, 23, 24, 5, 4, 
+	3, 2, 24, 25, 7, 3, 2, 2, 25, 31, 3, 2, 2, 2, 26, 27, 7, 4, 2, 2, 27, 28, 
+	5, 4, 3, 2, 28, 29, 7, 3, 2, 2, 29, 31, 3, 2, 2, 2, 30, 19, 3, 2, 2, 2, 
+	30, 21, 3, 2, 2, 2, 30, 22, 3, 2, 2, 2, 30, 26, 3, 2, 2, 2, 31, 40, 3, 
+	2, 2, 2, 32, 33, 12, 7, 2, 2, 33, 34, 7, 23, 2, 2, 34, 39, 5, 4, 3, 8, 
+	35, 36, 12, 6, 2, 2, 36, 37, 7, 24, 2, 2, 37, 39, 5, 4, 3, 7, 38, 32, 3, 
+	2, 2, 2, 38, 35, 3, 2, 2, 2, 39, 42, 3, 2, 2, 2, 40, 38, 3, 2, 2, 2, 40, 
+	41, 3, 2, 2, 2, 41, 5, 3, 2, 2, 2, 42, 40, 3, 2, 2, 2, 43, 44, 5, 8, 5, 
+	2, 44, 45, 7, 13, 2, 2, 45, 51, 3, 2, 2, 2, 46, 47, 5, 8, 5, 2, 47, 48, 
+	9, 2, 2, 2, 48, 49, 7, 11, 2, 2, 49, 51, 3, 2, 2, 2, 50, 43, 3, 2, 2, 2, 
+	50, 46, 3, 2, 2, 2, 51, 7, 3, 2, 2, 2, 52, 53, 7, 10, 2, 2, 53, 55, 7, 
+	5, 2, 2, 54, 52, 3, 2, 2, 2, 54, 55, 3, 2, 2, 2, 55, 56, 3, 2, 2, 2, 56, 
+	59, 7, 9, 2, 2, 57, 58, 7, 6, 2, 2, 58, 60, 7, 9, 2, 2, 59, 57, 3, 2, 2, 
+	2, 59, 60, 3, 2, 2, 2, 60, 9, 3, 2, 2, 2, 61, 62, 5, 8, 5, 2, 62, 63, 7, 
+	7, 2, 2, 63, 64, 5, 12, 7, 2, 64, 65, 7, 8, 2, 2, 65, 11, 3, 2, 2, 2, 66, 
 	84, 5, 6, 4, 2, 67, 68, 5, 6, 4, 2, 68, 69, 7, 23, 2, 2, 69, 70, 5, 6, 
 	4, 2, 70, 84, 3, 2, 2, 2, 71, 72, 5, 6, 4, 2, 72, 73, 7, 24, 2, 2, 73, 
 	74, 5, 6, 4, 2, 74, 84, 3, 2, 2, 2, 75, 76, 7, 25, 2, 2, 76, 77, 5, 12, 
@@ -56,9 +56,7 @@ var parserATN = []uint16{
 	83, 67, 3, 2, 2, 2, 83, 71, 3, 2, 2, 2, 83, 75, 3, 2, 2, 2, 83, 79, 3, 
 	2, 2, 2, 84, 13, 3, 2, 2, 2, 10, 15, 30, 38, 40, 50, 54, 59, 83,
 }
-
 var deserializer = antlr.NewATNDeserializer(nil)
-
 var deserializedATN = deserializer.DeserializeFromUInt16(parserATN)
 
 var literalNames = []string{
@@ -66,7 +64,6 @@ var literalNames = []string{
 	"' eq'", "' ne'", "' co'", "' sw'", "' ew'", "' gt'", "' ge'", "' lt'", 
 	"' le'", "' and '", "' or '",
 }
-
 var symbolicNames = []string{
 	"", "", "", "", "", "", "", "AttributeName", "Urn", "ComparisonValue", 
 	"Space", "PrOperator", "EqOperator", "NeOperator", "CoOperator", "SwOperator", 
@@ -78,24 +75,24 @@ var ruleNames = []string{
 	"root", "filter", "attributeExpression", "attributePath", "valueExpression", 
 	"valueFilter",
 }
+var decisionToDFA = make([]*antlr.DFA, len(deserializedATN.DecisionToState))
+
+func init() {
+	for index, ds := range deserializedATN.DecisionToState {
+		decisionToDFA[index] = antlr.NewDFA(ds, index)
+	}
+}
 
 type FilterParser struct {
 	*antlr.BaseParser
 }
 
 func NewFilterParser(input antlr.TokenStream) *FilterParser {
-	var decisionToDFA = make([]*antlr.DFA, len(deserializedATN.DecisionToState))
-	var sharedContextCache = antlr.NewPredictionContextCache()
-
-	for index, ds := range deserializedATN.DecisionToState {
-		decisionToDFA[index] = antlr.NewDFA(ds, index)
-	}
-
 	this := new(FilterParser)
 
 	this.BaseParser = antlr.NewBaseParser(input)
 
-	this.Interpreter = antlr.NewParserATNSimulator(this, deserializedATN, decisionToDFA, sharedContextCache)
+	this.Interpreter = antlr.NewParserATNSimulator(this, deserializedATN, decisionToDFA, antlr.NewPredictionContextCache())
 	this.RuleNames = ruleNames
 	this.LiteralNames = literalNames
 	this.SymbolicNames = symbolicNames
