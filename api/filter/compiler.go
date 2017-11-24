@@ -133,18 +133,18 @@ func compileValueFilter(ctx IValueFilterContext) ValueFilter {
 		}
 
 	case *OrValueFilterContext:
-		f = Or{
+		f = ValueOr{
 			*compileAttributeExpression(c.GetLeft()),
 			*compileAttributeExpression(c.GetRight()),
 		}
 
 	case *NotValueFilterContext:
-		f = Not{
+		f = ValueNot{
 			compileValueFilter(c.GetInnerFilter()),
 		}
 
 	case *GroupValueFilterContext:
-		f = Group{
+		f = ValueGroup{
 			compileValueFilter(c.GetInnerFilter()),
 		}
 	}
