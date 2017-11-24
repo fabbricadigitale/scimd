@@ -47,7 +47,7 @@ exec docker run --rm \
      -v ${src_dir}:${src_dir} \
      -v ${output_dir}:${output_dir} \
      -v ${lib_dir}:${lib_dir} \
-     petervaczi/antlr:${image_tag} \
+     leodido/antlr:${image_tag} \
      -o ${output_dir} \
      -lib ${lib_dir} \
      ${options} \
