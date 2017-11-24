@@ -16,10 +16,24 @@ var AttrNameRegexp = regexp.MustCompile("^" + AttrNameExpr + "$")
 
 var attrName = func(fl validator.FieldLevel) bool {
 	field := fl.Field()
+	parent := fl.Parent()
+
+	if parent.Kind() != reflect.Struct {
+		panic(fmt.Sprintf("It has to be used in a Struct"))
+	}
+
+	typeField := parent.FieldByName("Type")
+
+	if typeField == (reflect.Value{}) {
+		panic(fmt.Sprintf("No field Type"))
+	}
 
 	switch field.Kind() {
 	case reflect.String:
 		str := field.String()
+		if typeField.String() == "reference" {
+			return str == "$ref"
+		}
 		return AttrNameRegexp.MatchString(str)
 	}
 
