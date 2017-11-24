@@ -2,37 +2,43 @@ package filter
 
 import (
 	"encoding/json"
+	"strconv"
 	"strings"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
+	"github.com/fabbricadigitale/scimd/api"
 	"github.com/fabbricadigitale/scimd/api/attr"
 )
 
+type parserErrorListener struct {
+	antlr.DefaultErrorListener
+	err error
+}
+
+func (l *parserErrorListener) SyntaxError(recognizer antlr.Recognizer, offendingSymbol interface{}, line, column int, msg string, e antlr.RecognitionException) {
+	l.err = &api.InvalidFilterError{
+		Detail: "syntax error at character " + strconv.Itoa(column) + ", " + msg,
+	}
+}
+
+// CompileString parses a SCIM filter string and returns, if successful, a Filter object.
 func CompileString(s string) (Filter, error) {
 
+	errListener := new(parserErrorListener)
 	stream := antlr.NewInputStream(s)
 	lexer := NewFilterLexer(stream)
 	tokens := antlr.NewCommonTokenStream(lexer, 0)
 
 	parser := NewFilterParser(tokens)
-	parser.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
-	parser.BuildParseTrees = true
+	parser.AddErrorListener(errListener)
 
 	ctx := parser.Root()
-	/*
-		symbols := lexer.GetSymbolicNames()
 
-		for _, tkn := range tokens.GetAllTokens() {
-			sym := "//"
-			if t := tkn.GetTokenType(); t >= 0 {
-				sym = symbols[t]
-			}
-			fmt.Printf("%+v \t\t => %s\n", tkn, sym)
-		}
-	*/
-	f := compileFilter(ctx.GetChild(0).(IFilterContext))
+	if errListener.err != nil {
+		return nil, errListener.err
+	}
 
-	return f, nil
+	return compileFilter(ctx.GetChild(0).(IFilterContext)), nil
 }
 
 func compileFilter(ctx IFilterContext) Filter {
@@ -66,6 +72,8 @@ func compileFilter(ctx IFilterContext) Filter {
 		f = Group{
 			compileFilter(c.GetInnerFilter()),
 		}
+	default:
+		panic("filter: unexpected context")
 	}
 
 	return f
@@ -102,7 +110,9 @@ func compileAttributeExpression(c IAttributeExpressionContext) *AttrExpr {
 	vctx := c.GetValue()
 	var value interface{}
 	if vctx != nil {
-		json.Unmarshal([]byte(vctx.GetText()), &value)
+		if err := json.Unmarshal([]byte(vctx.GetText()), &value); err != nil {
+			panic(err)
+		}
 	}
 
 	return &AttrExpr{
@@ -147,6 +157,8 @@ func compileValueFilter(ctx IValueFilterContext) ValueFilter {
 		f = ValueGroup{
 			compileValueFilter(c.GetInnerFilter()),
 		}
+	default:
+		panic("filter: unexpected context")
 	}
 
 	return f

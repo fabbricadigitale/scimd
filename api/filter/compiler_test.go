@@ -2,7 +2,6 @@ package filter
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"testing"
 
@@ -18,11 +17,28 @@ func TestParse(t *testing.T) {
 
 	for scanner.Scan() {
 		input := scanner.Text()
-		f, _ := CompileString(input)
-		output := f.String()
-		require.Equal(t, input, output)
-		fmt.Println(output)
+		f, err := CompileString(input)
+		if err != nil {
+			t.Log(err)
+			t.Fail()
+		} else {
+			output := f.String()
+			require.Equal(t, input, output)
+		}
 	}
+}
 
-	// TODO
+func TestParseInvalid(t *testing.T) {
+
+	inFile, _ := os.Open("testdata/wrong.txt")
+	defer inFile.Close()
+	scanner := bufio.NewScanner(inFile)
+	scanner.Split(bufio.ScanLines)
+
+	for scanner.Scan() {
+		input := scanner.Text()
+		f, err := CompileString(input)
+		require.NotNil(t, err)
+		require.Nil(t, f)
+	}
 }
