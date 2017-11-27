@@ -5,16 +5,40 @@ import (
 	"strings"
 )
 
+// ByName returns the *Attribute with the given name, performing a insensitive match. It returns nil if no attribute was found.
+func (attributes Attributes) ByName(name string) *Attribute {
+	name = strings.ToLower(name)
+	for _, a := range attributes {
+		if name == strings.ToLower(a.Name) {
+			return a
+		}
+	}
+	return nil
+}
+
+func byKeyInsensitive(key string, data map[string]json.RawMessage) *json.RawMessage {
+	if part, ok := data[key]; ok {
+		return &part
+	}
+	key = strings.ToLower(key)
+	for k, v := range data {
+		if key == strings.ToLower(k) {
+			return &v
+		}
+	}
+	return nil
+}
+
 // Unmarshal a SCIM a complex value by attributes definition
 func (attributes *Attributes) Unmarshal(data map[string]json.RawMessage) (*Complex, error) {
 	ret := Complex{}
-	for _, aDef := range *attributes {
-		if part, ok := data[aDef.Name]; ok {
-			value, err := aDef.Unmarshal(part)
+	for _, a := range *attributes {
+		if part := byKeyInsensitive(a.Name, data); part != nil {
+			value, err := a.Unmarshal(*part)
 			if err != nil {
 				return &ret, err
 			}
-			ret[aDef.Name] = value
+			ret[a.Name] = value
 		}
 	}
 
