@@ -1,2 +1,17 @@
-a nonexistingop
+a nonexistingop 
 [type pr]
+animal run street
+a
+a a
+(not eq "stringsss"
+a eq
+ eq b
+a and
+ and b
+ or b
+not
+not and
+notand
+"abc"
+not ""
+(not eq )
