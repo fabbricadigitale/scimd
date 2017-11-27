@@ -19,13 +19,13 @@ var attrName = func(fl validator.FieldLevel) bool {
 	parent := fl.Parent()
 
 	if parent.Kind() != reflect.Struct {
-		panic(fmt.Sprintf("It has to be used in a Struct"))
+		panic(fmt.Sprintf("Invalid parent type %T: must be a struct", parent.Interface()))
 	}
 
 	typeField := parent.FieldByName("Type")
 
 	if typeField == (reflect.Value{}) {
-		panic(fmt.Sprintf("No field Type"))
+		panic(fmt.Sprintf("Field Type not found in the Struct"))
 	}
 
 	switch field.Kind() {

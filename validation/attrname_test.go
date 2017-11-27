@@ -4,47 +4,74 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	validator "gopkg.in/go-playground/validator.v9"
 )
 
-type testAN struct {
-	Name    string `validate:"attrname"`
-	Type    string `validate:"attrname"`
-	Integer int    `validate:"attrname"`
+type testOK struct {
+	Name string `validate:"attrname"`
+	Type string
+}
+
+type testInvalidType struct {
+	Name int `validate:"attrname"`
+	Type string
+}
+
+type testMissingType struct {
+	Name string `validate:"attrname"`
 }
 
 func TestAttrName(t *testing.T) {
-	x := testAN{}
+	x := testOK{}
+	y := testInvalidType{}
+	z := testMissingType{}
 
-	fields := []string{"Name", "Type", "Integer"}
-	failtags := []string{"attrname", "attrname", "attrname"}
+	var err error
 
-	defer func() {
-		r := recover()
-		require.NotNil(t, r)
-		require.Equal(t, "Bad field type int", r)
-	}()
+	testRef1 := testOK{
+		Name: "$ref",
+		Type: "reference",
+	}
+
+	testRef2 := testOK{
+		Name: "ref",
+		Type: "reference",
+	}
 
 	// Match Regex
 	x.Name = "bar"
-
-	errors := Validator.Var(x, "attrname")
-	require.NoError(t, errors)
+	err = Validator.Var(x, "attrname")
+	require.NoError(t, err)
 
 	x.Name = "bar0"
-
-	errors = Validator.Var(x, "attrname")
-	require.NoError(t, errors)
+	err = Validator.Var(x, "attrname")
+	require.NoError(t, err)
 
 	// Doesn't match Regex
 	x.Name = "0bar"
+	err = Validator.Var(x, "attrname")
+	require.Error(t, err)
 
-	errors = Validator.Var(x, "attrname")
-	require.Error(t, errors)
+	// Invalid parent type
+	require.PanicsWithValue(t, "Invalid parent type string: must be a struct", func() {
+		Validator.Var(x.Name, "attrname")
+	})
 
-	for e, err := range errors.(validator.ValidationErrors) {
-		require.Equal(t, "testAN."+fields[e], err.Namespace())
-		require.Equal(t, fields[e], err.Field())
-		require.Equal(t, failtags[e], err.ActualTag())
-	}
+	// Missing Type
+	z.Name = "bar"
+	require.PanicsWithValue(t, "Field Type not found in the Struct", func() {
+		Validator.Var(z, "attrname")
+	})
+
+	// Invalid Type
+	y.Name = 123
+	require.PanicsWithValue(t, "Bad field type int", func() {
+		Validator.Var(y, "attrname")
+	})
+
+	// Reference
+	err = Validator.Var(testRef1, "attrname")
+	require.NoError(t, err)
+
+	err = Validator.Var(testRef2, "attrname")
+	require.Error(t, err)
 }
