@@ -27,13 +27,13 @@ func TestAttrName(t *testing.T) {
 
 	var err error
 
-	testRef1 := testOK{
+	testCorrectReference := testOK{
 		Name: "$ref",
 		Type: "reference",
 	}
 
-	testRef2 := testOK{
-		Name: "ref",
+	testWrongReference := testOK{
+		Name: "abc",
 		Type: "reference",
 	}
 
@@ -69,9 +69,9 @@ func TestAttrName(t *testing.T) {
 	})
 
 	// Reference
-	err = Validator.Var(testRef1, "attrname")
+	err = Validator.Var(testCorrectReference, "attrname")
 	require.NoError(t, err)
 
-	err = Validator.Var(testRef2, "attrname")
+	err = Validator.Var(testWrongReference, "attrname")
 	require.Error(t, err)
 }
