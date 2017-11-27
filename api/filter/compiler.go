@@ -12,17 +12,16 @@ import (
 
 type parserErrorListener struct {
 	antlr.DefaultErrorListener
-	err error
 }
 
 func (l *parserErrorListener) SyntaxError(recognizer antlr.Recognizer, offendingSymbol interface{}, line, column int, msg string, e antlr.RecognitionException) {
-	l.err = &api.InvalidFilterError{
+	panic(&api.InvalidFilterError{
 		Detail: "syntax error at character " + strconv.Itoa(column) + ", " + msg,
-	}
+	})
 }
 
 // CompileString parses a SCIM filter string and returns, if successful, a Filter object.
-func CompileString(s string) (Filter, error) {
+func CompileString(s string) (f Filter, err error) {
 
 	errListener := new(parserErrorListener)
 	stream := antlr.NewInputStream(s)
@@ -30,13 +29,17 @@ func CompileString(s string) (Filter, error) {
 	tokens := antlr.NewCommonTokenStream(lexer, 0)
 
 	parser := NewFilterParser(tokens)
+	parser.RemoveErrorListeners()
 	parser.AddErrorListener(errListener)
 
-	ctx := parser.Root()
+	defer func() {
+		if r := recover(); r != nil {
+			f = nil
+			err = r.(error)
+		}
+	}()
 
-	if errListener.err != nil {
-		return nil, errListener.err
-	}
+	ctx := parser.Root()
 
 	return compileFilter(ctx.GetChild(0).(IFilterContext)), nil
 }
