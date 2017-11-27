@@ -13,6 +13,14 @@ It may not always be completely up to date.
 Within `scimd` a `core.Attribute` is the definition of a SCIM attribute. It's can be included within a `core.Schema`, has a name and some characteristics.
 Also, it defines the **Data Type** of the value that can be bound to the attribute.
 
+### Case sensitivity
+
+All runtime operations match attribute names in a *case-sensitive* way (exact match), expect the following cases:
+
+* Unmarshalling matches JSON keys to the names defined by the schema, preferring an exact match but also accepting a *case-insensitive* match. As result, decoded names are normalized according to its schema.
+*  **(TODO)** When an attribute name is included in a request body, it should be normalized as unmarshalling does.
+*  **(TODO)** Filtering should accept *case-insensitive* matches for attribute paths
+
 ### Data Types
 
 Mapping from [SCIM Data Types](https://tools.ietf.org/html/rfc7643#section-2.3) to `go` type are defined as following:
