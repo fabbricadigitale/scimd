@@ -33,8 +33,17 @@ func (a *Adapter) Create(res *resource.Resource) error {
 }
 
 // Get is ...
-func (a *Adapter) Get(id) error {
-	return (*a.adaptee).Get(id)
+func (a *Adapter) Get(id string) (*resource.Resource, error) {
+
+	h := &HResource{}
+
+	h, err := (*a.adaptee).Get(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return a.toResource(h)
 }
 
 // Count ...
@@ -94,7 +103,7 @@ func (a *Adapter) hydrateResource(r *resource.Resource) *HResource {
 	return h
 }
 
-func (a *Adapter) toResource(h *HResource) *resource.Resource {
+func (a *Adapter) toResource(h *HResource) (*resource.Resource, error) {
 
 	r := &resource.Resource{}
 
@@ -117,5 +126,5 @@ func (a *Adapter) toResource(h *HResource) *resource.Resource {
 		r.SetValues(ns, p)
 	}
 
-	return r
+	return r, nil
 }

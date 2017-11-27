@@ -2,6 +2,7 @@ package mongo
 
 import (
 	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 //Driver repository adaptee
@@ -45,12 +46,22 @@ func (d *Driver) Create(res *HResource) error {
 	return d.errorWrapper(c.Insert(res))
 }
 
-func (d *Driver) Get(id, version string) error {
+func (d *Driver) Get(id string) (*HResource, error) {
 	//not yet implemented
-	_, close := d.getCollection()
+	c, close := d.getCollection()
 	defer close()
 
-	return nil
+	data := &HResource{}
+	var query bson.M
+
+	query = bson.M{"id": id}
+
+	err := c.Find(query).One(&data)
+	if err != nil {
+		return nil, d.errorWrapper(err)
+	}
+
+	return data, nil
 }
 
 func (d *Driver) Count() error {

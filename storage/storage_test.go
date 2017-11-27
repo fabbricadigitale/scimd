@@ -77,3 +77,5 @@ func TestCreate(t *testing.T) {
 // (TODO) > Test hydrateResource adapter method
 
 // (TODO) > Test toResource adapter method
+
+// (TODO) > Test Get adapter method
