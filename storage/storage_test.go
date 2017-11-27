@@ -58,7 +58,7 @@ func TestCreate(t *testing.T) {
 	}
 
 	var manager Manager
-	adapter, err := manager.CreateAdapter("mongo", "mongodb://localhost:27017/test_db?maxPoolSize=100", "test_db", "resources")
+	adapter, err := manager.CreateAdapter("mongo", "mongodb://localhost:27017", "test_db", "resources")
 
 	if err != nil {
 		t.Log(err)
@@ -73,3 +73,7 @@ func TestCreate(t *testing.T) {
 
 	require.Nil(t, err)
 }
+
+// (TODO) > Test hydrateResource adapter method
+
+// (TODO) > Test toResource adapter method

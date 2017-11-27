@@ -37,7 +37,7 @@ func (d *Driver) getCollection() (*mgo.Collection, func()) {
 	return s.DB(d.db).C(d.collection), func() { s.Close() }
 }
 
-func (d *Driver) Create(res *Data) error {
+func (d *Driver) Create(res *HResource) error {
 	// Not yet implemented
 	c, close := d.getCollection()
 	defer close()
