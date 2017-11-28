@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"testing"
+	"time"
 
 	"github.com/fabbricadigitale/scimd/validation"
 	"github.com/stretchr/testify/assert"
@@ -68,7 +69,12 @@ func TestServiceProviderConfigResource(t *testing.T) {
 }
 
 func TestServiceProviderConfigValidation(t *testing.T) {
-	res := &ServiceProviderConfig{}
+	res := NewServiceProviderConfig()
+	res.Common.ID = "User"
+	res.Meta.Location = "https://example.com/v2/ResourceTypes/User"
+	now := time.Now()
+	res.Meta.Created = &now
+	res.Meta.LastModified = &now
 
 	errors := validation.Validator.Struct(res)
 	require.NotNil(t, errors)
