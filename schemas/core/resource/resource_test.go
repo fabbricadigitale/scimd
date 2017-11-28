@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/fabbricadigitale/scimd/schemas/core"
+	"github.com/fabbricadigitale/scimd/schemas/datatype"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -64,22 +65,22 @@ func TestUnmarshalResource(t *testing.T) {
 	}
 
 	baseAttr := *res.GetValues("urn:ietf:params:scim:schemas:core:2.0:User")
-	assert.Equal(t, true, !core.IsNull(baseAttr))
+	assert.Equal(t, true, !datatype.IsNull(baseAttr))
 
 	extAttr := *res.GetValues("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User")
-	assert.Equal(t, true, !core.IsNull(extAttr))
+	assert.Equal(t, true, !datatype.IsNull(extAttr))
 
 	attrEqualities := []struct {
 		value interface{}
 		field interface{}
 	}{
-		{core.String("bjensen@example.com"), baseAttr["userName"]},
-		{core.String("Babs Jensen"), baseAttr["displayName"]},
-		{core.Boolean(true), baseAttr["active"]},
-		{core.String("Ms. Barbara J Jensen, III"), baseAttr["name"].(core.Complex)["formatted"]},
+		{datatype.String("bjensen@example.com"), baseAttr["userName"]},
+		{datatype.String("Babs Jensen"), baseAttr["displayName"]},
+		{datatype.Boolean(true), baseAttr["active"]},
+		{datatype.String("Ms. Barbara J Jensen, III"), baseAttr["name"].(datatype.Complex)["formatted"]},
 
-		{core.String("701984"), extAttr["employeeNumber"]},
-		{core.String("4130"), extAttr["costCenter"]},
+		{datatype.String("701984"), extAttr["employeeNumber"]},
+		{datatype.String("4130"), extAttr["costCenter"]},
 	}
 
 	for _, row := range attrEqualities {

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/fabbricadigitale/scimd/schemas/core"
+	"github.com/fabbricadigitale/scimd/schemas/datatype"
 	"github.com/stretchr/testify/require"
 )
 
@@ -13,10 +13,10 @@ func TestNewError(t *testing.T) {
 
 	// Unexpected Data Type
 	var s = "randomvalue"
-	_, err := core.NewDataType(s)
+	_, err := datatype.New(s)
 
 	require.Equal(t, Error{
-		Schemas:  append([]string{}, ErrorURN),
+		Schemas:  append([]string{}, ErrorURI),
 		Status:   string(http.StatusBadRequest),
 		ScimType: "invalidValue",
 		Detail:   err.Error(),
@@ -32,7 +32,7 @@ func TestNewError(t *testing.T) {
 	err = json.Unmarshal([]byte(byt), &p)
 
 	require.Equal(t, Error{
-		Schemas:  append([]string{}, ErrorURN),
+		Schemas:  append([]string{}, ErrorURI),
 		Status:   string(http.StatusBadRequest),
 		ScimType: "invalidValue",
 		Detail:   err.Error(),
@@ -44,7 +44,7 @@ func TestNewError(t *testing.T) {
 	err = json.Unmarshal([]byte(byt), &p)
 
 	require.Equal(t, Error{
-		Schemas:  append([]string{}, ErrorURN),
+		Schemas:  append([]string{}, ErrorURI),
 		Status:   string(http.StatusBadRequest),
 		ScimType: "invalidSyntax",
 		Detail:   err.Error(),

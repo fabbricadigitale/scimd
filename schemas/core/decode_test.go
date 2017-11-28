@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fabbricadigitale/scimd/schemas/datatype"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -23,9 +24,9 @@ func TestDecodeNullWhenSingle(t *testing.T) {
 		t.Log(err)
 		t.Fail()
 	}
-	require.IsType(t, Complex{}, r)
+	require.IsType(t, datatype.Complex{}, r)
 
-	c := r.(Complex)
+	c := r.(datatype.Complex)
 	v, ok := c[a.SubAttributes[0].Name]
 
 	// equivalent of `ok && core.IsNull(v)`
@@ -39,9 +40,9 @@ func TestDecodeNullWhenSingle(t *testing.T) {
 		t.Log(err)
 		t.Fail()
 	}
-	require.IsType(t, Complex{}, r)
+	require.IsType(t, datatype.Complex{}, r)
 
-	c = r.(Complex)
+	c = r.(datatype.Complex)
 	v, ok = c[a.SubAttributes[0].Name]
 
 	assert.Nil(t, v)
@@ -89,15 +90,15 @@ func TestDecodeValuedWhenSingle(t *testing.T) {
 		t.Log(err)
 		t.Fail()
 	}
-	require.IsType(t, Complex{}, r)
+	require.IsType(t, datatype.Complex{}, r)
 
-	c := r.(Complex)
+	c := r.(datatype.Complex)
 	v, ok := c[attributes[0].SubAttributes[0].Name]
 
 	assert.True(t, ok)
-	assert.True(t, IsSingleValue(v))
+	assert.True(t, datatype.IsSingleValue(v))
 
-	assert.Equal(t, String("some value"), v)
+	assert.Equal(t, datatype.String("some value"), v)
 
 	// Boolean
 	data = (json.RawMessage)(`{"b": true}`)
@@ -106,15 +107,15 @@ func TestDecodeValuedWhenSingle(t *testing.T) {
 		t.Log(err)
 		t.Fail()
 	}
-	require.IsType(t, Complex{}, r)
+	require.IsType(t, datatype.Complex{}, r)
 
-	c = r.(Complex)
+	c = r.(datatype.Complex)
 	v, ok = c[attributes[1].SubAttributes[0].Name]
 
 	assert.True(t, ok)
-	assert.True(t, IsSingleValue(v))
+	assert.True(t, datatype.IsSingleValue(v))
 
-	assert.Equal(t, Boolean(true), v)
+	assert.Equal(t, datatype.Boolean(true), v)
 
 	//Decimal
 	data = (json.RawMessage)(`{"c": 3.14}`)
@@ -123,15 +124,15 @@ func TestDecodeValuedWhenSingle(t *testing.T) {
 		t.Log(err)
 		t.Fail()
 	}
-	require.IsType(t, Complex{}, r)
+	require.IsType(t, datatype.Complex{}, r)
 
-	c = r.(Complex)
+	c = r.(datatype.Complex)
 	v, ok = c[attributes[2].SubAttributes[0].Name]
 
 	assert.True(t, ok)
-	assert.True(t, IsSingleValue(v))
+	assert.True(t, datatype.IsSingleValue(v))
 
-	assert.Equal(t, Decimal(3.14), v)
+	assert.Equal(t, datatype.Decimal(3.14), v)
 
 	//Decimal
 	data = (json.RawMessage)(`{"d": 123}`)
@@ -140,15 +141,15 @@ func TestDecodeValuedWhenSingle(t *testing.T) {
 		t.Log(err)
 		t.Fail()
 	}
-	require.IsType(t, Complex{}, r)
+	require.IsType(t, datatype.Complex{}, r)
 
-	c = r.(Complex)
+	c = r.(datatype.Complex)
 	v, ok = c[attributes[3].SubAttributes[0].Name]
 
 	assert.True(t, ok)
-	assert.True(t, IsSingleValue(v))
+	assert.True(t, datatype.IsSingleValue(v))
 
-	assert.Equal(t, Integer(123), v)
+	assert.Equal(t, datatype.Integer(123), v)
 
 	//DateTime
 	t2 := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
@@ -159,14 +160,14 @@ func TestDecodeValuedWhenSingle(t *testing.T) {
 		t.Log(err)
 		t.Fail()
 	}
-	require.IsType(t, Complex{}, r)
+	require.IsType(t, datatype.Complex{}, r)
 
-	c = r.(Complex)
+	c = r.(datatype.Complex)
 	v, ok = c[attributes[4].SubAttributes[0].Name]
 
 	assert.True(t, ok)
-	assert.True(t, IsSingleValue(v))
-	assert.Equal(t, DateTime(t2), v)
+	assert.True(t, datatype.IsSingleValue(v))
+	assert.Equal(t, datatype.DateTime(t2), v)
 
 	//Binary
 	b := []byte{'g'}
@@ -176,15 +177,15 @@ func TestDecodeValuedWhenSingle(t *testing.T) {
 		t.Log(err)
 		t.Fail()
 	}
-	require.IsType(t, Complex{}, r)
+	require.IsType(t, datatype.Complex{}, r)
 
-	c = r.(Complex)
+	c = r.(datatype.Complex)
 	v, ok = c[attributes[5].SubAttributes[0].Name]
 
 	require.True(t, ok)
-	require.True(t, IsSingleValue(v))
+	require.True(t, datatype.IsSingleValue(v))
 
-	require.Equal(t, Binary(b), v)
+	require.Equal(t, datatype.Binary(b), v)
 
 	//Reference
 	data = (json.RawMessage)(`{"g": "https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646"}`)
@@ -193,15 +194,15 @@ func TestDecodeValuedWhenSingle(t *testing.T) {
 		t.Log(err)
 		t.Fail()
 	}
-	require.IsType(t, Complex{}, r)
+	require.IsType(t, datatype.Complex{}, r)
 
-	c = r.(Complex)
+	c = r.(datatype.Complex)
 	v, ok = c[attributes[6].SubAttributes[0].Name]
 
 	assert.True(t, ok)
-	assert.True(t, IsSingleValue(v))
+	assert.True(t, datatype.IsSingleValue(v))
 
-	assert.Equal(t, Reference("https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646"), v)
+	assert.Equal(t, datatype.Reference("https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646"), v)
 }
 
 func TestDecodeNullWhenMulti(t *testing.T) {
@@ -218,12 +219,12 @@ func TestDecodeNullWhenMulti(t *testing.T) {
 			t.Log(err)
 			t.Fail()
 		}
-		require.IsType(t, Complex{}, r)
+		require.IsType(t, datatype.Complex{}, r)
 
-		c := r.(Complex)
+		c := r.(datatype.Complex)
 		v, ok := c[a.SubAttributes[0].Name]
-		require.IsType(t, []DataType{}, v)
-		mv := v.([]DataType)
+		require.IsType(t, []datatype.DataTyper{}, v)
+		mv := v.([]datatype.DataTyper)
 
 		// equivalent of `ok && core.IsNull(v)`
 		assert.Len(t, mv, 0)
@@ -239,9 +240,9 @@ func TestDecodeNullWhenMulti(t *testing.T) {
 		t.Log(err)
 		t.Fail()
 	}
-	require.IsType(t, Complex{}, r)
+	require.IsType(t, datatype.Complex{}, r)
 
-	c := r.(Complex)
+	c := r.(datatype.Complex)
 	v, ok := c[a.SubAttributes[0].Name]
 
 	assert.Nil(t, v)
@@ -288,16 +289,16 @@ func TestDecodeValuedWhenMulti(t *testing.T) {
 		t.Log(err)
 		t.Fail()
 	}
-	require.IsType(t, Complex{}, r)
+	require.IsType(t, datatype.Complex{}, r)
 
-	c := r.(Complex)
+	c := r.(datatype.Complex)
 	v, ok := c[attributes[0].SubAttributes[0].Name]
 
 	assert.True(t, ok)
-	assert.True(t, IsMultiValue(v))
+	assert.True(t, datatype.IsMultiValue(v))
 
-	assert.Contains(t, v, String("value a"))
-	assert.Contains(t, v, String("value b"))
+	assert.Contains(t, v, datatype.String("value a"))
+	assert.Contains(t, v, datatype.String("value b"))
 
 	// Boolean
 	data = (json.RawMessage)(`{"b": [true, false]}`)
@@ -306,16 +307,16 @@ func TestDecodeValuedWhenMulti(t *testing.T) {
 		t.Log(err)
 		t.Fail()
 	}
-	require.IsType(t, Complex{}, r)
+	require.IsType(t, datatype.Complex{}, r)
 
-	c = r.(Complex)
+	c = r.(datatype.Complex)
 	v, ok = c[attributes[1].SubAttributes[0].Name]
 
 	assert.True(t, ok)
-	assert.True(t, IsMultiValue(v))
+	assert.True(t, datatype.IsMultiValue(v))
 
-	assert.Contains(t, v, Boolean(true))
-	assert.Contains(t, v, Boolean(false))
+	assert.Contains(t, v, datatype.Boolean(true))
+	assert.Contains(t, v, datatype.Boolean(false))
 
 	// Decimal
 	data = (json.RawMessage)(`{"c": [3.14, 2.718]}`)
@@ -324,16 +325,16 @@ func TestDecodeValuedWhenMulti(t *testing.T) {
 		t.Log(err)
 		t.Fail()
 	}
-	require.IsType(t, Complex{}, r)
+	require.IsType(t, datatype.Complex{}, r)
 
-	c = r.(Complex)
+	c = r.(datatype.Complex)
 	v, ok = c[attributes[2].SubAttributes[0].Name]
 
 	assert.True(t, ok)
-	assert.True(t, IsMultiValue(v))
+	assert.True(t, datatype.IsMultiValue(v))
 
-	assert.Contains(t, v, Decimal(3.14))
-	assert.Contains(t, v, Decimal(2.718))
+	assert.Contains(t, v, datatype.Decimal(3.14))
+	assert.Contains(t, v, datatype.Decimal(2.718))
 
 	// Integer
 	data = (json.RawMessage)(`{"d": [123, 456]}`)
@@ -342,16 +343,16 @@ func TestDecodeValuedWhenMulti(t *testing.T) {
 		t.Log(err)
 		t.Fail()
 	}
-	require.IsType(t, Complex{}, r)
+	require.IsType(t, datatype.Complex{}, r)
 
-	c = r.(Complex)
+	c = r.(datatype.Complex)
 	v, ok = c[attributes[3].SubAttributes[0].Name]
 
 	assert.True(t, ok)
-	assert.True(t, IsMultiValue(v))
+	assert.True(t, datatype.IsMultiValue(v))
 
-	assert.Contains(t, v, Integer(123))
-	assert.Contains(t, v, Integer(456))
+	assert.Contains(t, v, datatype.Integer(123))
+	assert.Contains(t, v, datatype.Integer(456))
 
 	// DateTime
 	t2 := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
@@ -362,16 +363,16 @@ func TestDecodeValuedWhenMulti(t *testing.T) {
 		t.Log(err)
 		t.Fail()
 	}
-	require.IsType(t, Complex{}, r)
+	require.IsType(t, datatype.Complex{}, r)
 
-	c = r.(Complex)
+	c = r.(datatype.Complex)
 	v, ok = c[attributes[4].SubAttributes[0].Name]
 
 	assert.True(t, ok)
-	assert.True(t, IsMultiValue(v))
+	assert.True(t, datatype.IsMultiValue(v))
 
-	assert.Contains(t, v, DateTime(t2))
-	assert.Contains(t, v, DateTime(t3))
+	assert.Contains(t, v, datatype.DateTime(t2))
+	assert.Contains(t, v, datatype.DateTime(t3))
 
 	// Binary
 	b := []byte(`g`)
@@ -382,16 +383,16 @@ func TestDecodeValuedWhenMulti(t *testing.T) {
 		t.Log(err)
 		t.Fail()
 	}
-	require.IsType(t, Complex{}, r)
+	require.IsType(t, datatype.Complex{}, r)
 
-	c = r.(Complex)
+	c = r.(datatype.Complex)
 	v, ok = c[attributes[5].SubAttributes[0].Name]
 
 	assert.True(t, ok)
-	assert.True(t, IsMultiValue(v))
+	assert.True(t, datatype.IsMultiValue(v))
 
-	assert.Contains(t, v, Binary(b))
-	assert.Contains(t, v, Binary(b1))
+	assert.Contains(t, v, datatype.Binary(b))
+	assert.Contains(t, v, datatype.Binary(b1))
 
 	// Reference
 	data = (json.RawMessage)(`{"g": ["https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646", "https://example.com/v2/Users/2819c223-7f76-453a-919d-413861906464" ]}`)
@@ -400,16 +401,16 @@ func TestDecodeValuedWhenMulti(t *testing.T) {
 		t.Log(err)
 		t.Fail()
 	}
-	require.IsType(t, Complex{}, r)
+	require.IsType(t, datatype.Complex{}, r)
 
-	c = r.(Complex)
+	c = r.(datatype.Complex)
 	v, ok = c[attributes[6].SubAttributes[0].Name]
 
 	assert.True(t, ok)
-	assert.True(t, IsMultiValue(v))
+	assert.True(t, datatype.IsMultiValue(v))
 
-	assert.Contains(t, v, Reference("https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646"))
-	assert.Contains(t, v, Reference("https://example.com/v2/Users/2819c223-7f76-453a-919d-413861906464"))
+	assert.Contains(t, v, datatype.Reference("https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646"))
+	assert.Contains(t, v, datatype.Reference("https://example.com/v2/Users/2819c223-7f76-453a-919d-413861906464"))
 }
 
 func TestUnmarshalAttributes(t *testing.T) {
@@ -443,22 +444,22 @@ func TestUnmarshalAttributes(t *testing.T) {
 		t.Log(err)
 		t.Fail()
 	}
-	require.IsType(t, &Complex{}, r)
+	require.IsType(t, &datatype.Complex{}, r)
 
 	username := (*r)["UserName"]
-	name := (*r)["Name"].(Complex)
-	mails := (*r)["Emails"].([]DataType)
+	name := (*r)["Name"].(datatype.Complex)
+	mails := (*r)["Emails"].([]datatype.DataTyper)
 
-	require.Equal(t, String("Billy123"), username)
+	require.Equal(t, datatype.String("Billy123"), username)
 
-	require.Equal(t, String("Bill"), name["givenName"])
-	require.Equal(t, String("Cow"), name["familyName"])
+	require.Equal(t, datatype.String("Bill"), name["givenName"])
+	require.Equal(t, datatype.String("Cow"), name["familyName"])
 
-	mail1 := mails[0].(Complex)
-	require.Equal(t, String("billthecow@email.com"), mail1["value"])
-	require.Equal(t, String("work"), mail1["type"])
+	mail1 := mails[0].(datatype.Complex)
+	require.Equal(t, datatype.String("billthecow@email.com"), mail1["value"])
+	require.Equal(t, datatype.String("work"), mail1["type"])
 
-	mail2 := mails[1].(Complex)
-	require.Equal(t, String("billthegoat@email.com"), mail2["value"])
-	require.Equal(t, String("home"), mail2["type"])
+	mail2 := mails[1].(datatype.Complex)
+	require.Equal(t, datatype.String("billthegoat@email.com"), mail2["value"])
+	require.Equal(t, datatype.String("home"), mail2["type"])
 }

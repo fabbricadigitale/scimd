@@ -4,21 +4,22 @@ import (
 	"encoding/json"
 
 	"github.com/fabbricadigitale/scimd/schemas/core"
+	"github.com/fabbricadigitale/scimd/schemas/datatype"
 )
 
 // Resource The data resource structure
 type Resource struct {
 	core.Common
-	data map[string]*core.Complex
+	data map[string]*datatype.Complex
 }
 
 // SetValues is the method to set Resource attributes
-func (r *Resource) SetValues(ns string, values *core.Complex) {
+func (r *Resource) SetValues(ns string, values *datatype.Complex) {
 	r.data[ns] = values
 }
 
 // GetValues is the method to access the attributes
-func (r *Resource) GetValues(ns string) *core.Complex {
+func (r *Resource) GetValues(ns string) *datatype.Complex {
 	return r.data[ns]
 }
 
@@ -48,10 +49,10 @@ func (r *Resource) UnmarshalJSON(b []byte) error {
 	}
 
 	var err error
-	r.data = make(map[string]*core.Complex)
+	r.data = make(map[string]*datatype.Complex)
 
 	// Get schema attributes' values
-	var values *core.Complex
+	var values *datatype.Complex
 	if values, err = schema.Unmarshal(parts); err != nil {
 		return err
 	}
@@ -65,7 +66,7 @@ func (r *Resource) UnmarshalJSON(b []byte) error {
 			if err := json.Unmarshal(extRawMsg, &extParts); err != nil {
 				return err
 			}
-			var values *core.Complex
+			var values *datatype.Complex
 			if values, err = schExt.Unmarshal(extParts); err != nil {
 				return err
 			}

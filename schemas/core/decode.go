@@ -3,6 +3,8 @@ package core
 import (
 	"encoding/json"
 	"strings"
+
+	"github.com/fabbricadigitale/scimd/schemas/datatype"
 )
 
 // ByName returns the *Attribute with the given name, performing a insensitive match. It returns nil if no attribute was found.
@@ -30,8 +32,8 @@ func byKeyInsensitive(key string, data map[string]json.RawMessage) *json.RawMess
 }
 
 // Unmarshal a SCIM a complex value by attributes definition
-func (attributes *Attributes) Unmarshal(data map[string]json.RawMessage) (*Complex, error) {
-	ret := Complex{}
+func (attributes *Attributes) Unmarshal(data map[string]json.RawMessage) (*datatype.Complex, error) {
+	ret := datatype.Complex{}
 	for _, a := range *attributes {
 		if part := byKeyInsensitive(a.Name, data); part != nil {
 			value, err := a.Unmarshal(*part)
@@ -55,7 +57,7 @@ func (attribute *Attribute) Unmarshal(data json.RawMessage) (interface{}, error)
 	return unmarshalSingular(attribute, data)
 }
 
-func unmarshalSingular(attr *Attribute, data json.RawMessage) (DataType, error) {
+func unmarshalSingular(attr *Attribute, data json.RawMessage) (datatype.DataTyper, error) {
 
 	if len(data) == 4 && strings.ToLower(string(data)) == "null" {
 		return nil, nil
@@ -63,7 +65,7 @@ func unmarshalSingular(attr *Attribute, data json.RawMessage) (DataType, error) 
 
 	var err error
 
-	if attr.Type == ComplexType {
+	if attr.Type == datatype.ComplexType {
 		var subParts map[string]json.RawMessage
 		if err = json.Unmarshal(data, &subParts); err != nil {
 			return nil, err
@@ -75,8 +77,8 @@ func unmarshalSingular(attr *Attribute, data json.RawMessage) (DataType, error) 
 		return nil, err
 	}
 
-	var p DataType
-	if p, err = NewDataType(attr.Type); err != nil {
+	var p datatype.DataTyper
+	if p, err = datatype.New(attr.Type); err != nil {
 		return nil, err
 	}
 
@@ -86,13 +88,13 @@ func unmarshalSingular(attr *Attribute, data json.RawMessage) (DataType, error) 
 	return p.Value(), nil
 }
 
-func unmarshalMulti(attr *Attribute, data json.RawMessage) ([]DataType, error) {
+func unmarshalMulti(attr *Attribute, data json.RawMessage) ([]datatype.DataTyper, error) {
 	var parts []json.RawMessage
 	if err := json.Unmarshal(data, &parts); err != nil {
 		return nil, err
 	}
 
-	ret := make([]DataType, len(parts))
+	ret := make([]datatype.DataTyper, len(parts))
 
 	for i, p := range parts {
 		value, err := unmarshalSingular(attr, p)
@@ -106,6 +108,6 @@ func unmarshalMulti(attr *Attribute, data json.RawMessage) ([]DataType, error) {
 }
 
 // Unmarshal SCIM values by schema definition
-func (schema *Schema) Unmarshal(data map[string]json.RawMessage) (*Complex, error) {
+func (schema *Schema) Unmarshal(data map[string]json.RawMessage) (*datatype.Complex, error) {
 	return schema.Attributes.Unmarshal(data)
 }

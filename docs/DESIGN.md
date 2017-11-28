@@ -39,7 +39,7 @@ Golang `type` 	| SCIM Data Type 	|  SCIM Schema "type" 	| JSON Type 	|
 Rules: 
 * **JSON Type** must be used when encoding/decoding
 * **SCIM Schema "type"** is the set of values that `core.Attribute.Type` can assume
-* **SCIM Data Type** `scimd`'s `type`s *(with the same name)* are also defined within the [`core`](../schemas/core/data_type.go) package
+* **SCIM Data Type** `scimd`'s `type`s *(with the same name)* are also defined within the [`datatype`](../schemas/datatype/) package
 * **Golang `type`** are just the underlying Go `type` (ie. not use them directly)
 
 Indeed:
@@ -60,23 +60,27 @@ type Complex map[string]interface{}
 
 Furthermore, all `type`s implement:
 ```go 
-type DataType interface {
+package datatype
+
+// ...
+
+type DataTyper interface {
     // ...
 }
 ```
 
 ### Singular and Multi-Valued
 
-By convention, the `type` of a **single-value** (for *singular attribute*) is any `type` that implements `DataType`, `type` thus must be one of:
+By convention, the `type` of a **single-value** (for *singular attribute*) is any `type` that implements `DataTyper`, `type` thus must be one of:
 ```go
 String, Boolean, Decimal, Integer, DateTime, Binary, Reference, Complex
 ```
 
-Instead, the `type` of a **multi-value** (for *multi-valued attribute*) must be `[]DataType`.
+Instead, the `type` of a **multi-value** (for *multi-valued attribute*) must be `[]DataTyper`.
 
 To check if a value is **single** or **multi** 
 
-> A value that's not a `DataType` nor `[]DataType` is considered a **Null** value.
+> A value that's not a `DataTyper` nor `[]DataTyper` is considered a **Null** value.
 
 ### Unassigned and Null Values
 
@@ -99,7 +103,7 @@ Overriding default values when [Creating Resources](https://tools.ietf.org/html/
 [Replacing with PUT](https://tools.ietf.org/html/rfc7644#section-3.5.1)
 > Clients that want to override a server's defaults MAY specify "null" for a single-valued attribute, or an empty array "[]" for a multi-valued attribute, to clear all values.
 
-**Unassigned** and **Null** values have particular meaning when using `map` (`core.Complex` is a `map` too). Thus, assuming:
+**Unassigned** and **Null** values have particular meaning when using `map` (`datatype.Complex` is a `map` too). Thus, assuming:
 ```go
 // m is a map[string]interface{}
 v, ok := m[key]
@@ -107,9 +111,9 @@ v, ok := m[key]
 
 You should use:
 
-* `core.IsNull(v)` to check if a value is **Null**
-* `!core.IsNull(v)` to check if an attribute's value is NOT **Unassigned** (ie. is assigned)
-* `ok && core.IsNull(v)` to check if an attribute's **value must be cleared**
+* `datatype.IsNull(v)` to check if a value is **Null**
+* `!datatype.IsNull(v)` to check if an attribute's value is NOT **Unassigned** (ie. is assigned)
+* `ok && datatype.IsNull(v)` to check if an attribute's **value must be cleared**
 
 
 ## Resources
@@ -144,18 +148,18 @@ For instance, `core.ServiceProviderConfig` (that's a *Structured Resource*) can 
 ### Mapped Resources
 
 To handle any other type of resource (including *User Resource*, *Group Resource* and new ones may be defined in future), 
-`scimd` uses `core.resource.Resource` that implements a flexible data rapresentation using Go `map` internally.
+`scimd` uses `resource.Resource` that implements a flexible data rapresentation using Go `map` internally.
 
 A *mapped resource*:
 
 * still embed `core.Common` for common attribures (ie. `Schemas`, `ID`, `Meta`, etc)
-* has a `map` of `core.Complex` indexed by schema URI
-* each `core.Complex` (that's another `map`) can hold values needed by the bound schema
+* has a `map` of `datatype.Complex` indexed by schema URI
+* each `datatype.Complex` (that's another `map`) can hold values needed by the bound schema
 
 Notes:
 > Members of `core.Common` use Go primitive `type`s, instead `map`s hold *Data Types*
 
-> `core.resource.Resource` is **NOT** responsible to enforce attributes structure and characteristics defined by bound schemas *(other APIs are needed to accomplish that)*.
+> `resource.Resource` is **NOT** responsible to enforce attributes structure and characteristics defined by bound schemas *(other APIs are needed to accomplish that)*.
 
 In this way, it can represent data for any schemas (or composition of them in case of extensions).
 

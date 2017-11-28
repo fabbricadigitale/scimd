@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/fabbricadigitale/scimd/api"
-	"github.com/fabbricadigitale/scimd/schemas/core"
+	"github.com/fabbricadigitale/scimd/schemas/datatype"
 )
 
 //ErrorURI error message urn
@@ -28,7 +28,7 @@ func NewError(e error) Error {
 	case *json.SyntaxError:
 		scimError.Status = string(http.StatusBadRequest)
 		scimError.ScimType = "invalidSyntax"
-	case *core.InvalidaDataTypeError:
+	case *datatype.InvalidaDataTypeError:
 		scimError.Status = string(http.StatusBadRequest)
 		scimError.ScimType = "invalidValue"
 	case *json.UnmarshalTypeError:

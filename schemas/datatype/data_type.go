@@ -1,4 +1,4 @@
-package core
+package datatype
 
 import (
 	"encoding/json"
@@ -6,11 +6,11 @@ import (
 	"time"
 )
 
-// DataType is the interface implemented by SCIM Data Types.
-// DataTypes implement Value() that returns the value that DataType holds,
+// DataTyper is the interface implemented by SCIM Data Types.
+// DataTypers implement Value() that returns the value that DataType holds,
 // Type() that returns the corrisponding SCIM Schema "type"
-type DataType interface {
-	Value() DataType
+type DataTyper interface {
+	Value() DataTyper
 	Type() string
 }
 
@@ -26,49 +26,49 @@ const (
 	ComplexType   = "complex"
 )
 
-// String defines the equivalent SCIM Data Type and attaches the methods of DataType interface to string
+// String defines the equivalent SCIM Data Type and attaches the methods of DataTyper interface to string
 type String string
 
-// Value returns the DataType's value
-func (p String) Value() DataType { return p }
+// Value returns the DataTyper's value
+func (p String) Value() DataTyper { return p }
 
-// Type returns DataType's "type"
+// Type returns DataTyper's "type"
 func (p String) Type() string { return StringType }
 
-// Boolean defines the equivalent SCIM Data Type and attaches the methods of DataType interface to bool
+// Boolean defines the equivalent SCIM Data Type and attaches the methods of DataTyper interface to bool
 type Boolean bool
 
-// Value returns the DataType's value
-func (p Boolean) Value() DataType { return p }
+// Value returns the DataTyper's value
+func (p Boolean) Value() DataTyper { return p }
 
-// Type returns DataType's "type"
+// Type returns DataTyper's "type"
 func (p Boolean) Type() string { return BooleanType }
 
-// Decimal defines the equivalent SCIM Data Type and attaches the methods of DataType interface to float64
+// Decimal defines the equivalent SCIM Data Type and attaches the methods of DataTyper interface to float64
 type Decimal float64
 
-// Value returns the DataType's value
-func (p Decimal) Value() DataType { return p }
+// Value returns the DataTyper's value
+func (p Decimal) Value() DataTyper { return p }
 
-// Type returns DataType's "type"
+// Type returns DataTyper's "type"
 func (p Decimal) Type() string { return DecimalType }
 
-// Integer defines the equivalent SCIM Data Type and attaches the methods of DataType interface to int64
+// Integer defines the equivalent SCIM Data Type and attaches the methods of DataTyper interface to int64
 type Integer int64
 
-// Value returns the DataType's value
-func (p Integer) Value() DataType { return p }
+// Value returns the DataTyper's value
+func (p Integer) Value() DataTyper { return p }
 
-// Type returns DataType's "type"
+// Type returns DataTyper's "type"
 func (p Integer) Type() string { return IntegerType }
 
-// DateTime defines the equivalent SCIM Data Type and attaches the methods of DataType interface to time.Time
+// DateTime defines the equivalent SCIM Data Type and attaches the methods of DataTyper interface to time.Time
 type DateTime time.Time
 
-// Value returns the DataType's value
-func (p DateTime) Value() DataType { return p }
+// Value returns the DataTyper's value
+func (p DateTime) Value() DataTyper { return p }
 
-// Type returns DataType's "type"
+// Type returns DataTyper's "type"
 func (p DateTime) Type() string { return DateTimeType }
 
 // UnmarshalJSON implements custom logic for DateTime
@@ -81,13 +81,13 @@ func (p *DateTime) MarshalJSON() ([]byte, error) {
 	return json.Marshal((time.Time)(*p))
 }
 
-// Binary defines the equivalent SCIM Data Type and attaches the methods of DataType interface to []byte
+// Binary defines the equivalent SCIM Data Type and attaches the methods of DataTyper interface to []byte
 type Binary []byte
 
-// Value returns the DataType's value
-func (p Binary) Value() DataType { return p }
+// Value returns the DataTyper's value
+func (p Binary) Value() DataTyper { return p }
 
-// Type returns DataType's "type"
+// Type returns DataTyper's "type"
 func (p Binary) Type() string { return BinaryType }
 
 // UnmarshalJSON implements custom logic for Binary
@@ -100,28 +100,28 @@ func (p *Binary) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*[]byte)(p))
 }
 
-// Reference defines the equivalent SCIM Data Type and attaches the methods of DataType interface to []byte
+// Reference defines the equivalent SCIM Data Type and attaches the methods of DataTyper interface to []byte
 type Reference string
 
-// Value returns the DataType's value
-func (p Reference) Value() DataType { return p }
+// Value returns the DataTyper's value
+func (p Reference) Value() DataTyper { return p }
 
-// Type returns DataType's "type"
+// Type returns DataTyper's "type"
 func (p Reference) Type() string { return ReferenceType }
 
-// Complex defines the equivalent SCIM Data Type and attaches the methods of DataType interface to map[string]interface{}
+// Complex defines the equivalent SCIM Data Type and attaches the methods of DataTyper interface to map[string]interface{}
 type Complex map[string]interface{}
 
-// Value returns the DataType's value
-func (p Complex) Value() DataType { return p }
+// Value returns the DataTyper's value
+func (p Complex) Value() DataTyper { return p }
 
-// Type returns DataType's "type"
+// Type returns DataTyper's "type"
 func (p Complex) Type() string { return ComplexType }
 
-// NewDataType function allocates for SCIM Data Types.
+// New function allocates for SCIM Data Types.
 // The first argument is string containing the SCIM Schema "type" as per https://tools.ietf.org/html/rfc7643#section-2.3,
-// and the value returnerd is a DataType interface that holds a pointer to a newly allocated zero value of that "type".
-func NewDataType(t string) (DataType, error) {
+// and the value returnerd is a DataTyper interface that holds a pointer to a newly allocated zero value of that "type".
+func New(t string) (DataTyper, error) {
 	switch t {
 	case StringType:
 		return new(String), nil
@@ -154,19 +154,19 @@ func (e *InvalidaDataTypeError) Error() string {
 
 // IsSingleValue hecks if v holds a Data Type value
 func IsSingleValue(v interface{}) bool {
-	_, ok := v.(DataType)
+	_, ok := v.(DataTyper)
 	return ok
 }
 
 // IsMultiValue checks if v holds a slices of Data Type values
 func IsMultiValue(v interface{}) bool {
-	_, ok := v.([]DataType)
+	_, ok := v.([]DataTyper)
 	return ok
 }
 
 // If v is a multi-value return its length, otherwise zero
 func multiValueLen(v interface{}) int {
-	if dt, ok := v.([]DataType); ok {
+	if dt, ok := v.([]DataTyper); ok {
 		return len(dt)
 	}
 	return 0
