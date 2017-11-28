@@ -79,3 +79,5 @@ func TestCreate(t *testing.T) {
 // (TODO) > Test toResource adapter method
 
 // (TODO) > Test Get adapter method
+
+// (TODO) > Test Delete adapter method

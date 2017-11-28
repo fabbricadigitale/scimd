@@ -57,8 +57,8 @@ func (a *Adapter) Update() error {
 }
 
 // Delete is ...
-func (a *Adapter) Delete(id, version string) error {
-	return (*a.adaptee).Delete(id, version)
+func (a *Adapter) Delete(id string) error {
+	return (*a.adaptee).Delete(id)
 }
 
 // Search is ...
@@ -66,6 +66,7 @@ func (a *Adapter) Search() error {
 	return (*a.adaptee).Search()
 }
 
+// HResource is a ready-to-store format for Resource
 type HResource struct {
 	Data []map[string]interface{}
 }

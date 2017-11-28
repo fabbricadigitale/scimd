@@ -1,6 +1,8 @@
 package mongo
 
 import (
+	"fmt"
+
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -38,6 +40,7 @@ func (d *Driver) getCollection() (*mgo.Collection, func()) {
 	return s.DB(d.db).C(d.collection), func() { s.Close() }
 }
 
+// Create is the adapter method for Create
 func (d *Driver) Create(res *HResource) error {
 	// Not yet implemented
 	c, close := d.getCollection()
@@ -46,6 +49,7 @@ func (d *Driver) Create(res *HResource) error {
 	return d.errorWrapper(c.Insert(res))
 }
 
+// Get is the adapter method for Get
 func (d *Driver) Get(id string) (*HResource, error) {
 	//not yet implemented
 	c, close := d.getCollection()
@@ -58,33 +62,81 @@ func (d *Driver) Get(id string) (*HResource, error) {
 
 	err := c.Find(query).One(&data)
 	if err != nil {
-		return nil, d.errorWrapper(err)
+		return nil, d.errorWrapper(err, id)
 	}
 
 	return data, nil
 }
 
+// Count is the adapter method for Count
 func (d *Driver) Count() error {
 	// Not yet implemented
 	return nil
 }
 
+// Update is the adapter method for Update
 func (d *Driver) Update() error {
 	// Not yet implemented
 	return nil
 }
 
-func (d *Driver) Delete(id, version string) error {
+// Delete is the adapter method for Delete
+func (d *Driver) Delete(id string) error {
+
+	c, close := d.getCollection()
+	defer close()
+
+	var query bson.M
+	query = bson.M{"id": id}
+	err := c.Remove(query)
+	if err != nil {
+		return d.errorWrapper(err, id)
+	}
+
 	return nil
 }
 
+// Search is the adapter method for Search
 func (d *Driver) Search() error {
 	// Not yet implemented
 	return nil
 }
 
 // mongoErrorWrapper translates mongo errors in specific domain errors
-func (d *Driver) errorWrapper(e error) error {
+func (d *Driver) errorWrapper(e error, args ...interface{}) error {
 	// Not yet implemented
-	return e
+
+	if e == nil {
+		return nil
+	}
+	switch {
+	case e.Error() == "not found":
+		if len(args) > 1 {
+			return ResourceNotFoundError{
+				fmt.Sprintf("%v", args[0]),
+				fmt.Sprintf("%v", args[1]),
+			}
+		} else if len(args) > 0 {
+			return ResourceNotFoundError{
+				fmt.Sprintf("%v", args[0]),
+				"",
+			}
+		}
+		return ResourceNotFoundError{
+			"",
+			"",
+		}
+	default:
+		return e
+	}
+}
+
+// ResourceNotFoundError is ...
+type ResourceNotFoundError struct {
+	msg string
+	id  string
+}
+
+func (r ResourceNotFoundError) Error() string {
+	return fmt.Sprintf("%v - id %v", r.msg, r.id)
 }
