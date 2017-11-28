@@ -33,11 +33,11 @@ func (a *Adapter) Create(res *resource.Resource) error {
 }
 
 // Get is ...
-func (a *Adapter) Get(id string) (*resource.Resource, error) {
+func (a *Adapter) Get(id, version string) (*resource.Resource, error) {
 
 	h := &HResource{}
 
-	h, err := (*a.adaptee).Get(id)
+	h, err := (*a.adaptee).Get(id, version)
 
 	if err != nil {
 		return nil, err
@@ -52,14 +52,14 @@ func (a *Adapter) Count() error {
 }
 
 // Update is ...
-func (a *Adapter) Update(id string, resource *resource.Resource) error {
+func (a *Adapter) Update(id string, version string, resource *resource.Resource) error {
 	dataResource := a.hydrateResource(resource)
-	return (*a.adaptee).Update(id, dataResource)
+	return (*a.adaptee).Update(id, version, dataResource)
 }
 
 // Delete is ...
-func (a *Adapter) Delete(id string) error {
-	return (*a.adaptee).Delete(id)
+func (a *Adapter) Delete(id, version string) error {
+	return (*a.adaptee).Delete(id, version)
 }
 
 // Search is ...

@@ -9,13 +9,13 @@ import (
 type Storage interface {
 	Create(*resource.Resource) error
 
-	Get(id string) (*resource.Resource, error)
+	Get(string, string) (*resource.Resource, error)
 
 	Count() error
 
-	Update(string, *resource.Resource) error
+	Update(string, string, *resource.Resource) error
 
-	Delete(string) error
+	Delete(string, string) error
 
 	Search() error
 }

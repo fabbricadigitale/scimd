@@ -50,15 +50,13 @@ func (d *Driver) Create(res *HResource) error {
 }
 
 // Get is the adapter method for Get
-func (d *Driver) Get(id string) (*HResource, error) {
+func (d *Driver) Get(id, version string) (*HResource, error) {
 	//not yet implemented
 	c, close := d.getCollection()
 	defer close()
 
 	data := &HResource{}
-	var query bson.M
-
-	query = bson.M{"id": id}
+	query := d.makeQuery(id, version)
 
 	err := c.Find(query).One(&data)
 	if err != nil {
@@ -75,25 +73,23 @@ func (d *Driver) Count() error {
 }
 
 // Update is the adapter method for Update
-func (d *Driver) Update(id string, resource *HResource) error {
+func (d *Driver) Update(id string, version string, resource *HResource) error {
 	c, close := d.getCollection()
 	defer close()
 
-	var query bson.M
-	query = bson.M{"id": id}
+	query := d.makeQuery(id, version)
 
 	err := c.Update(query, *resource)
 	return d.errorWrapper(err, resource.Data[0]["id"])
 }
 
 // Delete is the adapter method for Delete
-func (d *Driver) Delete(id string) error {
+func (d *Driver) Delete(id string, version string) error {
 
 	c, close := d.getCollection()
 	defer close()
 
-	var query bson.M
-	query = bson.M{"id": id}
+	query := d.makeQuery(id, version)
 	err := c.Remove(query)
 	if err != nil {
 		return d.errorWrapper(err, id)
@@ -145,4 +141,14 @@ type ResourceNotFoundError struct {
 
 func (r ResourceNotFoundError) Error() string {
 	return fmt.Sprintf("%v - id %v", r.msg, r.id)
+}
+
+func (d *Driver) makeQuery(id, version string) *bson.M {
+	var query bson.M
+	if len(version) == 0 {
+		query = bson.M{"data": bson.M{"$elemMatch": bson.M{"id": id}}}
+	} else {
+		query = bson.M{"data": bson.M{"$elemMatch": bson.M{"$and": bson.M{"0": bson.M{"id": id}, "1": bson.M{"meta.version": version}}}}}
+	}
+	return &query
 }
