@@ -35,7 +35,7 @@ func (a *Adapter) Create(res *resource.Resource) error {
 // Get is ...
 func (a *Adapter) Get(id, version string) (*resource.Resource, error) {
 
-	h := &HResource{}
+	h := &resourceDocument{}
 
 	h, err := (*a.adaptee).Get(id, version)
 
@@ -67,14 +67,14 @@ func (a *Adapter) Search() error {
 	return (*a.adaptee).Search()
 }
 
-// HResource is a ready-to-store format for Resource
-type HResource struct {
+// resourceDocument is a ready-to-store format for Resource
+type resourceDocument struct {
 	Data []map[string]interface{}
 }
 
-func (a *Adapter) hydrateResource(r *resource.Resource) *HResource {
+func (a *Adapter) hydrateResource(r *resource.Resource) *resourceDocument {
 
-	h := &HResource{}
+	h := &resourceDocument{}
 
 	common := make(map[string]interface{})
 	common["_urn"] = "common"
@@ -105,7 +105,7 @@ func (a *Adapter) hydrateResource(r *resource.Resource) *HResource {
 	return h
 }
 
-func (a *Adapter) toResource(h *HResource) (*resource.Resource, error) {
+func (a *Adapter) toResource(h *resourceDocument) (*resource.Resource, error) {
 
 	r := &resource.Resource{}
 

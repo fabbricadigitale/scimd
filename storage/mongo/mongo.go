@@ -41,7 +41,7 @@ func (d *Driver) getCollection() (*mgo.Collection, func()) {
 }
 
 // Create is the adapter method for Create
-func (d *Driver) Create(res *HResource) error {
+func (d *Driver) Create(res *resourceDocument) error {
 	// Not yet implemented
 	c, close := d.getCollection()
 	defer close()
@@ -50,12 +50,12 @@ func (d *Driver) Create(res *HResource) error {
 }
 
 // Get is the adapter method for Get
-func (d *Driver) Get(id, version string) (*HResource, error) {
+func (d *Driver) Get(id, version string) (*resourceDocument, error) {
 	//not yet implemented
 	c, close := d.getCollection()
 	defer close()
 
-	data := &HResource{}
+	data := &resourceDocument{}
 	query := d.makeQuery(id, version)
 
 	err := c.Find(query).One(&data)
@@ -73,7 +73,7 @@ func (d *Driver) Count() error {
 }
 
 // Update is the adapter method for Update
-func (d *Driver) Update(id string, version string, resource *HResource) error {
+func (d *Driver) Update(id string, version string, resource *resourceDocument) error {
 	c, close := d.getCollection()
 	defer close()
 
