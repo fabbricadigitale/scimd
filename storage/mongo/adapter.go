@@ -12,6 +12,10 @@ type Adapter struct {
 
 var adapter Adapter
 
+// urnKey identifies the attributes namespace into document resource
+// The name stars with an underscore unlike scim properties that start with alphabetical characters
+const urnKey = "_urn"
+
 // GetAdapter ...
 func GetAdapter(url, db, collection string) (*Adapter, error) {
 
@@ -72,19 +76,23 @@ type resourceDocument struct {
 	Data []map[string]interface{}
 }
 
+// This method translate Resource to a ready-to-store document
+// The document has a Data property, array of []map[string]interface{},  with a fixed order:
+// index = 0 -> common attributes
+// index = 1 -> core attributes
+// index > 1 -> extensions attributes
 func (a *Adapter) hydrateResource(r *resource.Resource) *resourceDocument {
 
 	h := &resourceDocument{}
 
 	common := make(map[string]interface{})
-	common["_urn"] = "common"
 	common["schemas"] = r.Common.Schemas
 	common["id"] = r.Common.ID
 	common["external_id"] = r.Common.ExternalID
 	common["meta"] = r.Common.Meta
 
 	mCore := make(map[string]interface{})
-	mCore["_urn"] = r.GetSchema().ID
+	mCore[urnKey] = r.GetSchema().ID
 	for key, val := range *r.GetValues(r.GetSchema().ID) {
 		mCore[key] = val
 	}
@@ -94,7 +102,7 @@ func (a *Adapter) hydrateResource(r *resource.Resource) *resourceDocument {
 		mExt := make(map[string]interface{})
 		if extSch != nil {
 			ns := extSch.GetIdentifier()
-			mExt["_urn"] = ns
+			mExt[urnKey] = ns
 			for key, val := range *r.GetValues(ns) {
 				mExt[key] = val
 			}
@@ -121,9 +129,9 @@ func (a *Adapter) toResource(h *resourceDocument) (*resource.Resource, error) {
 
 	var p *core.Complex
 	for i := 1; i < len(h.Data); i++ {
-		ns := h.Data[i]["_urn"].(string)
+		ns := h.Data[i][urnKey].(string)
 		values := h.Data[i]
-		delete(values, "_urn")
+		delete(values, urnKey)
 		(*p) = core.Complex(values)
 		r.SetValues(ns, p)
 	}
