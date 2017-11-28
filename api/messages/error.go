@@ -8,7 +8,7 @@ import (
 	"github.com/fabbricadigitale/scimd/schemas/core"
 )
 
-//ErrorURN error message urn
+//ErrorURI error message urn
 const ErrorURI = "urn:ietf:params:scim:api:messages:2.0:Error"
 
 //Error is a struct for wrapping scim error
@@ -44,7 +44,7 @@ func NewError(e error) Error {
 		scimError.Status = string(http.StatusInternalServerError)
 	}
 
-	scimError.Schemas = append(scimError.Schemas, ErrorURN)
+	scimError.Schemas = append(scimError.Schemas, ErrorURI)
 	scimError.Detail = e.Error()
 
 	return scimError
