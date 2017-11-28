@@ -39,7 +39,7 @@ func TestCreate(t *testing.T) {
 	}
 
 	// Non-normative of SCIM user resource type [https://tools.ietf.org/html/rfc7643#section-8.2]
-	dat, err := ioutil.ReadFile("../schemas/core/resource/testdata/enterprise_user_resource.json")
+	dat, err := ioutil.ReadFile("../schemas/resource/testdata/enterprise_user_resource.json")
 
 	if err != nil {
 		t.Log(err)

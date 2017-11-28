@@ -1,9 +1,7 @@
 package core
 
-type Resource interface {
-	GetResourceType() *ResourceType
-	GetSchema() *Schema
-	GetSchemaExtensions() map[string]*Schema
-
+// ResourceTyper is the interface implemented by types that can hold Common resource attribute and are can return it ResourceType
+type ResourceTyper interface {
+	ResourceType() *ResourceType
 	GetCommon() *Common
 }

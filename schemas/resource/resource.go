@@ -7,19 +7,27 @@ import (
 	"github.com/fabbricadigitale/scimd/schemas/datatype"
 )
 
-// Resource The data resource structure
+// Valuer is the interface implemented by types that can hold resource's values
+type Valuer interface {
+	Values(ns string) *datatype.Complex
+}
+
+// Resource represents a mapped resource. It implements both core.ResourceTyper and Valuer
 type Resource struct {
 	core.Common
 	data map[string]*datatype.Complex
 }
 
-// SetValues is the method to set Resource attributes
+var _ core.ResourceTyper = (*Resource)(nil)
+var _ Valuer = (*Resource)(nil)
+
+// SetValues is the method to set Resource attributes by schema namespace
 func (r *Resource) SetValues(ns string, values *datatype.Complex) {
 	r.data[ns] = values
 }
 
-// GetValues is the method to access the attributes
-func (r *Resource) GetValues(ns string) *datatype.Complex {
+// Values is the method to access the attributes by schema namespace
+func (r *Resource) Values(ns string) *datatype.Complex {
 	return r.data[ns]
 }
 
@@ -31,13 +39,13 @@ func (r *Resource) UnmarshalJSON(b []byte) error {
 	}
 
 	// Validate and get ResourceType
-	resourceType := r.GetResourceType()
+	resourceType := r.ResourceType()
 	if resourceType == nil {
 		return &core.ScimError{"Unsupported Resource Type"}
 	}
 
 	// Validate and get schema
-	schema := r.GetSchema()
+	schema := resourceType.GetSchema()
 	if schema == nil {
 		return &core.ScimError{"Unsupported Schema"}
 	}
@@ -58,7 +66,7 @@ func (r *Resource) UnmarshalJSON(b []byte) error {
 	}
 	r.SetValues(schema.GetIdentifier(), values)
 
-	exts := r.GetSchemaExtensions()
+	exts := resourceType.GetSchemaExtensions()
 
 	for _, schExt := range exts {
 		if extRawMsg, ok := parts[schExt.GetIdentifier()]; ok && schExt != nil {
@@ -97,19 +105,19 @@ func (r *Resource) MarshalJSON() ([]byte, error) {
 	// ****
 
 	// Validate and get ResourceType
-	resourceType := r.GetResourceType()
+	resourceType := r.ResourceType()
 	if resourceType == nil {
 		return nil, &core.ScimError{"Unsupported Resource Type"}
 	}
 	// Validate and get schema
-	schema := r.GetSchema()
+	schema := resourceType.GetSchema()
 	if schema == nil {
 		return nil, &core.ScimError{"Unsupported Schema"}
 	}
 	// ****
 
 	// Marshal schema attrs to the top level
-	for key, values := range *r.GetValues(schema.GetIdentifier()) {
+	for key, values := range *r.Values(schema.GetIdentifier()) {
 		if msg, err = json.Marshal(values); err != nil {
 			return nil, err
 		}
@@ -117,10 +125,10 @@ func (r *Resource) MarshalJSON() ([]byte, error) {
 	}
 
 	// Marshal extensions to proper namespace key
-	for _, extSch := range r.GetSchemaExtensions() {
+	for _, extSch := range resourceType.GetSchemaExtensions() {
 		if extSch != nil {
 			ns := extSch.GetIdentifier()
-			values := *r.GetValues(ns)
+			values := *r.Values(ns)
 			if msg, err = json.Marshal(values); err != nil {
 				return nil, err
 			}

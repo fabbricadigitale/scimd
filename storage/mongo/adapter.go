@@ -92,19 +92,21 @@ func (a *Adapter) hydrateResource(r *resource.Resource) *resourceDocument {
 	common["external_id"] = r.Common.ExternalID
 	common["meta"] = r.Common.Meta
 
+	rt := r.ResourceType()
+
 	mCore := make(map[string]interface{})
 	mCore[urnKey] = r.GetSchema().ID
-	for key, val := range *r.GetValues(r.GetSchema().ID) {
+	for key, val := range *r.Values(rt.GetSchema().ID) {
 		mCore[key] = val
 	}
 	h.Data = append(h.Data, common, mCore)
 
-	for _, extSch := range r.GetSchemaExtensions() {
+	for _, extSch := range rt.GetSchemaExtensions() {
 		mExt := make(map[string]interface{})
 		if extSch != nil {
 			ns := extSch.GetIdentifier()
 			mExt[urnKey] = ns
-			for key, val := range *r.GetValues(ns) {
+			for key, val := range *r.Values(ns) {
 				mExt[key] = val
 			}
 		}

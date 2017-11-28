@@ -66,7 +66,7 @@ func NewServiceProviderConfig() *ServiceProviderConfig {
 	return spc
 }
 
-var _ Resource = (*ServiceProviderConfig)(nil)
+var _ ResourceTyper = (*ServiceProviderConfig)(nil)
 
 // UnmarshalJSON unmarshals an Attribute taking into account defaults
 func (spc *ServiceProviderConfig) UnmarshalJSON(data []byte) error {

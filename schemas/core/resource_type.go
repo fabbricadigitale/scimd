@@ -28,9 +28,25 @@ func NewResourceType(schema, resourceType string) *ResourceType {
 	}
 }
 
-var _ Resource = (*ResourceType)(nil)
+var _ ResourceTyper = (*ResourceType)(nil)
 
 // GetIdentifier ...
 func (rt ResourceType) GetIdentifier() string {
 	return rt.Name
+}
+
+// GetSchema returns the resource Schema, if any.
+func (rt ResourceType) GetSchema() *Schema {
+	return GetSchemaRepository().Get(rt.Schema)
+}
+
+// GetSchemaExtensions returns a map of resource's extensions Schema(s)
+func (rt ResourceType) GetSchemaExtensions() map[string]*Schema {
+	repo := GetSchemaRepository()
+	schExts := rt.SchemaExtensions
+	schemas := map[string]*Schema{}
+	for _, ext := range schExts {
+		schemas[ext.Schema] = repo.Get(ext.Schema)
+	}
+	return schemas
 }

@@ -81,7 +81,7 @@ func NewSchema() *Schema {
 	}
 }
 
-var _ Resource = (*Schema)(nil)
+var _ ResourceTyper = (*Schema)(nil)
 
 // GetIdentifier ...
 func (s Schema) GetIdentifier() string {
