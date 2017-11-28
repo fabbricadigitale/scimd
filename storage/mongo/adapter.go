@@ -2,7 +2,8 @@ package mongo
 
 import (
 	"github.com/fabbricadigitale/scimd/schemas/core"
-	"github.com/fabbricadigitale/scimd/schemas/core/resource"
+	"github.com/fabbricadigitale/scimd/schemas/datatype"
+	"github.com/fabbricadigitale/scimd/schemas/resource"
 )
 
 // Adapter is the repository Adapter
@@ -127,12 +128,12 @@ func (a *Adapter) toResource(h *resourceDocument) (*resource.Resource, error) {
 
 	r.Common = c
 
-	var p *core.Complex
+	var p *datatype.Complex
 	for i := 1; i < len(h.Data); i++ {
 		ns := h.Data[i][urnKey].(string)
 		values := h.Data[i]
 		delete(values, urnKey)
-		(*p) = core.Complex(values)
+		(*p) = datatype.Complex(values)
 		r.SetValues(ns, p)
 	}
 

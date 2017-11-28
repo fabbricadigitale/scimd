@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/fabbricadigitale/scimd/schemas/core"
-	"github.com/fabbricadigitale/scimd/schemas/core/resource"
+	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/stretchr/testify/require"
 )
 

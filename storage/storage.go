@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"github.com/fabbricadigitale/scimd/schemas/core/resource"
+	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/storage/mongo"
 )
 

@@ -14,17 +14,17 @@ import (
 
 func TestUnmarshalResource(t *testing.T) {
 	resTypeRepo := core.GetResourceTypeRepository()
-	if _, err := resTypeRepo.Add("../testdata/user.json"); err != nil {
+	if _, err := resTypeRepo.Add("../core/testdata/user.json"); err != nil {
 		t.Log(err)
 		t.Fail()
 	}
 
 	schemaRepo := core.GetSchemaRepository()
-	if _, err := schemaRepo.Add("../testdata/user_schema.json"); err != nil {
+	if _, err := schemaRepo.Add("../core/testdata/user_schema.json"); err != nil {
 		t.Log(err)
 		t.Fail()
 	}
-	if _, err := schemaRepo.Add("../testdata/enterprise_user_schema.json"); err != nil {
+	if _, err := schemaRepo.Add("../core/testdata/enterprise_user_schema.json"); err != nil {
 		t.Log(err)
 		t.Fail()
 	}
@@ -91,17 +91,17 @@ func TestUnmarshalResource(t *testing.T) {
 
 func TestMarshalResource(t *testing.T) {
 	resTypeRepo := core.GetResourceTypeRepository()
-	if _, err := resTypeRepo.Add("../testdata/user.json"); err != nil {
+	if _, err := resTypeRepo.Add("../core/testdata/user.json"); err != nil {
 		t.Log(err)
 		t.Fail()
 	}
 
 	schemaRepo := core.GetSchemaRepository()
-	if _, err := schemaRepo.Add("../testdata/user_schema.json"); err != nil {
+	if _, err := schemaRepo.Add("../core/testdata/user_schema.json"); err != nil {
 		t.Log(err)
 		t.Fail()
 	}
-	if _, err := schemaRepo.Add("../testdata/enterprise_user_schema.json"); err != nil {
+	if _, err := schemaRepo.Add("../core/testdata/enterprise_user_schema.json"); err != nil {
 		t.Log(err)
 		t.Fail()
 	}

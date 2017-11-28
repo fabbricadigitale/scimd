@@ -1,7 +1,7 @@
 package messages
 
 import (
-	"github.com/fabbricadigitale/scimd/schemas/core/resource"
+	"github.com/fabbricadigitale/scimd/schemas/resource"
 )
 
 const ListResponseURI = "urn:ietf:params:scim:api:messages:2.0:ListResponse"
