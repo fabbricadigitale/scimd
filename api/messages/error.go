@@ -9,7 +9,7 @@ import (
 )
 
 //ErrorURN error message urn
-const ErrorURN = "urn:ietf:params:scim:api:messages:2.0:Error"
+const ErrorURI = "urn:ietf:params:scim:api:messages:2.0:Error"
 
 //Error is a struct for wrapping scim error
 type Error struct {
