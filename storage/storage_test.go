@@ -81,3 +81,5 @@ func TestCreate(t *testing.T) {
 // (TODO) > Test Get adapter method
 
 // (TODO) > Test Delete adapter method
+
+// (TODO) > Test Update adapter method

@@ -13,9 +13,9 @@ type Storage interface {
 
 	Count() error
 
-	Update() error
+	Update(string, *resource.Resource) error
 
-	Delete(id string) error
+	Delete(string) error
 
 	Search() error
 }

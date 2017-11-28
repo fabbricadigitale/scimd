@@ -75,9 +75,15 @@ func (d *Driver) Count() error {
 }
 
 // Update is the adapter method for Update
-func (d *Driver) Update() error {
-	// Not yet implemented
-	return nil
+func (d *Driver) Update(id string, resource *HResource) error {
+	c, close := d.getCollection()
+	defer close()
+
+	var query bson.M
+	query = bson.M{"id": id}
+
+	err := c.Update(query, *resource)
+	return d.errorWrapper(err, resource.Data[0]["id"])
 }
 
 // Delete is the adapter method for Delete

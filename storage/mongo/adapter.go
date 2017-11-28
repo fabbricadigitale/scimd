@@ -52,8 +52,9 @@ func (a *Adapter) Count() error {
 }
 
 // Update is ...
-func (a *Adapter) Update() error {
-	return (*a.adaptee).Update()
+func (a *Adapter) Update(id string, resource *resource.Resource) error {
+	dataResource := a.hydrateResource(resource)
+	return (*a.adaptee).Update(id, dataResource)
 }
 
 // Delete is ...
