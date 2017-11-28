@@ -9,7 +9,7 @@ import (
 type Storage interface {
 	Create(*resource.Resource) error
 
-	Get(id string) error
+	Get(id string) (*resource.Resource, error)
 
 	Count() error
 
