@@ -29,7 +29,7 @@ type Attributes []*Attribute
 // Attribute describes a single attribute included within a Schema Definition.
 // It includes the characteristics of a SCIM Attribute as per https://tools.ietf.org/html/rfc7643#section-2.2.
 type Attribute struct {
-	Name            string     `json:"name,omitempty"`
+	Name            string     `json:"name,omitempty" validate:"attrname"`
 	Type            string     `json:"type,omitempty" default:"string"`
 	SubAttributes   Attributes `json:"subAttributes,omitempty"`
 	MultiValued     bool       `json:"multiValued"`

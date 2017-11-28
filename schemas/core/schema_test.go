@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"testing"
 
+	"github.com/fabbricadigitale/scimd/validation"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -162,4 +163,19 @@ func TestAttributeUnmarshalWithDefaults(t *testing.T) {
 
 	second.Type = first.Type
 	assertAttributeDefaults(t, first)
+}
+
+func TestAttributeValidation(t *testing.T) {
+	ok := NewAttribute()
+	notOk := NewAttribute()
+
+	var err error
+
+	ok.Name = "bar"
+	err = validation.Validator.Var(ok, "attrname")
+	require.NoError(t, err)
+
+	notOk.Name = "0bar"
+	err = validation.Validator.Var(notOk, "attrname")
+	require.Error(t, err)
 }
