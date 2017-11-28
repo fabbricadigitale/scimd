@@ -30,6 +30,15 @@ type Common struct {
 	Meta       Meta   `json:"meta" validate:"required"`
 }
 
+// NewCommon returns a Common filled with schema, resourceType, and ID
+func NewCommon(schema, resourceType, ID string) *Common {
+	return &Common{
+		Schemas: []string{schema},
+		ID:      ID,
+		Meta:    Meta{ResourceType: resourceType},
+	}
+}
+
 func (c *Common) GetCommon() *Common {
 	return c
 }

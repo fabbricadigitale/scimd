@@ -62,12 +62,23 @@ func (a *Attribute) UnmarshalJSON(data []byte) error {
 	return err
 }
 
+// SchemaURI is the Schema Definitions Schema used by Schema
+const SchemaURI = "urn:ietf:params:scim:schemas:core:2.0:Schema"
+
 // Schema is a structured resource for "urn:ietf:params:scim:schemas:core:2.0:Schema"
 type Schema struct {
 	Common
 	Name        string     `json:"name,omitempty"`
 	Description string     `json:"description,omitempty"`
 	Attributes  Attributes `json:"attributes,omitempty"`
+}
+
+// NewSchema returns a new Schema filled with defaults
+func NewSchema() *Schema {
+	return &Schema{
+		Common: *NewCommon(SchemaURI, "Schema", SchemaURI),
+		Name:   "Schema",
+	}
 }
 
 var _ Resource = (*Schema)(nil)

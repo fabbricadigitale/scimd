@@ -54,9 +54,14 @@ type ServiceProviderConfig struct {
 	AuthenticationSchemes []authenticationScheme `json:"authenticationSchemes" validate:"required"`
 }
 
-// NewServiceProviderConfig returns a new NewServiceProviderConfig filled with defaults
+// ServiceProviderConfigURI is the Service Provider Configuration schema used by ServiceProviderConfig
+const ServiceProviderConfigURI = "urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig"
+
+// NewServiceProviderConfig returns a new ServiceProviderConfig filled with defaults
 func NewServiceProviderConfig() *ServiceProviderConfig {
-	spc := new(ServiceProviderConfig)
+	spc := &ServiceProviderConfig{
+		Common: *NewCommon(ServiceProviderConfigURI, "ServiceProviderConfig", ""),
+	}
 	defaults.SetDefaults(spc)
 	return spc
 }

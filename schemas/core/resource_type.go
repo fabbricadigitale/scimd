@@ -16,6 +16,18 @@ type ResourceType struct {
 	SchemaExtensions []SchemaExtension `json:"schemaExtensions,omitempty"`
 }
 
+// ResourceTypeURI is the Resource Type Configuration schema used by ResourceType
+const ResourceTypeURI = "urn:ietf:params:scim:schemas:core:2.0:ResourceType"
+
+// NewResourceType returns a ResourceType filled with min values set which identify a particular schema and resourceType (eg. User)
+func NewResourceType(schema, resourceType string) *ResourceType {
+	return &ResourceType{
+		Common: *NewCommon(ResourceTypeURI, "ResourceType", resourceType),
+		Schema: schema,
+		Name:   resourceType,
+	}
+}
+
 var _ Resource = (*ResourceType)(nil)
 
 // GetIdentifier ...
