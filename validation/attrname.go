@@ -3,16 +3,10 @@ package validation
 import (
 	"fmt"
 	"reflect"
-	"regexp"
 
+	"github.com/fabbricadigitale/scimd/schemas"
 	validator "gopkg.in/go-playground/validator.v9"
 )
-
-// AttrNameExpr is the source text used to compile a regular expression macching a SCIM attribute name
-const AttrNameExpr = `[A-Za-z][\-$_0-9A-Za-z]*`
-
-// AttrNameRegexp is the compiled Regexp built from AttrNameExpr
-var AttrNameRegexp = regexp.MustCompile("^" + AttrNameExpr + "$")
 
 var attrName = func(fl validator.FieldLevel) bool {
 	field := fl.Field()
@@ -32,9 +26,9 @@ var attrName = func(fl validator.FieldLevel) bool {
 	case reflect.String:
 		str := field.String()
 		if typeField.String() == "reference" {
-			return str == "$ref"
+			return str == schemas.ReferenceAttrName
 		}
-		return AttrNameRegexp.MatchString(str)
+		return schemas.AttrNameRegexp.MatchString(str)
 	}
 
 	panic(fmt.Sprintf("Bad field type %T", field.Interface()))

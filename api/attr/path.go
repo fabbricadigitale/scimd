@@ -3,21 +3,19 @@ package attr
 import (
 	"regexp"
 
-	"github.com/fabbricadigitale/scimd/schemas/core"
+	"github.com/fabbricadigitale/scimd/schemas"
 )
 
 const (
 	// attrPath  = [URI ":"] ATTRNAME *1subAttr ; SCIM attribute name ; URI is SCIM "schema" URI
-	attrPath = `((?P<URI>` + core.URIExpr + `)\:)?` + attrName + subAttr + `?`
-
-	// ATTRNAME  = ALPHA *(nameChar)
-	attrName = `(?P<ATTRNAME>[A-Za-z](` + nameChar + `)*)`
+	attrPath = `((?P<URI>` + schemas.URIExpr + `)\:)?` + attrName + subAttr + `?`
 
 	// nameChar  = "-" / "_" / DIGIT / ALPHA
-	nameChar = `(\-|_|[0-9A-Za-z])`
+	// ATTRNAME  = ALPHA *(nameChar)
+	attrName = `(?P<ATTRNAME>(` + schemas.AttrNameExpr + `))`
+
 	// subAttr   = "." ATTRNAME ; a sub-attribute of a complex attribute
-	subAttr     = `(\.` + subAttrName + `)`
-	subAttrName = `(?P<SUBATTRNAME>[A-Za-z](` + nameChar + `)*)`
+	subAttr = `(\.(?P<SUBATTRNAME>` + schemas.AttrNameExpr + `))`
 )
 
 // A Path represents a parsed SCIM attribute path as per https://tools.ietf.org/html/rfc7644#section-3.10
