@@ -13,6 +13,7 @@ const (
 	path4 = `urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:manager.displayName`
 	path5 = `userName`
 	path6 = `name.givenName`
+	path7 = `urn:ietf:params:scim:schemas:core:2.0`
 )
 
 func TestPath(t *testing.T) {
@@ -23,6 +24,8 @@ func TestPath(t *testing.T) {
 	assert.Equal(t, "name", a.Name)
 
 	assert.Equal(t, path1, a.String())
+
+	assert.True(t, a.Valid())
 
 	b := Parse(path2)
 
@@ -59,4 +62,8 @@ func TestPath(t *testing.T) {
 	assert.Equal(t, "givenName", f.Sub)
 
 	assert.Equal(t, path6, f.String())
+
+	g := Parse(path7)
+
+	assert.False(t, g.Valid())
 }
