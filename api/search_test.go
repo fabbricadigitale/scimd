@@ -7,7 +7,6 @@ import (
 
 	"github.com/fabbricadigitale/scimd/validation"
 	"github.com/stretchr/testify/require"
-	validator "gopkg.in/go-playground/validator.v9"
 )
 
 func TestSearchResource(t *testing.T) {
@@ -46,54 +45,54 @@ func TestSearchResource(t *testing.T) {
 
 func TestSearchValidation(t *testing.T) {
 	s := Search{}
-	s.Sorting.SortOrder = "sam"
+
+	var err error
+
+	defer func() {
+		r := recover()
+		require.NotNil(t, r)
+		require.Equal(t, "Field Type not found in the Struct", r)
+	}()
+
+	// Wrong Search struct tags
+	// Attributes attrname
+	s.Attributes.Attributes = []string{"1userName"}
+	err = validation.Validator.Var(s, "attrname")
+	require.Error(t, err)
+
+	// ExcludedAttributes attrname
+	s.Attributes.ExcludedAttributes = []string{"2age"}
+	err = validation.Validator.Var(s, "attrname")
+	require.Error(t, err)
+
+	// Pagination StartIndex
 	s.Pagination.StartIndex = 0
+	err = validation.Validator.Var(s, "gt")
+	require.Error(t, err)
 
-	errors := validation.Validator.Struct(s)
-	require.NotNil(t, errors)
-	require.IsType(t, (validator.ValidationErrors)(nil), errors)
-	require.Len(t, errors, 2)
+	// Sorting SortOrder
+	s.Sorting.SortOrder = "sam"
+	err = validation.Validator.Var(s, "eq=ascending|eq=descending")
+	require.Error(t, err)
 
-	structs := []string{"Sorting", "Pagination"}
-	fields := []string{"SortOrder", "StartIndex"}
-	failtags := []string{"eq=ascending|eq=descending", "gt"}
+	// Right Search struct tags
+	// Attributes attrname
+	s.Attributes.Attributes = []string{"userName"}
+	err = validation.Validator.Var(s, "attrname")
+	require.NoError(t, err)
 
-	for e, err := range errors.(validator.ValidationErrors) {
-		exp := "Search." + structs[e]
-		if len(fields[e]) > 0 {
-			exp += "." + fields[e]
-		} else {
-			fields[e] = structs[e]
-		}
-		require.Equal(t, exp, err.Namespace())
-		require.Equal(t, fields[e], err.Field())
-		require.Equal(t, failtags[e], err.ActualTag())
-	}
+	// ExcludedAttributes attrname
+	s.Attributes.ExcludedAttributes = []string{"age"}
+	err = validation.Validator.Var(s, "attrname")
+	require.NoError(t, err)
 
-	s.Sorting.SortOrder = "ascending"
-
-	errors = validation.Validator.Struct(s)
-	require.Len(t, errors, 1)
-
-	structs = structs[1:]
-	fields = fields[1:]
-	failtags = failtags[1:]
-
-	for e, err := range errors.(validator.ValidationErrors) {
-		exp := "Search." + structs[e]
-		if len(fields[e]) > 0 {
-			exp += "." + fields[e]
-		} else {
-			fields[e] = structs[e]
-		}
-		require.Equal(t, exp, err.Namespace())
-		require.Equal(t, fields[e], err.Field())
-		require.Equal(t, failtags[e], err.ActualTag())
-	}
-
+	// Pagination StartIndex
 	s.Pagination.StartIndex = 1
+	err = validation.Validator.Var(s, "gt")
+	require.NoError(t, err)
 
-	errors = validation.Validator.Struct(s)
-	require.NoError(t, errors)
-
+	// Sorting SortOrder
+	s.Sorting.SortOrder = "ascending"
+	err = validation.Validator.Var(s, "eq=ascending|eq=descending")
+	require.NoError(t, err)
 }

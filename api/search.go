@@ -3,8 +3,8 @@ package api
 // TODO: validation
 
 type Attributes struct {
-	Attributes         []string `json:"attributes,omitempty"`         // TODO: validate Attribute Notation
-	ExcludedAttributes []string `json:"excludedAttributes,omitempty"` // TODO: validate Attribute Notation
+	Attributes         []string `json:"attributes,omitempty" validate:"attrname"`
+	ExcludedAttributes []string `json:"excludedAttributes,omitempty" validate:"attrname"`
 }
 
 type Filter string
