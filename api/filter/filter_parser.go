@@ -9,6 +9,11 @@ import (
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 )
 
+
+
+import "github.com/fabbricadigitale/scimd/api/attr"
+
+
 // Suppress unused import errors
 var _ = fmt.Printf
 var _ = reflect.Copy
@@ -16,55 +21,56 @@ var _ = strconv.Itoa
 
 
 var parserATN = []uint16{
-	3, 24715, 42794, 33075, 47597, 16764, 15335, 30598, 22884, 3, 24, 85, 4, 
+	3, 24715, 42794, 33075, 47597, 16764, 15335, 30598, 22884, 3, 25, 88, 4, 
 	2, 9, 2, 4, 3, 9, 3, 4, 4, 9, 4, 4, 5, 9, 5, 4, 6, 9, 6, 4, 7, 9, 7, 3, 
 	2, 5, 2, 16, 10, 2, 3, 2, 3, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 5, 3, 31, 10, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 
 	3, 3, 3, 7, 3, 39, 10, 3, 12, 3, 14, 3, 42, 11, 3, 3, 4, 3, 4, 3, 4, 3, 
 	4, 3, 4, 3, 4, 3, 4, 5, 4, 51, 10, 4, 3, 5, 5, 5, 54, 10, 5, 3, 5, 3, 5, 
-	3, 5, 5, 5, 59, 10, 5, 3, 6, 3, 6, 3, 6, 3, 6, 3, 6, 3, 7, 3, 7, 3, 7, 
+	3, 5, 5, 5, 59, 10, 5, 3, 5, 3, 5, 3, 5, 3, 6, 3, 6, 3, 6, 3, 6, 3, 6, 
 	3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 
-	3, 7, 3, 7, 5, 7, 83, 10, 7, 3, 7, 3, 53, 3, 4, 8, 2, 4, 6, 8, 10, 12, 
-	2, 3, 3, 2, 7, 15, 2, 91, 2, 15, 3, 2, 2, 2, 4, 30, 3, 2, 2, 2, 6, 50, 
-	3, 2, 2, 2, 8, 53, 3, 2, 2, 2, 10, 60, 3, 2, 2, 2, 12, 82, 3, 2, 2, 2, 
-	14, 16, 5, 4, 3, 2, 15, 14, 3, 2, 2, 2, 15, 16, 3, 2, 2, 2, 16, 17, 3, 
-	2, 2, 2, 17, 18, 7, 2, 2, 3, 18, 3, 3, 2, 2, 2, 19, 20, 8, 3, 1, 2, 20, 
-	31, 5, 6, 4, 2, 21, 31, 5, 10, 6, 2, 22, 23, 7, 18, 2, 2, 23, 24, 5, 4, 
-	3, 2, 24, 25, 7, 19, 2, 2, 25, 31, 3, 2, 2, 2, 26, 27, 7, 20, 2, 2, 27, 
-	28, 5, 4, 3, 2, 28, 29, 7, 19, 2, 2, 29, 31, 3, 2, 2, 2, 30, 19, 3, 2, 
-	2, 2, 30, 21, 3, 2, 2, 2, 30, 22, 3, 2, 2, 2, 30, 26, 3, 2, 2, 2, 31, 40, 
-	3, 2, 2, 2, 32, 33, 12, 7, 2, 2, 33, 34, 7, 16, 2, 2, 34, 39, 5, 4, 3, 
-	8, 35, 36, 12, 6, 2, 2, 36, 37, 7, 17, 2, 2, 37, 39, 5, 4, 3, 7, 38, 32, 
-	3, 2, 2, 2, 38, 35, 3, 2, 2, 2, 39, 42, 3, 2, 2, 2, 40, 38, 3, 2, 2, 2, 
-	40, 41, 3, 2, 2, 2, 41, 5, 3, 2, 2, 2, 42, 40, 3, 2, 2, 2, 43, 44, 5, 8, 
-	5, 2, 44, 45, 7, 6, 2, 2, 45, 51, 3, 2, 2, 2, 46, 47, 5, 8, 5, 2, 47, 48, 
-	9, 2, 2, 2, 48, 49, 7, 4, 2, 2, 49, 51, 3, 2, 2, 2, 50, 43, 3, 2, 2, 2, 
-	50, 46, 3, 2, 2, 2, 51, 7, 3, 2, 2, 2, 52, 54, 7, 23, 2, 2, 53, 54, 3, 
-	2, 2, 2, 53, 52, 3, 2, 2, 2, 54, 55, 3, 2, 2, 2, 55, 58, 7, 3, 2, 2, 56, 
-	57, 7, 22, 2, 2, 57, 59, 7, 3, 2, 2, 58, 56, 3, 2, 2, 2, 58, 59, 3, 2, 
-	2, 2, 59, 9, 3, 2, 2, 2, 60, 61, 5, 8, 5, 2, 61, 62, 7, 24, 2, 2, 62, 63, 
-	5, 12, 7, 2, 63, 64, 7, 21, 2, 2, 64, 11, 3, 2, 2, 2, 65, 83, 5, 6, 4, 
-	2, 66, 67, 5, 6, 4, 2, 67, 68, 7, 16, 2, 2, 68, 69, 5, 6, 4, 2, 69, 83, 
-	3, 2, 2, 2, 70, 71, 5, 6, 4, 2, 71, 72, 7, 17, 2, 2, 72, 73, 5, 6, 4, 2, 
-	73, 83, 3, 2, 2, 2, 74, 75, 7, 18, 2, 2, 75, 76, 5, 12, 7, 2, 76, 77, 7, 
-	19, 2, 2, 77, 83, 3, 2, 2, 2, 78, 79, 7, 20, 2, 2, 79, 80, 5, 12, 7, 2, 
-	80, 81, 7, 19, 2, 2, 81, 83, 3, 2, 2, 2, 82, 65, 3, 2, 2, 2, 82, 66, 3, 
-	2, 2, 2, 82, 70, 3, 2, 2, 2, 82, 74, 3, 2, 2, 2, 82, 78, 3, 2, 2, 2, 83, 
-	13, 3, 2, 2, 2, 10, 15, 30, 38, 40, 50, 53, 58, 82,
+	3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 5, 7, 86, 10, 7, 3, 7, 2, 3, 4, 8, 2, 4, 
+	6, 8, 10, 12, 2, 3, 3, 2, 9, 17, 2, 94, 2, 15, 3, 2, 2, 2, 4, 30, 3, 2, 
+	2, 2, 6, 50, 3, 2, 2, 2, 8, 53, 3, 2, 2, 2, 10, 63, 3, 2, 2, 2, 12, 85, 
+	3, 2, 2, 2, 14, 16, 5, 4, 3, 2, 15, 14, 3, 2, 2, 2, 15, 16, 3, 2, 2, 2, 
+	16, 17, 3, 2, 2, 2, 17, 18, 7, 2, 2, 3, 18, 3, 3, 2, 2, 2, 19, 20, 8, 3, 
+	1, 2, 20, 31, 5, 6, 4, 2, 21, 31, 5, 10, 6, 2, 22, 23, 7, 20, 2, 2, 23, 
+	24, 5, 4, 3, 2, 24, 25, 7, 21, 2, 2, 25, 31, 3, 2, 2, 2, 26, 27, 7, 22, 
+	2, 2, 27, 28, 5, 4, 3, 2, 28, 29, 7, 21, 2, 2, 29, 31, 3, 2, 2, 2, 30, 
+	19, 3, 2, 2, 2, 30, 21, 3, 2, 2, 2, 30, 22, 3, 2, 2, 2, 30, 26, 3, 2, 2, 
+	2, 31, 40, 3, 2, 2, 2, 32, 33, 12, 7, 2, 2, 33, 34, 7, 18, 2, 2, 34, 39, 
+	5, 4, 3, 8, 35, 36, 12, 6, 2, 2, 36, 37, 7, 19, 2, 2, 37, 39, 5, 4, 3, 
+	7, 38, 32, 3, 2, 2, 2, 38, 35, 3, 2, 2, 2, 39, 42, 3, 2, 2, 2, 40, 38, 
+	3, 2, 2, 2, 40, 41, 3, 2, 2, 2, 41, 5, 3, 2, 2, 2, 42, 40, 3, 2, 2, 2, 
+	43, 44, 5, 8, 5, 2, 44, 45, 7, 8, 2, 2, 45, 51, 3, 2, 2, 2, 46, 47, 5, 
+	8, 5, 2, 47, 48, 9, 2, 2, 2, 48, 49, 7, 4, 2, 2, 49, 51, 3, 2, 2, 2, 50, 
+	43, 3, 2, 2, 2, 50, 46, 3, 2, 2, 2, 51, 7, 3, 2, 2, 2, 52, 54, 7, 6, 2, 
+	2, 53, 52, 3, 2, 2, 2, 53, 54, 3, 2, 2, 2, 54, 55, 3, 2, 2, 2, 55, 58, 
+	7, 3, 2, 2, 56, 57, 7, 24, 2, 2, 57, 59, 7, 3, 2, 2, 58, 56, 3, 2, 2, 2, 
+	58, 59, 3, 2, 2, 2, 59, 60, 3, 2, 2, 2, 60, 61, 8, 5, 1, 2, 61, 62, 6, 
+	5, 4, 3, 62, 9, 3, 2, 2, 2, 63, 64, 5, 8, 5, 2, 64, 65, 7, 25, 2, 2, 65, 
+	66, 5, 12, 7, 2, 66, 67, 7, 23, 2, 2, 67, 11, 3, 2, 2, 2, 68, 86, 5, 6, 
+	4, 2, 69, 70, 5, 6, 4, 2, 70, 71, 7, 18, 2, 2, 71, 72, 5, 6, 4, 2, 72, 
+	86, 3, 2, 2, 2, 73, 74, 5, 6, 4, 2, 74, 75, 7, 19, 2, 2, 75, 76, 5, 6, 
+	4, 2, 76, 86, 3, 2, 2, 2, 77, 78, 7, 20, 2, 2, 78, 79, 5, 12, 7, 2, 79, 
+	80, 7, 21, 2, 2, 80, 86, 3, 2, 2, 2, 81, 82, 7, 22, 2, 2, 82, 83, 5, 12, 
+	7, 2, 83, 84, 7, 21, 2, 2, 84, 86, 3, 2, 2, 2, 85, 68, 3, 2, 2, 2, 85, 
+	69, 3, 2, 2, 2, 85, 73, 3, 2, 2, 2, 85, 77, 3, 2, 2, 2, 85, 81, 3, 2, 2, 
+	2, 86, 13, 3, 2, 2, 2, 10, 15, 30, 38, 40, 50, 53, 58, 85,
 }
 var deserializer = antlr.NewATNDeserializer(nil)
 var deserializedATN = deserializer.DeserializeFromUInt16(parserATN)
 
 var literalNames = []string{
-	"", "", "", "' '", "' pr'", "' eq'", "' ne'", "' co'", "' sw'", "' ew'", 
-	"' gt'", "' ge'", "' lt'", "' le'", "' and '", "' or '", "", "')'", "'('", 
-	"']'", "'.'", "'urn'", "'['",
+	"", "", "", "", "", "':'", "' pr'", "' eq'", "' ne'", "' co'", "' sw'", 
+	"' ew'", "' gt'", "' ge'", "' lt'", "' le'", "' and '", "' or '", "", "')'", 
+	"'('", "']'", "'.'", "'['",
 }
 var symbolicNames = []string{
-	"", "AttributeName", "ComparisonValue", "Space", "PrOperator", "EqOperator", 
-	"NeOperator", "CoOperator", "SwOperator", "EwOperator", "GtOperator", "GeOperator", 
-	"LtOperator", "LeOperator", "AndOperator", "OrOperator", "NotOperator", 
-	"RxBracket", "LxBracket", "RxSquareBracket", "Dot", "Urn", "LxSquareBracket",
+	"", "AttributeName", "ComparisonValue", "Space", "Urn", "Colon", "PrOperator", 
+	"EqOperator", "NeOperator", "CoOperator", "SwOperator", "EwOperator", "GtOperator", 
+	"GeOperator", "LtOperator", "LeOperator", "AndOperator", "OrOperator", 
+	"NotOperator", "RxBracket", "LxBracket", "RxSquareBracket", "Dot", "LxSquareBracket",
 }
 
 var ruleNames = []string{
@@ -103,25 +109,26 @@ const (
 	FilterParserAttributeName = 1
 	FilterParserComparisonValue = 2
 	FilterParserSpace = 3
-	FilterParserPrOperator = 4
-	FilterParserEqOperator = 5
-	FilterParserNeOperator = 6
-	FilterParserCoOperator = 7
-	FilterParserSwOperator = 8
-	FilterParserEwOperator = 9
-	FilterParserGtOperator = 10
-	FilterParserGeOperator = 11
-	FilterParserLtOperator = 12
-	FilterParserLeOperator = 13
-	FilterParserAndOperator = 14
-	FilterParserOrOperator = 15
-	FilterParserNotOperator = 16
-	FilterParserRxBracket = 17
-	FilterParserLxBracket = 18
-	FilterParserRxSquareBracket = 19
-	FilterParserDot = 20
-	FilterParserUrn = 21
-	FilterParserLxSquareBracket = 22
+	FilterParserUrn = 4
+	FilterParserColon = 5
+	FilterParserPrOperator = 6
+	FilterParserEqOperator = 7
+	FilterParserNeOperator = 8
+	FilterParserCoOperator = 9
+	FilterParserSwOperator = 10
+	FilterParserEwOperator = 11
+	FilterParserGtOperator = 12
+	FilterParserGeOperator = 13
+	FilterParserLtOperator = 14
+	FilterParserLeOperator = 15
+	FilterParserAndOperator = 16
+	FilterParserOrOperator = 17
+	FilterParserNotOperator = 18
+	FilterParserRxBracket = 19
+	FilterParserLxBracket = 20
+	FilterParserRxSquareBracket = 21
+	FilterParserDot = 22
+	FilterParserLxSquareBracket = 23
 )
 
 // FilterParser rules.
@@ -225,7 +232,7 @@ func (p *FilterParser) Root() (localctx IRootContext) {
 	_la = p.GetTokenStream().LA(1)
 
 
-	if (((_la) & -(0x1f+1)) == 0 && ((1 << uint(_la)) & ((1 << FilterParserAttributeName) | (1 << FilterParserNotOperator) | (1 << FilterParserLxBracket) | (1 << FilterParserUrn))) != 0) {
+	if (((_la) & -(0x1f+1)) == 0 && ((1 << uint(_la)) & ((1 << FilterParserAttributeName) | (1 << FilterParserUrn) | (1 << FilterParserNotOperator) | (1 << FilterParserLxBracket))) != 0) {
 		{
 			p.SetState(12)
 			p.filter(0)
@@ -997,24 +1004,12 @@ type IAttributePathContext interface {
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
-	// GetURI returns the URI token.
-	GetURI() antlr.Token 
-
-	// GetName returns the Name token.
-	GetName() antlr.Token 
-
-	// GetSub returns the Sub token.
-	GetSub() antlr.Token 
+	// GetPath returns the path attribute.
+	GetPath() *attr.Path
 
 
-	// SetURI sets the URI token.
-	SetURI(antlr.Token) 
-
-	// SetName sets the Name token.
-	SetName(antlr.Token) 
-
-	// SetSub sets the Sub token.
-	SetSub(antlr.Token) 
+	// SetPath sets the path attribute.
+	SetPath(*attr.Path)
 
 
 	// IsAttributePathContext differentiates from other interfaces.
@@ -1024,9 +1019,7 @@ type IAttributePathContext interface {
 type AttributePathContext struct {
 	*antlr.BaseParserRuleContext
 	parser antlr.Parser
-	URI antlr.Token
-	Name antlr.Token
-	Sub antlr.Token
+	path *attr.Path
 }
 
 func NewEmptyAttributePathContext() *AttributePathContext {
@@ -1051,18 +1044,10 @@ func NewAttributePathContext(parser antlr.Parser, parent antlr.ParserRuleContext
 
 func (s *AttributePathContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *AttributePathContext) GetURI() antlr.Token { return s.URI }
-
-func (s *AttributePathContext) GetName() antlr.Token { return s.Name }
-
-func (s *AttributePathContext) GetSub() antlr.Token { return s.Sub }
+func (s *AttributePathContext) GetPath() *attr.Path { return s.path }
 
 
-func (s *AttributePathContext) SetURI(v antlr.Token) { s.URI = v }
-
-func (s *AttributePathContext) SetName(v antlr.Token) { s.Name = v }
-
-func (s *AttributePathContext) SetSub(v antlr.Token) { s.Sub = v }
+func (s *AttributePathContext) SetPath(v *attr.Path) { s.path = v }
 
 
 func (s *AttributePathContext) AllAttributeName() []antlr.TerminalNode {
@@ -1073,12 +1058,12 @@ func (s *AttributePathContext) AttributeName(i int) antlr.TerminalNode {
 	return s.GetToken(FilterParserAttributeName, i)
 }
 
-func (s *AttributePathContext) Dot() antlr.TerminalNode {
-	return s.GetToken(FilterParserDot, 0)
-}
-
 func (s *AttributePathContext) Urn() antlr.TerminalNode {
 	return s.GetToken(FilterParserUrn, 0)
+}
+
+func (s *AttributePathContext) Dot() antlr.TerminalNode {
+	return s.GetToken(FilterParserDot, 0)
 }
 
 func (s *AttributePathContext) GetRuleContext() antlr.RuleContext {
@@ -1117,44 +1102,41 @@ func (p *FilterParser) AttributePath() (localctx IAttributePathContext) {
 	p.EnterOuterAlt(localctx, 1)
 	p.SetState(51)
 	p.GetErrorHandler().Sync(p)
+	_la = p.GetTokenStream().LA(1)
 
 
-	if p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 5, p.GetParserRuleContext()) == 1+1 {
+	if _la == FilterParserUrn {
 		{
 			p.SetState(50)
-
-			var _m = p.Match(FilterParserUrn)
-
-			localctx.(*AttributePathContext).URI = _m
+			p.Match(FilterParserUrn)
 		}
-
 
 	}
 	{
 		p.SetState(53)
-
-		var _m = p.Match(FilterParserAttributeName)
-
-		localctx.(*AttributePathContext).Name = _m
+		p.Match(FilterParserAttributeName)
 	}
 	p.SetState(56)
 	p.GetErrorHandler().Sync(p)
-	_la = p.GetTokenStream().LA(1)
 
 
-	if _la == FilterParserDot {
+	if p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 6, p.GetParserRuleContext()) == 1 {
 		{
 			p.SetState(54)
 			p.Match(FilterParserDot)
 		}
 		{
 			p.SetState(55)
-
-			var _m = p.Match(FilterParserAttributeName)
-
-			localctx.(*AttributePathContext).Sub = _m
+			p.Match(FilterParserAttributeName)
 		}
 
+
+	}
+	localctx.(*AttributePathContext).path = attr.Parse(localctx.(*AttributePathContext).GetText())
+	p.SetState(59)
+
+	if !(localctx.(*AttributePathContext).path.Valid()) {
+		panic(antlr.NewFailedPredicateException(p, "$path.Valid()", "is not a valid URN"))
 	}
 
 
@@ -1288,7 +1270,7 @@ func (p *FilterParser) ValueExpression() (localctx IValueExpressionContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(58)
+		p.SetState(61)
 
 		var _x = p.AttributePath()
 
@@ -1296,11 +1278,11 @@ func (p *FilterParser) ValueExpression() (localctx IValueExpressionContext) {
 		localctx.(*ValueExpressionContext).Path = _x
 	}
 	{
-		p.SetState(59)
+		p.SetState(62)
 		p.Match(FilterParserLxSquareBracket)
 	}
 	{
-		p.SetState(60)
+		p.SetState(63)
 
 		var _x = p.ValueFilter()
 
@@ -1308,7 +1290,7 @@ func (p *FilterParser) ValueExpression() (localctx IValueExpressionContext) {
 		localctx.(*ValueExpressionContext).InnerFilter = _x
 	}
 	{
-		p.SetState(61)
+		p.SetState(64)
 		p.Match(FilterParserRxSquareBracket)
 	}
 
@@ -1651,14 +1633,14 @@ func (p *FilterParser) ValueFilter() (localctx IValueFilterContext) {
 		}
 	}()
 
-	p.SetState(80)
+	p.SetState(83)
 	p.GetErrorHandler().Sync(p)
 	switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 7, p.GetParserRuleContext()) {
 	case 1:
 		localctx = NewAttributeExprValueFilterContext(p, localctx)
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(63)
+			p.SetState(66)
 
 			var _x = p.AttributeExpression()
 
@@ -1671,7 +1653,7 @@ func (p *FilterParser) ValueFilter() (localctx IValueFilterContext) {
 		localctx = NewAndValueFilterContext(p, localctx)
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(64)
+			p.SetState(67)
 
 			var _x = p.AttributeExpression()
 
@@ -1679,14 +1661,14 @@ func (p *FilterParser) ValueFilter() (localctx IValueFilterContext) {
 			localctx.(*AndValueFilterContext).Left = _x
 		}
 		{
-			p.SetState(65)
+			p.SetState(68)
 
 			var _m = p.Match(FilterParserAndOperator)
 
 			localctx.(*AndValueFilterContext).Op = _m
 		}
 		{
-			p.SetState(66)
+			p.SetState(69)
 
 			var _x = p.AttributeExpression()
 
@@ -1699,7 +1681,7 @@ func (p *FilterParser) ValueFilter() (localctx IValueFilterContext) {
 		localctx = NewOrValueFilterContext(p, localctx)
 		p.EnterOuterAlt(localctx, 3)
 		{
-			p.SetState(68)
+			p.SetState(71)
 
 			var _x = p.AttributeExpression()
 
@@ -1707,14 +1689,14 @@ func (p *FilterParser) ValueFilter() (localctx IValueFilterContext) {
 			localctx.(*OrValueFilterContext).Left = _x
 		}
 		{
-			p.SetState(69)
+			p.SetState(72)
 
 			var _m = p.Match(FilterParserOrOperator)
 
 			localctx.(*OrValueFilterContext).Op = _m
 		}
 		{
-			p.SetState(70)
+			p.SetState(73)
 
 			var _x = p.AttributeExpression()
 
@@ -1727,11 +1709,11 @@ func (p *FilterParser) ValueFilter() (localctx IValueFilterContext) {
 		localctx = NewNotValueFilterContext(p, localctx)
 		p.EnterOuterAlt(localctx, 4)
 		{
-			p.SetState(72)
+			p.SetState(75)
 			p.Match(FilterParserNotOperator)
 		}
 		{
-			p.SetState(73)
+			p.SetState(76)
 
 			var _x = p.ValueFilter()
 
@@ -1739,7 +1721,7 @@ func (p *FilterParser) ValueFilter() (localctx IValueFilterContext) {
 			localctx.(*NotValueFilterContext).InnerFilter = _x
 		}
 		{
-			p.SetState(74)
+			p.SetState(77)
 			p.Match(FilterParserRxBracket)
 		}
 
@@ -1748,11 +1730,11 @@ func (p *FilterParser) ValueFilter() (localctx IValueFilterContext) {
 		localctx = NewGroupValueFilterContext(p, localctx)
 		p.EnterOuterAlt(localctx, 5)
 		{
-			p.SetState(76)
+			p.SetState(79)
 			p.Match(FilterParserLxBracket)
 		}
 		{
-			p.SetState(77)
+			p.SetState(80)
 
 			var _x = p.ValueFilter()
 
@@ -1760,7 +1742,7 @@ func (p *FilterParser) ValueFilter() (localctx IValueFilterContext) {
 			localctx.(*GroupValueFilterContext).InnerFilter = _x
 		}
 		{
-			p.SetState(78)
+			p.SetState(81)
 			p.Match(FilterParserRxBracket)
 		}
 
@@ -1778,6 +1760,11 @@ func (p *FilterParser) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex 
 			if localctx != nil { t = localctx.(*FilterContext) }
 			return p.Filter_Sempred(t, predIndex)
 
+	case 3:
+			var t *AttributePathContext = nil
+			if localctx != nil { t = localctx.(*AttributePathContext) }
+			return p.AttributePath_Sempred(t, predIndex)
+
 
 	default:
 		panic("No predicate with index: " + fmt.Sprint(ruleIndex))
@@ -1791,6 +1778,16 @@ func (p *FilterParser) Filter_Sempred(localctx antlr.RuleContext, predIndex int)
 
 	case 1:
 			return p.Precpred(p.GetParserRuleContext(), 4)
+
+	default:
+		panic("No predicate with index: " + fmt.Sprint(predIndex))
+	}
+}
+
+func (p *FilterParser) AttributePath_Sempred(localctx antlr.RuleContext, predIndex int) bool {
+	switch predIndex {
+	case 2:
+			return localctx.(*AttributePathContext).path.Valid()
 
 	default:
 		panic("No predicate with index: " + fmt.Sprint(predIndex))
