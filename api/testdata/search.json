@@ -1,0 +1,9 @@
+{
+    "attributes": ["userName", "email"],
+    "excludedAttributes": ["age", "phoneNumber"],
+    "filter": "userName eq john",
+    "sortBy": "userName",
+    "sortOrder": "ascending",
+    "startIndex": 1,
+    "count": 0
+}
