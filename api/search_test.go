@@ -44,55 +44,51 @@ func TestSearchResource(t *testing.T) {
 }
 
 func TestSearchValidation(t *testing.T) {
-	s := Search{}
+	testWrong := Search{}
+	testWrong.Attributes.Attributes = []string{"urn:ietf:params:scim:schemas:core:2.0"}
+	testWrong.Attributes.ExcludedAttributes = []string{"urn:ietf:params:scim:schemas:core:2.0"}
+	testWrong.Pagination.StartIndex = 0
+	testWrong.Sorting.SortOrder = "sam"
+
+	testRight := Search{}
+	testRight.Attributes.Attributes = []string{"urn:ietf:params:scim:schemas:core:2.0:User:userName"}
+	testRight.Attributes.ExcludedAttributes = []string{"urn:ietf:params:scim:schemas:core:2.0:User:userName"}
+	testRight.Pagination.StartIndex = 1
+	testRight.Sorting.SortOrder = "ascending"
 
 	var err error
 
-	defer func() {
-		r := recover()
-		require.NotNil(t, r)
-		require.Equal(t, "Field Type not found in the Struct", r)
-	}()
-
 	// Wrong Search struct tags
-	// Attributes attrname
-	s.Attributes.Attributes = []string{"1userName"}
-	err = validation.Validator.Var(s, "attrname")
+	// Attributes attrpath
+	err = validation.Validator.Var(testWrong.Attributes, "attrpath")
 	require.Error(t, err)
 
-	// ExcludedAttributes attrname
-	s.Attributes.ExcludedAttributes = []string{"2age"}
-	err = validation.Validator.Var(s, "attrname")
+	// ExcludedAttributes attrpath
+	err = validation.Validator.Var(testWrong.Attributes, "attrpath")
 	require.Error(t, err)
 
 	// Pagination StartIndex
-	s.Pagination.StartIndex = 0
-	err = validation.Validator.Var(s, "gt")
+	err = validation.Validator.Var(testWrong.Pagination, "gt")
 	require.Error(t, err)
 
 	// Sorting SortOrder
-	s.Sorting.SortOrder = "sam"
-	err = validation.Validator.Var(s, "eq=ascending|eq=descending")
+	err = validation.Validator.Var(testWrong.Sorting, "eq=ascending|eq=descending")
 	require.Error(t, err)
 
 	// Right Search struct tags
-	// Attributes attrname
-	s.Attributes.Attributes = []string{"userName"}
-	err = validation.Validator.Var(s, "attrname")
+	// Attributes attrpath
+	err = validation.Validator.Var(testRight.Attributes, "attrpath")
 	require.NoError(t, err)
 
-	// ExcludedAttributes attrname
-	s.Attributes.ExcludedAttributes = []string{"age"}
-	err = validation.Validator.Var(s, "attrname")
+	// ExcludedAttributes attrpath
+	err = validation.Validator.Var(testRight.Attributes, "attrpath")
 	require.NoError(t, err)
 
 	// Pagination StartIndex
-	s.Pagination.StartIndex = 1
-	err = validation.Validator.Var(s, "gt")
+	err = validation.Validator.Var(testRight.Pagination, "gt")
 	require.NoError(t, err)
 
 	// Sorting SortOrder
-	s.Sorting.SortOrder = "ascending"
-	err = validation.Validator.Var(s, "eq=ascending|eq=descending")
+	err = validation.Validator.Var(testRight.Sorting, "eq=ascending|eq=descending")
 	require.NoError(t, err)
 }
