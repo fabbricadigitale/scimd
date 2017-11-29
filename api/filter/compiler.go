@@ -26,6 +26,7 @@ func CompileString(s string) (f Filter, err error) {
 	errListener := new(parserErrorListener)
 	stream := antlr.NewInputStream(s)
 	lexer := NewFilterLexer(stream)
+	lexer.RemoveErrorListeners()
 	tokens := antlr.NewCommonTokenStream(lexer, 0)
 
 	parser := NewFilterParser(tokens)
