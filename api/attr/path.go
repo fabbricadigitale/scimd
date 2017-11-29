@@ -54,11 +54,7 @@ func Parse(s string) *Path {
 }
 
 func (a Path) Valid() bool {
-	s := a.Name
-	if len(s) > 0 {
-		return true
-	}
-	return false
+	return len(a.Name) > 0
 }
 
 func (a Path) String() string {
