@@ -84,17 +84,7 @@ func compileFilter(ctx IFilterContext) Filter {
 }
 
 func compileAttributePath(c IAttributePathContext) *attr.Path {
-	path := attr.Path{}
-	if uri := c.GetURI(); uri != nil {
-		path.URI = uri.GetText()
-	}
-	if name := c.GetName(); name != nil {
-		path.Name = name.GetText()
-	}
-	if sub := c.GetSub(); sub != nil {
-		path.Sub = sub.GetText()
-	}
-	return &path
+	return c.GetPath()
 }
 
 func compileAttributeExpression(c IAttributeExpressionContext) *AttrExpr {
