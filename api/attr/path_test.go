@@ -7,13 +7,14 @@ import (
 )
 
 const (
-	path1 = `urn:ietf:params:scim:schemas:core:2.0:User:name`
-	path2 = `urn:ietf:params:scim:schemas:core:2.0:User:name.givenName`
-	path3 = `urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:employeeNumber`
-	path4 = `urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:manager.displayName`
-	path5 = `userName`
-	path6 = `name.givenName`
-	path7 = `urn:ietf:params:scim:schemas:core:2.0`
+	path1      = `urn:ietf:params:scim:schemas:core:2.0:User:name`
+	path2      = `urn:ietf:params:scim:schemas:core:2.0:User:name.givenName`
+	path3      = `urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:employeeNumber`
+	path4      = `urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:manager.displayName`
+	path5      = `userName`
+	path6      = `name.givenName`
+	path7      = `urn:ietf:params:scim:schemas:core:2.0`
+	invalidUrn = `urn:urn:params:scim:schemas:core:2.0:User:name`
 )
 
 func TestPath(t *testing.T) {
@@ -64,6 +65,8 @@ func TestPath(t *testing.T) {
 	assert.Equal(t, path6, f.String())
 
 	g := Parse(path7)
-
 	assert.False(t, g.Valid())
+
+	ko := Parse(invalidUrn)
+	assert.False(t, ko.Valid())
 }

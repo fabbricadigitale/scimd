@@ -2,6 +2,7 @@ package attr
 
 import (
 	"regexp"
+	"strings"
 
 	"github.com/fabbricadigitale/scimd/schemas"
 )
@@ -17,6 +18,8 @@ const (
 	// subAttr   = "." ATTRNAME ; a sub-attribute of a complex attribute
 	subAttr = `(\.(?P<SUBATTRNAME>` + schemas.AttrNameExpr + `))`
 )
+
+const invalidURNPrefix = "urn:urn:"
 
 // A Path represents a parsed SCIM attribute path as per https://tools.ietf.org/html/rfc7644#section-3.10
 type Path struct {
@@ -53,11 +56,15 @@ func Parse(s string) *Path {
 	return a
 }
 
+// Valid returns true if a is valid attribute path
 func (a Path) Valid() bool {
-	return len(a.Name) > 0
+	return len(a.Name) > 0 && !strings.HasPrefix(strings.ToLower(a.URI), invalidURNPrefix)
 }
 
 func (a Path) String() string {
+	if !a.Valid() {
+		return ""
+	}
 	s := a.URI
 	if len(s) > 0 {
 		s += ":"
