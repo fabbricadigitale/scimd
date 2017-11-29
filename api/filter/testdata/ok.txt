@@ -26,3 +26,9 @@ not (userName eq "strings")
 not (not co "stringsss")
 emails[not (type sw null)]
 emails[not (not co "")]
+urn:nid:nss:userName sw "J"
+urn:validid:validnss:attrname.subattrname sw "J"
+urn:ietf:params:scim:schemas:core:2.0:User:userName sw "J"
+urn:ietf:params:scim:schemas:core:2.0:User::X:::userName sw "J"
+urn:ietf:params:scim:schemas:core:2.0:User::X:::emails.type sw "J"
+schemas eq "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"

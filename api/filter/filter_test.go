@@ -67,11 +67,9 @@ func TestParserError(t *testing.T) {
 		parser := NewFilterParser(tokens)
 		parser.RemoveErrorListeners()
 		parser.AddErrorListener(errListener)
-		parser.BuildParseTrees = true
 
 		require.Panics(t, func() {
 			parser.Root()
 		})
-
 	}
 }

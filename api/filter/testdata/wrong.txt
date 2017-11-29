@@ -15,3 +15,5 @@ notand
 "abc"
 not ""
 (not eq )
+urn:-ietf:params:scim:schemas:core:2.0:User::X:::emails.type sw "J"
+urn:a!?:params:scim:schemas:core:2.0:User:emails.type sw "J"

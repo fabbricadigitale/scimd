@@ -9,7 +9,6 @@ import (
 )
 
 func TestParse(t *testing.T) {
-
 	inFile, _ := os.Open("testdata/ok.txt")
 	defer inFile.Close()
 	scanner := bufio.NewScanner(inFile)

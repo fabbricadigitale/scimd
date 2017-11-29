@@ -1,2 +1,0 @@
-urn:ietf:params:scim:schemas:core:2.0:User:userName sw "J"
-schemas eq "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"
