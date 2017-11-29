@@ -40,6 +40,8 @@ const (
 func Parse(s string) *Path {
 	a := &Path{}
 	matches := attrNameExp.FindStringSubmatch(s)
+
+	// to be valid must match ATTRNAME at least
 	l := len(matches)
 	if l > nameIdx {
 		a.URI = matches[uriIdx]
@@ -49,6 +51,14 @@ func Parse(s string) *Path {
 		}
 	}
 	return a
+}
+
+func (a Path) Valid() bool {
+	s := a.Name
+	if len(s) > 0 {
+		return true
+	}
+	return false
 }
 
 func (a Path) String() string {
