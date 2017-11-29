@@ -95,7 +95,7 @@ func (a *Adapter) hydrateResource(r *resource.Resource) *resourceDocument {
 	rt := r.ResourceType()
 
 	mCore := make(map[string]interface{})
-	mCore[urnKey] = r.GetSchema().ID
+	mCore[urnKey] = rt.GetSchema().ID
 	for key, val := range *r.Values(rt.GetSchema().ID) {
 		mCore[key] = val
 	}
