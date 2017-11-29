@@ -57,7 +57,7 @@ const SchemaURI = "urn:ietf:params:scim:schemas:core:2.0:Schema"
 
 // Schema is a structured resource for "urn:ietf:params:scim:schemas:core:2.0:Schema"
 type Schema struct {
-	Common
+	CommonAttributes
 	Name        string     `json:"name,omitempty"`
 	Description string     `json:"description,omitempty"`
 	Attributes  Attributes `json:"attributes,omitempty"`
@@ -66,8 +66,8 @@ type Schema struct {
 // NewSchema returns a new Schema filled with defaults
 func NewSchema() *Schema {
 	return &Schema{
-		Common: *NewCommon(SchemaURI, "Schema", SchemaURI),
-		Name:   "Schema",
+		CommonAttributes: *NewCommon(SchemaURI, "Schema", SchemaURI),
+		Name:             "Schema",
 	}
 }
 

@@ -53,11 +53,11 @@ func TestUnmarshalResource(t *testing.T) {
 		field interface{}
 	}{
 		{"2819c223-7f76-453a-919d-413861904646", res.ID},
-		{"2819c223-7f76-453a-919d-413861904646", res.Common.ID},
+		{"2819c223-7f76-453a-919d-413861904646", res.CommonAttributes.ID},
 		{[]string{"urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"}, res.Schemas},
-		{[]string{"urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"}, res.Common.Schemas},
+		{[]string{"urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"}, res.CommonAttributes.Schemas},
 		{"https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646", res.Meta.Location},
-		{"https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646", res.Common.Meta.Location},
+		{"https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646", res.CommonAttributes.Meta.Location},
 	}
 
 	for _, row := range equalities {

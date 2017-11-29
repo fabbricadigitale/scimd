@@ -43,7 +43,7 @@ type authenticationScheme struct {
 
 // ServiceProviderConfig is a structured resource for "urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig"
 type ServiceProviderConfig struct {
-	Common
+	CommonAttributes
 	DocumentationURI      string                 `json:"documentationUri,omitempty" validate:"omitempty,uri"`
 	Patch                 patch                  `json:"patch" validate:"required"`
 	Bulk                  bulk                   `json:"bulk" validate:"required"`
@@ -60,7 +60,7 @@ const ServiceProviderConfigURI = "urn:ietf:params:scim:schemas:core:2.0:ServiceP
 // NewServiceProviderConfig returns a new ServiceProviderConfig filled with defaults
 func NewServiceProviderConfig() *ServiceProviderConfig {
 	spc := &ServiceProviderConfig{
-		Common: *NewCommon(ServiceProviderConfigURI, "ServiceProviderConfig", ""),
+		CommonAttributes: *NewCommon(ServiceProviderConfigURI, "ServiceProviderConfig", ""),
 	}
 	defaults.SetDefaults(spc)
 	return spc

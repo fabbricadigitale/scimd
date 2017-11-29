@@ -70,7 +70,7 @@ func TestServiceProviderConfigResource(t *testing.T) {
 
 func TestServiceProviderConfigValidation(t *testing.T) {
 	res := NewServiceProviderConfig()
-	res.Common.ID = "User"
+	res.ID = "User"
 	res.Meta.Location = "https://example.com/v2/ResourceTypes/User"
 	now := time.Now()
 	res.Meta.Created = &now

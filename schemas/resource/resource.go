@@ -14,7 +14,7 @@ type Valuer interface {
 
 // Resource represents a mapped resource. It implements both core.ResourceTyper and Valuer
 type Resource struct {
-	core.Common
+	core.CommonAttributes
 	data map[string]*datatype.Complex
 }
 
@@ -34,7 +34,7 @@ func (r *Resource) Values(ns string) *datatype.Complex {
 // UnmarshalJSON is the Resource Marshal implementation
 func (r *Resource) UnmarshalJSON(b []byte) error {
 	// Unmarshal common parts
-	if err := json.Unmarshal(b, &r.Common); err != nil {
+	if err := json.Unmarshal(b, &r.CommonAttributes); err != nil {
 		return err
 	}
 
@@ -94,10 +94,10 @@ func (r *Resource) MarshalJSON() ([]byte, error) {
 	// Attach Common attribute to the map before marshal operation
 	// TODO: implement "omitempty" check
 	out := map[string]interface{}{
-		"id":         r.Common.ID,
-		"externalId": r.Common.ExternalID,
-		"schemas":    r.Common.Schemas,
-		"meta":       r.Common.Meta,
+		"id":         r.ID,
+		"externalId": r.ExternalID,
+		"schemas":    r.Schemas,
+		"meta":       r.Meta,
 	}
 
 	// Get BaseSchema to encode core attributes

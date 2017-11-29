@@ -8,7 +8,7 @@ type SchemaExtension struct {
 
 // ResourceType is a structured resource for "urn:ietf:params:scim:schemas:core:2.0:ResourceType"
 type ResourceType struct {
-	Common
+	CommonAttributes
 	Name             string            `json:"name" validate:"required"`
 	Endpoint         string            `json:"endpoint" validate:"startswith=/,required"`
 	Description      string            `json:"description,omitempty"`
@@ -22,9 +22,9 @@ const ResourceTypeURI = "urn:ietf:params:scim:schemas:core:2.0:ResourceType"
 // NewResourceType returns a ResourceType filled with min values set which identify a particular schema and resourceType (eg. User)
 func NewResourceType(schema, resourceType string) *ResourceType {
 	return &ResourceType{
-		Common: *NewCommon(ResourceTypeURI, "ResourceType", resourceType),
-		Schema: schema,
-		Name:   resourceType,
+		CommonAttributes: *NewCommon(ResourceTypeURI, "ResourceType", resourceType),
+		Schema:           schema,
+		Name:             resourceType,
 	}
 }
 

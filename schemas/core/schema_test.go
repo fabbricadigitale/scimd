@@ -25,11 +25,11 @@ func TestSchemaResource(t *testing.T) {
 		field interface{}
 	}{
 		{"urn:ietf:params:scim:schemas:core:2.0:User", sch.ID},
-		{"urn:ietf:params:scim:schemas:core:2.0:User", sch.Common.ID},
+		{"urn:ietf:params:scim:schemas:core:2.0:User", sch.CommonAttributes.ID},
 		{"Schema", sch.Meta.ResourceType},
-		{"Schema", sch.Common.Meta.ResourceType},
+		{"Schema", sch.CommonAttributes.Meta.ResourceType},
 		{"/v2/Schemas/urn:ietf:params:scim:schemas:core:2.0:User", sch.Meta.Location},
-		{"/v2/Schemas/urn:ietf:params:scim:schemas:core:2.0:User", sch.Common.Meta.Location},
+		{"/v2/Schemas/urn:ietf:params:scim:schemas:core:2.0:User", sch.CommonAttributes.Meta.Location},
 	}
 
 	for _, row := range equalities {

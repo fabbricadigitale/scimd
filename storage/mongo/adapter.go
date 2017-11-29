@@ -87,10 +87,10 @@ func (a *Adapter) hydrateResource(r *resource.Resource) *resourceDocument {
 	h := &resourceDocument{}
 
 	common := make(map[string]interface{})
-	common["schemas"] = r.Common.Schemas
-	common["id"] = r.Common.ID
-	common["external_id"] = r.Common.ExternalID
-	common["meta"] = r.Common.Meta
+	common["schemas"] = r.Schemas
+	common["id"] = r.ID
+	common["external_id"] = r.ExternalID
+	common["meta"] = r.Meta
 
 	rt := r.ResourceType()
 
@@ -118,17 +118,15 @@ func (a *Adapter) hydrateResource(r *resource.Resource) *resourceDocument {
 
 func (a *Adapter) toResource(h *resourceDocument) (*resource.Resource, error) {
 
-	r := &resource.Resource{}
-
-	c := core.Common{}
 	hCommon := h.Data[0]
-
-	c.Schemas = hCommon["schemas"].([]string)
-	c.ID = hCommon["id"].(string)
-	c.ExternalID = hCommon["external_id"].(string)
-	c.Meta = hCommon["meta"].(core.Meta)
-
-	r.Common = c
+	r := &resource.Resource{
+		CommonAttributes: core.CommonAttributes{
+			Schemas:    hCommon["schemas"].([]string),
+			ID:         hCommon["id"].(string),
+			ExternalID: hCommon["external_id"].(string),
+			Meta:       hCommon["meta"].(core.Meta),
+		},
+	}
 
 	var p *datatype.Complex
 	for i := 1; i < len(h.Data); i++ {

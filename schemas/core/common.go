@@ -20,8 +20,8 @@ type Meta struct {
 	Version      string     `json:"version,omitempty"`
 }
 
-// Common ...
-type Common struct {
+// CommonAttributes represents SCIM Common Attributes as per https://tools.ietf.org/html/rfc7643#section-3.1
+type CommonAttributes struct {
 	Schemas []string `json:"schemas" validate:"gt=0,dive,urn,required"`
 
 	// Common attributes
@@ -31,18 +31,20 @@ type Common struct {
 }
 
 // NewCommon returns a Common filled with schema, resourceType, and ID
-func NewCommon(schema, resourceType, ID string) *Common {
-	return &Common{
+func NewCommon(schema, resourceType, ID string) *CommonAttributes {
+	return &CommonAttributes{
 		Schemas: []string{schema},
 		ID:      ID,
 		Meta:    Meta{ResourceType: resourceType},
 	}
 }
 
-func (c *Common) GetCommon() *Common {
+// Common returns CommonAttributes of a SCIM resource
+func (c *CommonAttributes) Common() *CommonAttributes {
 	return c
 }
 
-func (c *Common) ResourceType() *ResourceType {
+// ResourceType returns the ResourceType of a SCIM resource
+func (c *CommonAttributes) ResourceType() *ResourceType {
 	return GetResourceTypeRepository().Get(c.Meta.ResourceType)
 }

@@ -44,7 +44,7 @@ func TestMetaValidation(t *testing.T) {
 }
 
 func TestCommonValidation(t *testing.T) {
-	c := Common{}
+	c := CommonAttributes{}
 
 	fmt.Println(c)
 
@@ -58,7 +58,7 @@ func TestCommonValidation(t *testing.T) {
 	failtags := []string{"gt", "required", "excludes"}
 
 	for e, err := range errors.(validator.ValidationErrors) {
-		exp := "Common." + fields[e]
+		exp := "CommonAttributes." + fields[e]
 		require.Equal(t, exp, err.Namespace())
 		require.Equal(t, fields[e], err.Field())
 		require.Equal(t, failtags[e], err.ActualTag())
