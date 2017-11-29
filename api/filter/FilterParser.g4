@@ -3,6 +3,10 @@
  */
 parser grammar FilterParser;
 
+@header {
+import "github.com/fabbricadigitale/scimd/api/attr"
+}
+
 options {
         tokenVocab=FilterLexer;
 }
@@ -26,7 +30,10 @@ attributeExpression
         ;
 
 attributePath
-        : (URI=Urn)?? Name=AttributeName (Dot Sub=AttributeName)?
+        returns [*attr.Path path]
+        : Urn? AttributeName (Dot AttributeName)?
+        {$path = attr.Parse($ctx.GetText())}
+        {$path.Valid()}?<fail={"is not a valid URN"}>
         ;
 
 valueExpression

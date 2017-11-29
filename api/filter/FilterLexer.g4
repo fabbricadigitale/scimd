@@ -13,9 +13,16 @@ ComparisonValue
         ;
 
 Space
-        : ' ' 
+        : [ ]
         ;
 
+Urn
+        : [uU][rR][nN] Colon (. | ~[ ])+ Colon
+        ;
+
+Colon
+        : ':'
+        ;
 
 PrOperator
         : ' pr'
@@ -83,10 +90,6 @@ RxSquareBracket
 
 Dot
         : '.'
-        ;
-
-Urn
-        : 'urn'
         ;
 
 LxSquareBracket
