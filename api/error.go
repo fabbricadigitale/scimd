@@ -27,3 +27,12 @@ func (e *InvalidFilterError) Error() string {
 	}
 	return fmt.Sprintf("Filter is invalid: %s", e.Detail)
 }
+
+// InternalServerError is a wrapper of a generic server error
+type InternalServerError struct {
+	Detail string
+}
+
+func (e *InternalServerError) Error() string {
+	return fmt.Sprintf("Ops! Internal server error: %s", e.Detail)
+}
