@@ -1,0 +1,10 @@
+{
+    "schemas": ["urn:ietf:params:scim:api:messages:2.0:SearchRequest"],
+    "attributes": ["userName", "email"],
+    "excludedAttributes": ["age", "phoneNumber"],
+    "filter": "userName eq john",
+    "sortBy": "userName",
+    "sortOrder": "ascending",
+    "startIndex": 1,
+    "count": 0
+}
