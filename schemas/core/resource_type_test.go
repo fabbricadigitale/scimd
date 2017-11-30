@@ -66,7 +66,7 @@ func TestResourceTypeValidation(t *testing.T) {
 	require.Len(t, errors, 3)
 
 	fields := []string{"Name", "Endpoint", "Schema"}
-	failtags := []string{"required", "startswith", "required"}
+	failtags := []string{"required", "startswith", "urn", "required"}
 
 	for e, err := range errors.(validator.ValidationErrors) {
 		require.Equal(t, "ResourceType."+fields[e], err.Namespace())
@@ -108,8 +108,6 @@ func TestResourceTypeValidation(t *testing.T) {
 
 	fields = fields[1:]
 	failtags = failtags[1:]
-
-	// fmt.Println(errors)
 
 	// (todo)> try a non urn on schema
 

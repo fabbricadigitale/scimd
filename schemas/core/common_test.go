@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/fabbricadigitale/scimd/validation"
@@ -46,8 +45,6 @@ func TestMetaValidation(t *testing.T) {
 func TestCommonValidation(t *testing.T) {
 	c := CommonAttributes{}
 
-	fmt.Println(c)
-
 	errors := validation.Validator.StructExcept(c, "Meta")
 	require.NotNil(t, errors)
 	require.IsType(t, (validator.ValidationErrors)(nil), errors)
@@ -64,17 +61,35 @@ func TestCommonValidation(t *testing.T) {
 		require.Equal(t, failtags[e], err.ActualTag())
 	}
 
-	c.Schemas = []string{"not-a-urn"}
+	// Wrong URN fail on urn validation tag, right ID
+	c = CommonAttributes{
+		Schemas: []string{"not-a-urn"},
+		ID:      "test",
+	}
 	errors = validation.Validator.StructExcept(c, "Meta")
+	for _, err := range errors.(validator.ValidationErrors) {
+		require.NotNil(t, err)
+		require.IsType(t, (validator.ValidationErrors)(nil), errors)
+	}
+	require.Len(t, errors, 1)
 
-	c.ID = "bulkId"
+	// Empty Schema fail on gt validation tag, ID fails on excludes validation tag
+	c = CommonAttributes{
+		Schemas: []string{},
+		ID:      "bulkId",
+	}
 	errors = validation.Validator.StructExcept(c, "Meta")
-	require.NotNil(t, errors)
+	for _, err := range errors.(validator.ValidationErrors) {
+		require.NotNil(t, err)
+		require.IsType(t, (validator.ValidationErrors)(nil), errors)
+	}
+	require.Len(t, errors, 2)
 
-	c.ID = "bulkID"
+	// Right URN and valid ID
+	c = CommonAttributes{
+		Schemas: []string{"urn:ietf:params:scim:schemas:core:2.0:User"},
+		ID:      "test",
+	}
 	errors = validation.Validator.StructExcept(c, "Meta")
-	require.Nil(t, errors)
-
-	// (todo) > complete when urn validator will be done
-	fmt.Println(errors)
+	require.NoError(t, errors)
 }
