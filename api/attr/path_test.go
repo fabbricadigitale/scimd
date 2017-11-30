@@ -3,6 +3,7 @@ package attr
 import (
 	"testing"
 
+	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -69,4 +70,39 @@ func TestPath(t *testing.T) {
 
 	ko := Parse(invalidUrn)
 	assert.False(t, ko.Valid())
+}
+
+func TestFindAttribute(t *testing.T) {
+	resTypeRepo := core.GetResourceTypeRepository()
+	if _, err := resTypeRepo.Add("../../schemas/core/testdata/user.json"); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	schemaRepo := core.GetSchemaRepository()
+	if _, err := schemaRepo.Add("../../schemas/core/testdata/user_schema.json"); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	rt := resTypeRepo.Get("User")
+
+	// FQN path / case insesitive
+	p := Path{
+		URI:  "urn:ietf:params:scim:schemas:core:2.0:User",
+		Name: "NAME",
+		Sub:  "gIvEnNaMe",
+	}
+	assert.Equal(t, rt.GetSchema().Attributes.ByName("name").SubAttributes.ByName("givenName"), p.FindAttribute(rt))
+
+	// Just attribute name
+	p = Path{
+		Name: "userName",
+	}
+	assert.Equal(t, rt.GetSchema().Attributes.ByName("userName"), p.FindAttribute(rt))
+
+	// (todo) Name and Sub without URI
+
+	// (todo) Schema ex
+
 }

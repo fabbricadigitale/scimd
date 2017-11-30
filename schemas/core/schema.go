@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/json"
+	"strings"
 
 	"github.com/mcuadros/go-defaults"
 )
@@ -15,6 +16,17 @@ func (e *SchemaError) Error() string { return e.msg }
 
 // Attributes is a slice of Attribute that holds definitions of attributes included within a Schema Definition.
 type Attributes []*Attribute
+
+// ByName returns the *Attribute with the given name, performing a insensitive match. It returns nil if no attribute was found.
+func (attributes Attributes) ByName(name string) *Attribute {
+	name = strings.ToLower(name)
+	for _, a := range attributes {
+		if name == strings.ToLower(a.Name) {
+			return a
+		}
+	}
+	return nil
+}
 
 // Attribute describes a single attribute included within a Schema Definition.
 // It includes the characteristics of a SCIM Attribute as per https://tools.ietf.org/html/rfc7643#section-2.2.

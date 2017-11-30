@@ -7,17 +7,6 @@ import (
 	"github.com/fabbricadigitale/scimd/schemas/datatype"
 )
 
-// ByName returns the *Attribute with the given name, performing a insensitive match. It returns nil if no attribute was found.
-func (attributes Attributes) ByName(name string) *Attribute {
-	name = strings.ToLower(name)
-	for _, a := range attributes {
-		if name == strings.ToLower(a.Name) {
-			return a
-		}
-	}
-	return nil
-}
-
 func byKeyInsensitive(key string, data map[string]json.RawMessage) *json.RawMessage {
 	if part, ok := data[key]; ok {
 		return &part

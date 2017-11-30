@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/fabbricadigitale/scimd/schemas"
+	"github.com/fabbricadigitale/scimd/schemas/core"
 )
 
 const (
@@ -72,4 +73,42 @@ func (a Path) String() string {
 		s += "." + a.Sub
 	}
 	return s
+}
+
+func (a *Path) findAttrDef(s *core.Schema) *core.Attribute {
+	def := s.Attributes.ByName(a.Name)
+	if def != nil && a.Sub != "" {
+		def = def.SubAttributes.ByName(a.Sub)
+	}
+	return def
+}
+
+// FindAttribute returns the core.Attribute matched by Path within the given core.ResourceType, if any
+func (a Path) FindAttribute(rt *core.ResourceType) *core.Attribute {
+
+	if !a.Valid() {
+		return nil
+	}
+
+	s := rt.GetSchema()
+
+	// if no URI, assume base schema
+	if a.URI == "" {
+		return a.findAttrDef(s)
+	}
+
+	// (fixme) ToLower() is not enough to ensure URN-equivalence as per https://tools.ietf.org/html/rfc8141#section-3
+	lcURI := strings.ToLower(a.URI)
+
+	if lcURI == strings.ToLower(s.ID) {
+		return a.findAttrDef(s)
+	}
+
+	for _, s := range rt.GetSchemaExtensions() {
+		if lcURI == strings.ToLower(s.ID) {
+			return a.findAttrDef(s)
+		}
+	}
+
+	return nil
 }
