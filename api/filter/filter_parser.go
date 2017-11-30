@@ -1,5 +1,3 @@
-// Generated from /Users/leogr/code/github.com/fabbricadigitale/scimd/api/filter/FilterParser.g4 by ANTLR 4.7.
-
 package filter // FilterParser
 import (
 	"fmt"

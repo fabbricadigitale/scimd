@@ -1,5 +1,3 @@
-// Generated from /home/leodido/workspaces/golang/src/github.com/fabbricadigitale/scimd/api/filter/FilterLexer.g4 by ANTLR 4.7.
-
 package filter
 import (
 	"fmt"
