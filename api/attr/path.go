@@ -17,9 +17,9 @@ const (
 
 	// subAttr   = "." ATTRNAME ; a sub-attribute of a complex attribute
 	subAttr = `(\.(?P<SUBATTRNAME>` + schemas.AttrNameExpr + `))`
-)
 
-const invalidURNPrefix = "urn:urn:"
+	InvalidURNPrefix = "urn:urn:"
+)
 
 // A Path represents a parsed SCIM attribute path as per https://tools.ietf.org/html/rfc7644#section-3.10
 type Path struct {
@@ -58,7 +58,7 @@ func Parse(s string) *Path {
 
 // Valid returns true if a is valid attribute path
 func (a Path) Valid() bool {
-	return len(a.Name) > 0 && !strings.HasPrefix(strings.ToLower(a.URI), invalidURNPrefix)
+	return len(a.Name) > 0 && !strings.HasPrefix(strings.ToLower(a.URI), InvalidURNPrefix)
 }
 
 func (a Path) String() string {
