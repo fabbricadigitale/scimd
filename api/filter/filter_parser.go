@@ -1,4 +1,4 @@
-// Generated from /home/leodido/workspaces/golang/src/github.com/fabbricadigitale/scimd/api/filter/FilterParser.g4 by ANTLR 4.7.
+// Generated from /Users/leogr/code/github.com/fabbricadigitale/scimd/api/filter/FilterParser.g4 by ANTLR 4.7.
 
 package filter // FilterParser
 import (
@@ -1136,7 +1136,7 @@ func (p *FilterParser) AttributePath() (localctx IAttributePathContext) {
 	p.SetState(59)
 
 	if !(localctx.(*AttributePathContext).path.Valid()) {
-		panic(antlr.NewFailedPredicateException(p, "$path.Valid()", "is not a valid URN"))
+		panic(antlr.NewFailedPredicateException(p, "$path.Valid()", "cannot match any valid attribute path"))
 	}
 
 

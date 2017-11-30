@@ -33,7 +33,7 @@ attributePath
         returns [*attr.Path path]
         : Urn? AttributeName (Dot AttributeName)?
         {$path = attr.Parse($ctx.GetText())}
-        {$path.Valid()}?<fail={"is not a valid URN"}>
+        {$path.Valid()}?<fail={"cannot match any valid attribute path"}>
         ;
 
 valueExpression
