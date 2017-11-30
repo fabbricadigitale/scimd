@@ -170,14 +170,28 @@ func (a *Adapter) toResource(h *resourceDocument) (*resource.Resource, error) {
 	return r, nil
 }
 
-func convertToMongoQuery(query *api.Search) (bson.M, error) {
+func convertToMongoQuery(query *api.Search) (m bson.M, err error) {
+
+	defer func() {
+		if r := recover(); r != nil {
+			switch r.(type) {
+			case error:
+				err = r.(error)
+			default:
+				err = &api.InternalServerError{
+					Detail: r.(string),
+				}
+			}
+		}
+	}()
 
 	f, err := filter.CompileString(string(query.Filter))
 	if err != nil {
 		return nil, err
 	}
 	var conv *convert
-	return conv.do(f), nil
+	m, err = conv.do(f), nil
+	return m, err
 }
 
 type convert struct{}
