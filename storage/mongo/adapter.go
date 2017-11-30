@@ -1,6 +1,9 @@
 package mongo
 
 import (
+	"fmt"
+	"reflect"
+
 	"github.com/fabbricadigitale/scimd/api"
 	"github.com/fabbricadigitale/scimd/api/filter"
 	"github.com/fabbricadigitale/scimd/schemas/core"
@@ -29,12 +32,12 @@ var (
 	// OpLessOrEqualThan    = "le"
 	// OpPresent            = "pr"
 	mapOperator = map[string]string{
-		"eq": "$eq",
-		"ne": "$ne",
-		"gt": "$gt",
-		"lt": "$lt",
-		"ge": "$gte",
-		"le": "$lte",
+		filter.OpEqual:              "$eq",
+		filter.OpNotEqual:           "$ne",
+		filter.OpGreaterThan:        "$gt",
+		filter.OpLessThan:           "$lt",
+		filter.OpGreaterOrEqualThan: "$gte",
+		filter.OpLessOrEqualThan:    "$lte",
 	}
 )
 
@@ -217,10 +220,57 @@ func (c *convert) do(f filter.Filter) bson.M {
 		}
 	case *filter.AttrExpr:
 		node := f.(*filter.AttrExpr)
-		return bson.M{
-			node.Path.String(): bson.M{
-				mapOperator[node.Op]: node.Value,
-			},
+
+		// The 'co', 'sw' and ew operators can only be used if the attribute type is string
+		if node.Op == filter.OpContains || node.Op == filter.OpStartsWith || node.Op == filter.OpEndsWith {
+			// (TODO) > checks attribute type (refs https://github.com/fabbricadigitale/scimd/issues/32)
+			if reflect.ValueOf(node.Value).Kind() != reflect.String {
+				detail := fmt.Sprintf("Cannot use %s operator with non-string value", node.Op)
+
+				var e *api.InvalidFilterError
+				e = &api.InvalidFilterError{
+					Filter: f.String(),
+					Detail: detail,
+				}
+				panic(e)
+			}
+
+			switch node.Op {
+			case filter.OpContains:
+				return bson.M{
+					node.Path.String(): bson.M{
+						"$regex": bson.RegEx{
+							Pattern: node.Value.(string),
+							Options: "i",
+						},
+					},
+				}
+			case filter.OpStartsWith:
+				return bson.M{
+					node.Path.String(): bson.M{
+						"$regex": bson.RegEx{
+							Pattern: "^" + node.Value.(string),
+							Options: "i",
+						},
+					},
+				}
+			case filter.OpEndsWith:
+				return bson.M{
+					node.Path.String(): bson.M{
+						"$regex": bson.RegEx{
+							Pattern: node.Value.(string) + "$",
+							Options: "i",
+						},
+					},
+				}
+			}
+
+		} else {
+			return bson.M{
+				node.Path.String(): bson.M{
+					mapOperator[node.Op]: node.Value,
+				},
+			}
 		}
 
 	}
