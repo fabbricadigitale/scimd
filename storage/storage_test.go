@@ -2,6 +2,7 @@ package storage
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"testing"
 
@@ -10,6 +11,27 @@ import (
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/stretchr/testify/require"
 )
+
+var filters = []string{
+	`userName eq "bjensen@example.com"`,
+	`emails[type eq "work" and value co "@example.com"]`,
+	`userName eq "bjensen" and name.familyName sw "J"`,
+	`userType ne "Employee" and not (emails co "example.com" or emails.value co "example.org")`,
+	`emails.type ne true`,
+	`name.familyName co "O'Malley"`,
+	`userName sw "J"`,
+	`meta.lastModified gt "2011-05-13T04:42:34Z"`,
+	`meta.lastModified ge "2011-05-13T04:42:34Z"`,
+	`meta.lastModified lt "2011-05-13T04:42:34Z"`,
+	`meta.lastModified le "2011-05-13T04:42:34Z"`,
+	`emails[type eq "work" and value co "@example.com"] or ims[type eq "xmpp" and value co "@foo.com"]`,
+	`userType eq "Employee" and (emails co "example.com" or emails.value co "example.org")`,
+	`userType eq "Employee" and emails[type eq "work" and value co "@example.com"]`,
+	`userType eq "Employee" and (emails.type eq "work")`,
+	`title pr`,
+	`not (userName eq "strings")`,
+	`not (userName.Child eq "strings")`,
+}
 
 func TestCreateRepository(t *testing.T) {
 
@@ -75,7 +97,7 @@ func TestCreate(t *testing.T) {
 	require.Nil(t, err)
 }
 
-func TestSearch(t *testing.T) {
+func TestCountMethod(t *testing.T) {
 
 	var manager Manager
 	adapter, err := manager.CreateAdapter("mongo", "mongodb://localhost:27017", "test_db", "resources")
@@ -85,16 +107,21 @@ func TestSearch(t *testing.T) {
 		t.Fail()
 	}
 
-	err = adapter.Search(&api.Search{
-		Filter: `userType eq "Employee" and (emails.type eq "work")`,
-	})
+	for i, filter := range filters {
 
-	if err != nil {
-		t.Log(err)
+		var f api.Filter
+		f = api.Filter(filter)
+
+		count, err := adapter.Count(nil, &f)
+		if err != nil {
+			t.Log(err)
+		}
+
+		require.Nil(t, err)
+		fmt.Printf("%d ----------------\n", i)
+		fmt.Printf("Filter %s\n", filter)
+		fmt.Printf("Count: %v\n\n\n", count)
 	}
-
-	require.Nil(t, err)
-
 }
 
 // (TODO) > Test hydrateResource adapter method

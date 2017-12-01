@@ -80,8 +80,15 @@ func (a *Adapter) Get(resType *core.ResourceType, id, version string) (*resource
 }
 
 // Count ...
-func (a *Adapter) Count() error {
-	return (*a.adaptee).Count()
+func (a *Adapter) Count(resTypes []*core.ResourceType, filter *api.Filter) (int, error) {
+	q, _ := convertToMongoQuery(filter)
+
+	_q := bson.M{
+		"data": bson.M{
+			"$elemMatch": q,
+		},
+	}
+	return (*a.adaptee).Count(_q)
 }
 
 // Update is ...
@@ -96,10 +103,17 @@ func (a *Adapter) Delete(resType *core.ResourceType, id, version string) error {
 }
 
 // Search is ...
-func (a *Adapter) Search(resTypes []*core.ResourceType, search *api.Search) error {
-	q, _ := convertToMongoQuery(search)
+func (a *Adapter) Search(rTypes []*core.ResourceType, query *api.Search) error {
 
-	return (*a.adaptee).Search(q)
+	q, _ := convertToMongoQuery(&query.Filter)
+
+	_q := bson.M{
+		"data": bson.M{
+			"$elemMatch": q,
+		},
+	}
+
+	return (*a.adaptee).Search(_q)
 }
 
 // resourceDocument is a ready-to-store format for Resource
@@ -170,7 +184,7 @@ func (a *Adapter) toResource(h *resourceDocument) (*resource.Resource, error) {
 	return r, nil
 }
 
-func convertToMongoQuery(query *api.Search) (m bson.M, err error) {
+func convertToMongoQuery(ft *api.Filter) (m bson.M, err error) {
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -185,7 +199,7 @@ func convertToMongoQuery(query *api.Search) (m bson.M, err error) {
 		}
 	}()
 
-	f, err := filter.CompileString(string(query.Filter))
+	f, err := filter.CompileString(string(*ft))
 
 	if err != nil {
 		return nil, err
@@ -301,9 +315,7 @@ func (c *convert) logicalOperators(f interface{}, node filter.AttrExpr) bson.M {
 	if node.Op == filter.OpContains || node.Op == filter.OpStartsWith || node.Op == filter.OpEndsWith {
 		// (TODO) > checks attribute type (refs https://github.com/fabbricadigitale/scimd/issues/32)
 		if reflect.ValueOf(node.Value).Kind() != reflect.String {
-			if node.Value != "null" {
-				fmt.Printf("Type %T", node.Value)
-
+			if node.Value != nil {
 				detail := fmt.Sprintf("Cannot use %s operator with non-string value: %T", node.Op, node.Value)
 
 				var e *api.InvalidFilterError

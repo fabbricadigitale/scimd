@@ -26,17 +26,13 @@ var filters = []string{
 	`title pr`,
 	`not (userName eq "strings")`,
 	`not (userName.Child eq "strings")`,
-	`emails[not (type sw null)]`,
-	`title pr and userType eq "Employee"`,
-	`title pr or userType eq "Intern"`,
 }
 
 func TestConvertToMongoQuery(t *testing.T) {
 
 	for i, filter := range filters {
-		m, err := convertToMongoQuery(&api.Search{
-			Filter: api.Filter(filter),
-		})
+		var f = api.Filter(filter)
+		m, err := convertToMongoQuery(&f)
 		if err != nil {
 			t.Log(err)
 		}

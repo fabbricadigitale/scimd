@@ -67,9 +67,13 @@ func (d *Driver) Get(id, version string) (*resourceDocument, error) {
 }
 
 // Count is the adapter method for Count
-func (d *Driver) Count() error {
-	// Not yet implemented
-	return nil
+func (d *Driver) Count(q bson.M) (int, error) {
+
+	c, close := d.getCollection()
+	defer close()
+
+	count, err := c.Find(q).Count()
+	return count, d.errorWrapper(err)
 }
 
 // Update is the adapter method for Update
@@ -100,6 +104,7 @@ func (d *Driver) Delete(id string, version string) error {
 
 // Search is the adapter method for Search
 func (d *Driver) Search(q bson.M) error {
+
 	return nil
 }
 
