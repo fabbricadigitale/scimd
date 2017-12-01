@@ -4,22 +4,21 @@ import (
 	"github.com/fabbricadigitale/scimd/api"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
-	"github.com/fabbricadigitale/scimd/storage/mongo"
 )
 
 //Storage is the target interface
 type Storage interface {
-	Create(*resource.Resource) error
+	Create(res *resource.Resource) error
 
-	Get(rType core.ResourceType, id, version string) (*resource.Resource, error)
+	Get(resType *core.ResourceType, id, version string) (*resource.Resource, error)
 
-	Count() error
+	Count() error // (todo)
 
-	Update(rType core.ResourceType, id, version string, resource *resource.Resource) error
+	Update(resType *resource.Resource, id, version string) error
 
-	Delete(rType core.ResourceType, id, version string) error
+	Delete(resType *core.ResourceType, id, version string) error
 
-	Search(rTypes []core.ResourceType, search api.Search) error
+	Search(resTypes []*core.ResourceType, search *api.Search) error
 }
 
 // Manager is ...
@@ -29,8 +28,9 @@ type Manager struct{}
 func (m *Manager) CreateAdapter(t, url, db, collection string) (Storage, error) {
 
 	switch t {
-	case "mongo":
-		return mongo.GetAdapter(url, db, collection)
+	// (fixme) Do NOT import child packages
+	// case "mongo":
+	// 	return mongo.GetAdapter(url, db, collection)
 	default:
 		return nil, nil
 	}

@@ -5,6 +5,7 @@ import (
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/datatype"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
+	"github.com/fabbricadigitale/scimd/storage"
 )
 
 // Adapter is the repository Adapter
@@ -12,7 +13,7 @@ type Adapter struct {
 	adaptee *Driver
 }
 
-var adapter Adapter
+var adapter storage.Storage = (*Adapter)(nil)
 
 // urnKey identifies the attributes namespace into document resource
 // The name stars with an underscore unlike scim properties that start with alphabetical characters
@@ -39,7 +40,7 @@ func (a *Adapter) Create(res *resource.Resource) error {
 }
 
 // Get is ...
-func (a *Adapter) Get(rType core.ResourceType, id, version string) (*resource.Resource, error) {
+func (a *Adapter) Get(resType *core.ResourceType, id, version string) (*resource.Resource, error) {
 
 	h := &resourceDocument{}
 
@@ -58,18 +59,18 @@ func (a *Adapter) Count() error {
 }
 
 // Update is ...
-func (a *Adapter) Update(rType core.ResourceType, id string, version string, resource *resource.Resource) error {
+func (a *Adapter) Update(resource *resource.Resource, id string, version string) error {
 	dataResource := a.hydrateResource(resource)
 	return (*a.adaptee).Update(id, version, dataResource)
 }
 
 // Delete is ...
-func (a *Adapter) Delete(rType core.ResourceType, id, version string) error {
+func (a *Adapter) Delete(resType *core.ResourceType, id, version string) error {
 	return (*a.adaptee).Delete(id, version)
 }
 
 // Search is ...
-func (a *Adapter) Search(rTypes []core.ResourceType, search api.Search) error {
+func (a *Adapter) Search(resTypes []*core.ResourceType, search *api.Search) error {
 	return (*a.adaptee).Search()
 }
 

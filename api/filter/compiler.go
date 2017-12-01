@@ -128,7 +128,7 @@ func compileValueFilter(ctx IValueFilterContext) ValueFilter {
 
 	switch c := ctx.(type) {
 	case *AttributeExprValueFilterContext:
-		f = compileAttributeExpression(c.GetAttributeExpr())
+		f = *compileAttributeExpression(c.GetAttributeExpr())
 
 	case *AndValueFilterContext:
 		f = ValueAnd{
