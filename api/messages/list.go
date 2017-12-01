@@ -15,3 +15,9 @@ type ListResponse struct {
 	StartIndex   int                  `json:"startIndex" validate:"gt=0,required"` // we set this always required even if the RFC 7644 specifies that it's required due to pagination
 	Resources    []*resource.Resource `json:"Resources" validate:"required"`
 }
+
+func NewListResponse() *ListResponse {
+	return &ListResponse{
+		Schemas: []string{ListResponseURI},
+	}
+}

@@ -2,6 +2,17 @@ package api
 
 import "fmt"
 
+type NotFoundError struct {
+	Subject string
+}
+
+func (e *NotFoundError) Error() string {
+	if e.Subject == "" {
+		return "Not found"
+	}
+	return e.Subject + " not found"
+}
+
 // InvalidPathError is thrown when path attribute is invalid or malformed
 type InvalidPathError struct {
 	Path   string
