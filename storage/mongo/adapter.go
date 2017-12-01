@@ -186,6 +186,7 @@ func convertToMongoQuery(query *api.Search) (m bson.M, err error) {
 	}()
 
 	f, err := filter.CompileString(string(query.Filter))
+
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +197,7 @@ func convertToMongoQuery(query *api.Search) (m bson.M, err error) {
 
 type convert struct{}
 
-func (c *convert) do(f filter.Filter) bson.M {
+func (c *convert) do(f interface{}) bson.M {
 
 	var (
 		left, right bson.M
@@ -204,8 +205,59 @@ func (c *convert) do(f filter.Filter) bson.M {
 
 	switch f.(type) {
 
-	case *filter.And:
-		node := f.(*filter.And)
+	case *filter.ValuePath:
+
+		node := f.(*filter.ValuePath)
+
+		right = c.do(node.ValueFilter)
+
+		return bson.M{
+			node.Path.String(): bson.M{
+				"$elemMatch": right,
+			},
+		}
+
+	case filter.ValueAnd:
+
+		node := f.(filter.ValueAnd)
+
+		left = c.do(node.Left)
+
+		right = c.do(node.Right)
+
+		return bson.M{
+			"$and": []interface{}{left, right},
+		}
+
+	case filter.ValueOr:
+
+		node := f.(filter.ValueOr)
+
+		left = c.do(node.Left)
+
+		right = c.do(node.Right)
+
+		return bson.M{
+			"$or": []interface{}{left, right},
+		}
+
+	case filter.ValueNot:
+
+		node := f.(filter.ValueNot)
+
+		left = c.do(node.ValueFilter)
+
+		return bson.M{
+			"$nor": []interface{}{left},
+		}
+
+	case *filter.Group:
+		node := f.(*filter.Group)
+
+		return c.do(node.Filter)
+
+	case filter.And:
+		node := f.(filter.And)
 		if node.Left != nil {
 			left = c.do(node.Left)
 		}
@@ -215,8 +267,8 @@ func (c *convert) do(f filter.Filter) bson.M {
 		return bson.M{
 			"$and": []interface{}{left, right},
 		}
-	case *filter.Or:
-		node := f.(*filter.Or)
+	case filter.Or:
+		node := f.(filter.Or)
 		if node.Left != nil {
 			left = c.do(node.Left)
 		}
@@ -226,67 +278,81 @@ func (c *convert) do(f filter.Filter) bson.M {
 		return bson.M{
 			"$or": []interface{}{left, right},
 		}
-	case *filter.Not:
-		node := f.(*filter.Not)
+	case filter.Not:
+		node := f.(filter.Not)
 		left = c.do(node.Filter)
 		return bson.M{
 			"$nor": []interface{}{left},
 		}
 	case *filter.AttrExpr:
 		node := f.(*filter.AttrExpr)
+		return c.logicalOperators(f, *node)
+	case filter.AttrExpr:
+		node := f.(filter.AttrExpr)
+		return c.logicalOperators(f, node)
+	}
 
-		// The 'co', 'sw' and ew operators can only be used if the attribute type is string
-		if node.Op == filter.OpContains || node.Op == filter.OpStartsWith || node.Op == filter.OpEndsWith {
-			// (TODO) > checks attribute type (refs https://github.com/fabbricadigitale/scimd/issues/32)
-			if reflect.ValueOf(node.Value).Kind() != reflect.String {
-				detail := fmt.Sprintf("Cannot use %s operator with non-string value", node.Op)
+	return nil
+}
+
+func (c *convert) logicalOperators(f interface{}, node filter.AttrExpr) bson.M {
+
+	// The 'co', 'sw' and ew operators can only be used if the attribute type is string
+	if node.Op == filter.OpContains || node.Op == filter.OpStartsWith || node.Op == filter.OpEndsWith {
+		// (TODO) > checks attribute type (refs https://github.com/fabbricadigitale/scimd/issues/32)
+		if reflect.ValueOf(node.Value).Kind() != reflect.String {
+			if node.Value != "null" {
+				fmt.Printf("Type %T", node.Value)
+
+				detail := fmt.Sprintf("Cannot use %s operator with non-string value: %T", node.Op, node.Value)
 
 				var e *api.InvalidFilterError
 				e = &api.InvalidFilterError{
-					Filter: f.String(),
+					Filter: f.(filter.Filter).String(),
 					Detail: detail,
 				}
 				panic(e)
 			}
+		}
 
-			switch node.Op {
-			case filter.OpContains:
-				return bson.M{
-					node.Path.String(): bson.M{
-						"$regex": bson.RegEx{
-							Pattern: node.Value.(string),
-							Options: "i",
-						},
-					},
-				}
-			case filter.OpStartsWith:
-				return bson.M{
-					node.Path.String(): bson.M{
-						"$regex": bson.RegEx{
-							Pattern: "^" + node.Value.(string),
-							Options: "i",
-						},
-					},
-				}
-			case filter.OpEndsWith:
-				return bson.M{
-					node.Path.String(): bson.M{
-						"$regex": bson.RegEx{
-							Pattern: node.Value.(string) + "$",
-							Options: "i",
-						},
-					},
-				}
-			}
-
-		} else {
+		switch node.Op {
+		case filter.OpContains:
 			return bson.M{
 				node.Path.String(): bson.M{
-					mapOperator[node.Op]: node.Value,
+					"$regex": bson.RegEx{
+						Pattern: node.Value.(string),
+						Options: "i",
+					},
+				},
+			}
+		case filter.OpStartsWith:
+			return bson.M{
+				node.Path.String(): bson.M{
+					"$regex": bson.RegEx{
+						Pattern: "^" + node.Value.(string),
+						Options: "i",
+					},
+				},
+			}
+		case filter.OpEndsWith:
+			return bson.M{
+				node.Path.String(): bson.M{
+					"$regex": bson.RegEx{
+						Pattern: node.Value.(string) + "$",
+						Options: "i",
+					},
 				},
 			}
 		}
 
+	} else if node.Op == filter.OpPresent {
+		//Not implemented
+	} else {
+		return bson.M{
+			node.Path.String(): bson.M{
+				mapOperator[node.Op]: node.Value,
+			},
+		}
 	}
 
 	return nil
