@@ -109,9 +109,22 @@ func TestResourceTypeValidation(t *testing.T) {
 	fields = fields[1:]
 	failtags = failtags[1:]
 
-	// (todo)> try a non urn on schema
+	// non urn on schema
+	res.Schema = "urn:a:"
+	errors = validation.Validator.Struct(res)
+	require.Error(t, errors)
 
-	// (todo)> try a urn on schema
+	// urn on schema
+	res.Schema = "urn:ietf:params:scim:schemas:core:2.0:User"
+	errors = validation.Validator.Struct(res)
+	require.NoError(t, errors)
 
-	// (todo)> nested struct schemaext
+	// nested struct schemaext
+	res.SchemaExtensions = []SchemaExtension{
+		SchemaExtension{
+			Schema: "urn:ietf:params:scim:schemas:core:2.0:User",
+		},
+	}
+	errors = validation.Validator.Struct(res)
+	require.NoError(t, errors)
 }
