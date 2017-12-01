@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"testing"
 
+	"github.com/fabbricadigitale/scimd/api"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/stretchr/testify/require"
@@ -72,6 +73,28 @@ func TestCreate(t *testing.T) {
 	}
 
 	require.Nil(t, err)
+}
+
+func TestSearch(t *testing.T) {
+
+	var manager Manager
+	adapter, err := manager.CreateAdapter("mongo", "mongodb://localhost:27017", "test_db", "resources")
+
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	err = adapter.Search(&api.Search{
+		Filter: `userType eq "Employee" and (emails.type eq "work")`,
+	})
+
+	if err != nil {
+		t.Log(err)
+	}
+
+	require.Nil(t, err)
+
 }
 
 // (TODO) > Test hydrateResource adapter method

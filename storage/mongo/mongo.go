@@ -99,8 +99,7 @@ func (d *Driver) Delete(id string, version string) error {
 }
 
 // Search is the adapter method for Search
-func (d *Driver) Search() error {
-	// Not yet implemented
+func (d *Driver) Search(q bson.M) error {
 	return nil
 }
 

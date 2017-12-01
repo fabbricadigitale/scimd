@@ -2,9 +2,11 @@ package mongo
 
 import (
 	"github.com/fabbricadigitale/scimd/api"
+	"github.com/fabbricadigitale/scimd/api/filter"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/datatype"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // Adapter is the repository Adapter
@@ -14,7 +16,27 @@ type Adapter struct {
 
 // (fixme) var _ storage.Storer = (*Adapter)(nil)
 // (fixme) global adapter must be avoided
-var adapter Adapter
+var (
+	adapter Adapter
+	// OpEqual              = "eq"
+	// OpNotEqual           = "ne"
+	// OpContains           = "co"
+	// OpStartsWith         = "sw"
+	// OpEndsWith           = "ew"
+	// OpGreaterThan        = "gt"
+	// OpLessThan           = "lt"
+	// OpGreaterOrEqualThan = "ge"
+	// OpLessOrEqualThan    = "le"
+	// OpPresent            = "pr"
+	mapOperator = map[string]string{
+		"eq": "$eq",
+		"ne": "$ne",
+		"gt": "$gt",
+		"lt": "$lt",
+		"ge": "$gte",
+		"le": "$lte",
+	}
+)
 
 // urnKey identifies the attributes namespace into document resource
 // The name stars with an underscore unlike scim properties that start with alphabetical characters
@@ -72,7 +94,9 @@ func (a *Adapter) Delete(resType *core.ResourceType, id, version string) error {
 
 // Search is ...
 func (a *Adapter) Search(resTypes []*core.ResourceType, search *api.Search) error {
-	return (*a.adaptee).Search()
+	q, _ := convertToMongoQuery(search)
+
+	return (*a.adaptee).Search(q)
 }
 
 // resourceDocument is a ready-to-store format for Resource
@@ -141,4 +165,65 @@ func (a *Adapter) toResource(h *resourceDocument) (*resource.Resource, error) {
 	}
 
 	return r, nil
+}
+
+func convertToMongoQuery(query *api.Search) (bson.M, error) {
+
+	f, err := filter.CompileString(string(query.Filter))
+	if err != nil {
+		return nil, err
+	}
+	var conv *convert
+	return conv.do(f), nil
+}
+
+type convert struct{}
+
+func (c *convert) do(f filter.Filter) bson.M {
+
+	var (
+		left, right bson.M
+	)
+
+	switch f.(type) {
+
+	case *filter.And:
+		node := f.(*filter.And)
+		if node.Left != nil {
+			left = c.do(node.Left)
+		}
+		if node.Right != nil {
+			right = c.do(node.Right)
+		}
+		return bson.M{
+			"$and": []interface{}{left, right},
+		}
+	case *filter.Or:
+		node := f.(*filter.Or)
+		if node.Left != nil {
+			left = c.do(node.Left)
+		}
+		if node.Right != nil {
+			right = c.do(node.Right)
+		}
+		return bson.M{
+			"$or": []interface{}{left, right},
+		}
+	case *filter.Not:
+		node := f.(*filter.Not)
+		left = c.do(node.Filter)
+		return bson.M{
+			"$nor": []interface{}{left},
+		}
+	case *filter.AttrExpr:
+		node := f.(*filter.AttrExpr)
+		return bson.M{
+			node.Path.String(): bson.M{
+				mapOperator[node.Op]: node.Value,
+			},
+		}
+
+	}
+
+	return nil
 }
