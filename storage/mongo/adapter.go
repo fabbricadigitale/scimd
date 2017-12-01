@@ -5,7 +5,6 @@ import (
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/datatype"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
-	"github.com/fabbricadigitale/scimd/storage"
 )
 
 // Adapter is the repository Adapter
@@ -13,7 +12,9 @@ type Adapter struct {
 	adaptee *Driver
 }
 
-var adapter storage.Storage = (*Adapter)(nil)
+// (fixme) var _ storage.Storer = (*Adapter)(nil)
+// (fixme) global adapter must be avoided
+var adapter Adapter
 
 // urnKey identifies the attributes namespace into document resource
 // The name stars with an underscore unlike scim properties that start with alphabetical characters

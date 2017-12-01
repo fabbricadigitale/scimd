@@ -1,38 +1,37 @@
 package storage
 
 import (
-	"github.com/fabbricadigitale/scimd/api"
+	"github.com/fabbricadigitale/scimd/api/attr"
+	"github.com/fabbricadigitale/scimd/api/filter"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 )
 
-//Storage is the target interface
-type Storage interface {
+type Iter interface {
+	Next() *resource.Resource
+	Done() bool
+	Close()
+}
+
+type Querier interface {
+	Fields(included []*attr.Path, excluded []*attr.Path) Querier
+	Skip(int) Querier
+	Limit(int) Querier
+	Sort(by *attr.Path, asc bool) Querier
+
+	Count() (n int, err error)
+	Iter() Iter
+}
+
+// Storer is the target interface
+type Storer interface {
 	Create(res *resource.Resource) error
 
 	Get(resType *core.ResourceType, id, version string) (*resource.Resource, error)
-
-	Count() error // (todo)
 
 	Update(resType *resource.Resource, id, version string) error
 
 	Delete(resType *core.ResourceType, id, version string) error
 
-	Search(resTypes []*core.ResourceType, search *api.Search) error
-}
-
-// Manager is ...
-type Manager struct{}
-
-// CreateAdapter is ...
-func (m *Manager) CreateAdapter(t, url, db, collection string) (Storage, error) {
-
-	switch t {
-	// (fixme) Do NOT import child packages
-	// case "mongo":
-	// 	return mongo.GetAdapter(url, db, collection)
-	default:
-		return nil, nil
-	}
-
+	Find(resType []*core.ResourceType, filter filter.Filter) (Querier, error)
 }
