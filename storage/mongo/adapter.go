@@ -1,6 +1,7 @@
 package mongo
 
 import (
+	"github.com/fabbricadigitale/scimd/api"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/datatype"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
@@ -38,7 +39,7 @@ func (a *Adapter) Create(res *resource.Resource) error {
 }
 
 // Get is ...
-func (a *Adapter) Get(id, version string) (*resource.Resource, error) {
+func (a *Adapter) Get(rType core.ResourceType, id, version string) (*resource.Resource, error) {
 
 	h := &resourceDocument{}
 
@@ -57,18 +58,18 @@ func (a *Adapter) Count() error {
 }
 
 // Update is ...
-func (a *Adapter) Update(id string, version string, resource *resource.Resource) error {
+func (a *Adapter) Update(rType core.ResourceType, id string, version string, resource *resource.Resource) error {
 	dataResource := a.hydrateResource(resource)
 	return (*a.adaptee).Update(id, version, dataResource)
 }
 
 // Delete is ...
-func (a *Adapter) Delete(id, version string) error {
+func (a *Adapter) Delete(rType core.ResourceType, id, version string) error {
 	return (*a.adaptee).Delete(id, version)
 }
 
 // Search is ...
-func (a *Adapter) Search() error {
+func (a *Adapter) Search(rTypes []core.ResourceType, search api.Search) error {
 	return (*a.adaptee).Search()
 }
 

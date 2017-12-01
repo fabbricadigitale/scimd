@@ -1,6 +1,8 @@
 package storage
 
 import (
+	"github.com/fabbricadigitale/scimd/api"
+	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/storage/mongo"
 )
@@ -9,15 +11,15 @@ import (
 type Storage interface {
 	Create(*resource.Resource) error
 
-	Get(id, version string) (*resource.Resource, error)
+	Get(rType core.ResourceType, id, version string) (*resource.Resource, error)
 
 	Count() error
 
-	Update(id, version string, resource *resource.Resource) error
+	Update(rType core.ResourceType, id, version string, resource *resource.Resource) error
 
-	Delete(id, version string) error
+	Delete(rType core.ResourceType, id, version string) error
 
-	Search() error
+	Search(rTypes []core.ResourceType, search api.Search) error
 }
 
 // Manager is ...
