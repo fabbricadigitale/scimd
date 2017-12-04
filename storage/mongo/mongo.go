@@ -40,7 +40,7 @@ func (d *Driver) getCollection() (*mgo.Collection, func()) {
 	return s.DB(d.db).C(d.collection), func() { s.Close() }
 }
 
-// Create is the adapter method for Create
+// Create is the driver method for Create
 func (d *Driver) Create(res *resourceDocument) error {
 	// Not yet implemented
 	c, close := d.getCollection()
@@ -49,7 +49,7 @@ func (d *Driver) Create(res *resourceDocument) error {
 	return d.errorWrapper(c.Insert(res))
 }
 
-// Get is the adapter method for Get
+// Get is the driver method for Get
 func (d *Driver) Get(id, version string) (*resourceDocument, error) {
 	//not yet implemented
 	c, close := d.getCollection()
@@ -66,7 +66,7 @@ func (d *Driver) Get(id, version string) (*resourceDocument, error) {
 	return data, nil
 }
 
-// Count is the adapter method for Count
+// Count is the driver method for Count
 func (d *Driver) Count(q bson.M) (int, error) {
 
 	c, close := d.getCollection()
@@ -76,7 +76,7 @@ func (d *Driver) Count(q bson.M) (int, error) {
 	return count, d.errorWrapper(err)
 }
 
-// Update is the adapter method for Update
+// Update is the driver method for Update
 func (d *Driver) Update(id string, version string, resource *resourceDocument) error {
 	c, close := d.getCollection()
 	defer close()
@@ -87,7 +87,7 @@ func (d *Driver) Update(id string, version string, resource *resourceDocument) e
 	return d.errorWrapper(err, resource.Data[0]["id"])
 }
 
-// Delete is the adapter method for Delete
+// Delete is the driver method for Delete
 func (d *Driver) Delete(id string, version string) error {
 
 	c, close := d.getCollection()
@@ -102,10 +102,13 @@ func (d *Driver) Delete(id string, version string) error {
 	return nil
 }
 
-// Search is the adapter method for Search
-func (d *Driver) Search(q bson.M) error {
+// Find is the driver method for Find
+func (d *Driver) Find(q bson.M) (*mgo.Query, error) {
+	c, close := d.getCollection()
+	defer close()
 
-	return nil
+	query := c.Find(q)
+	return query, nil
 }
 
 // mongoErrorWrapper translates mongo errors in specific domain errors

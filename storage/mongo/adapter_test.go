@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/fabbricadigitale/scimd/api"
+	"github.com/fabbricadigitale/scimd/api/filter"
 )
 
 var filters = []string{
@@ -30,14 +30,18 @@ var filters = []string{
 
 func TestConvertToMongoQuery(t *testing.T) {
 
-	for i, filter := range filters {
-		var f = api.Filter(filter)
-		m, err := convertToMongoQuery(&f)
+	for i, str := range filters {
+
+		ft, err := filter.CompileString(str)
+		if err != nil {
+			t.Log(err)
+		}
+		m, err := convertToMongoQuery(ft)
 		if err != nil {
 			t.Log(err)
 		}
 		fmt.Printf("%d ----------------\n", i)
-		fmt.Printf("Filter %s\n", filter)
+		fmt.Printf("Filter %s\n", str)
 		fmt.Printf("Converted: %+v\n\n\n", m)
 	}
 

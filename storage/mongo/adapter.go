@@ -9,6 +9,7 @@ import (
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/datatype"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
+	"github.com/fabbricadigitale/scimd/storage"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -20,7 +21,6 @@ type Adapter struct {
 // (fixme) var _ storage.Storer = (*Adapter)(nil)
 // (fixme) global adapter must be avoided
 var (
-	adapter Adapter
 	// OpEqual              = "eq"
 	// OpNotEqual           = "ne"
 	// OpContains           = "co"
@@ -45,17 +45,17 @@ var (
 // The name stars with an underscore unlike scim properties that start with alphabetical characters
 const urnKey = "_urn"
 
-// GetAdapter ...
-func GetAdapter(url, db, collection string) (*Adapter, error) {
+// New makes and return a new adapter of type storage.Storer using a mongo driver
+func New(url, db, collection string) (storage.Storer, error) {
 
-	if (Adapter{}) == adapter {
-		driver, err := CreateDriver(url, db, collection)
-		if err != nil {
-			return nil, err
-		}
-		adapter.adaptee = driver
+	adapter := &Adapter{}
+	driver, err := CreateDriver(url, db, collection)
+	if err != nil {
+		return nil, err
 	}
-	return &adapter, nil
+	adapter.adaptee = driver
+
+	return adapter, nil
 }
 
 // Create is ...
@@ -76,19 +76,7 @@ func (a *Adapter) Get(resType *core.ResourceType, id, version string) (*resource
 		return nil, err
 	}
 
-	return a.toResource(h)
-}
-
-// Count ...
-func (a *Adapter) Count(resTypes []*core.ResourceType, filter *api.Filter) (int, error) {
-	q, _ := convertToMongoQuery(filter)
-
-	_q := bson.M{
-		"data": bson.M{
-			"$elemMatch": q,
-		},
-	}
-	return (*a.adaptee).Count(_q)
+	return toResource(h), nil
 }
 
 // Update is ...
@@ -102,10 +90,10 @@ func (a *Adapter) Delete(resType *core.ResourceType, id, version string) error {
 	return (*a.adaptee).Delete(id, version)
 }
 
-// Search is ...
-func (a *Adapter) Search(rTypes []*core.ResourceType, query *api.Search) error {
+// Find is ...
+func (a *Adapter) Find(resType []*core.ResourceType, filter filter.Filter) (storage.Querier, error) {
 
-	q, _ := convertToMongoQuery(&query.Filter)
+	q, _ := convertToMongoQuery(filter)
 
 	_q := bson.M{
 		"data": bson.M{
@@ -113,7 +101,13 @@ func (a *Adapter) Search(rTypes []*core.ResourceType, query *api.Search) error {
 		},
 	}
 
-	return (*a.adaptee).Search(_q)
+	query, err := (*a.adaptee).Find(_q)
+	if err != nil {
+		return nil, err
+	}
+	return &Query{
+		q: query,
+	}, nil
 }
 
 // resourceDocument is a ready-to-store format for Resource
@@ -160,7 +154,7 @@ func (a *Adapter) hydrateResource(r *resource.Resource) *resourceDocument {
 	return h
 }
 
-func (a *Adapter) toResource(h *resourceDocument) (*resource.Resource, error) {
+func toResource(h *resourceDocument) *resource.Resource {
 
 	hCommon := h.Data[0]
 	r := &resource.Resource{
@@ -181,10 +175,10 @@ func (a *Adapter) toResource(h *resourceDocument) (*resource.Resource, error) {
 		r.SetValues(ns, p)
 	}
 
-	return r, nil
+	return r
 }
 
-func convertToMongoQuery(ft *api.Filter) (m bson.M, err error) {
+func convertToMongoQuery(ft filter.Filter) (m bson.M, err error) {
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -199,13 +193,8 @@ func convertToMongoQuery(ft *api.Filter) (m bson.M, err error) {
 		}
 	}()
 
-	f, err := filter.CompileString(string(*ft))
-
-	if err != nil {
-		return nil, err
-	}
 	var conv *convert
-	m, err = conv.do(f), nil
+	m, err = conv.do(ft), nil
 	return m, err
 }
 
