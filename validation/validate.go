@@ -14,4 +14,6 @@ func init() {
 	Validator.RegisterValidation("urn", urn)
 	Validator.RegisterValidation("attrname", attrName)
 	Validator.RegisterValidation("attrpath", attrPath)
+	Validator.RegisterValidation("isfield", isField)
+	Validator.RegisterValidation("isset", depsOn)
 }
