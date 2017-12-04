@@ -126,15 +126,15 @@ func TestResourceTypeValidation(t *testing.T) {
 			Schema: "urn:ietf:params:scim:schemas:core:2.0:User",
 		},
 	}
-	errors = validation.Validator.Var(res.SchemaExtensions[0].Schema, "urn")
+	errors = validation.Validator.Struct(res)
 	require.NoError(t, errors)
 
 	// Invalid URN
 	res.SchemaExtensions = []SchemaExtension{
 		SchemaExtension{
-			Schema: "urn:a:",
+			Schema: "notValidUrn",
 		},
 	}
-	errors = validation.Validator.Var(res.SchemaExtensions[0].Schema, "urn")
+	errors = validation.Validator.Struct(res)
 	require.Error(t, errors)
 }
