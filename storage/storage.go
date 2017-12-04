@@ -27,7 +27,7 @@ type Querier interface {
 type Storer interface {
 	Create(res *resource.Resource) error
 
-	Get(resType *core.ResourceType, id, version string) (*resource.Resource, error)
+	Get(resType *core.ResourceType, id, version string, included []*attr.Path, excluded []*attr.Path) (*resource.Resource, error)
 
 	Update(resType *resource.Resource, id, version string) error
 

@@ -66,6 +66,15 @@ func (res *Query) Fields(included []*attr.Path, excluded []*attr.Path) storage.Q
 	return res
 }
 
+func (res *Query) one() (*resource.Resource, error) {
+	resDoc := &resourceDocument{}
+	err := res.q.One(resDoc)
+	if err != nil {
+		return nil, err
+	}
+	return toResource(resDoc), nil
+}
+
 // Iter executes the query and returns an iterator capable of going over all
 // the results.
 func (res *Query) Iter() storage.Iter {

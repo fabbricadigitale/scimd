@@ -49,54 +49,24 @@ func (d *Driver) Create(res *resourceDocument) error {
 	return d.errorWrapper(c.Insert(res))
 }
 
-// Get is the driver method for Get
-func (d *Driver) Get(id, version string) (*resourceDocument, error) {
-	//not yet implemented
-	c, close := d.getCollection()
-	defer close()
-
-	data := &resourceDocument{}
-	query := d.makeQuery(id, version)
-
-	err := c.Find(query).One(&data)
-	if err != nil {
-		return nil, d.errorWrapper(err, id)
-	}
-
-	return data, nil
-}
-
-// Count is the driver method for Count
-func (d *Driver) Count(q bson.M) (int, error) {
-
-	c, close := d.getCollection()
-	defer close()
-
-	count, err := c.Find(q).Count()
-	return count, d.errorWrapper(err)
-}
-
 // Update is the driver method for Update
-func (d *Driver) Update(id string, version string, resource *resourceDocument) error {
+func (d *Driver) Update(query bson.M, resource *resourceDocument) error {
 	c, close := d.getCollection()
 	defer close()
-
-	query := d.makeQuery(id, version)
 
 	err := c.Update(query, *resource)
 	return d.errorWrapper(err, resource.Data[0]["id"])
 }
 
 // Delete is the driver method for Delete
-func (d *Driver) Delete(id string, version string) error {
+func (d *Driver) Delete(query bson.M) error {
 
 	c, close := d.getCollection()
 	defer close()
 
-	query := d.makeQuery(id, version)
 	err := c.Remove(query)
 	if err != nil {
-		return d.errorWrapper(err, id)
+		return d.errorWrapper(err)
 	}
 
 	return nil
@@ -150,12 +120,18 @@ func (r ResourceNotFoundError) Error() string {
 	return fmt.Sprintf("%v - id %v", r.msg, r.id)
 }
 
-func (d *Driver) makeQuery(id, version string) *bson.M {
-	var query bson.M
-	if len(version) == 0 {
-		query = bson.M{"data": bson.M{"$elemMatch": bson.M{"id": id}}}
-	} else {
-		query = bson.M{"data": bson.M{"$elemMatch": bson.M{"$and": bson.M{"0": bson.M{"id": id}, "1": bson.M{"meta.version": version}}}}}
+func makeQuery(resType, id, version string) bson.M {
+
+	c := bson.M{
+		urnKey:             nil,
+		"id":               id,
+		"meta.resouceType": resType,
 	}
-	return &query
+
+	if version != "" {
+		c["meta.version"] = version
+	}
+
+	query := bson.M{"data": bson.M{"$elemMatch": c}}
+	return query
 }

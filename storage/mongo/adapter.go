@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/fabbricadigitale/scimd/api"
+	"github.com/fabbricadigitale/scimd/api/attr"
 	"github.com/fabbricadigitale/scimd/api/filter"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/datatype"
@@ -66,28 +67,28 @@ func (a *Adapter) Create(res *resource.Resource) error {
 }
 
 // Get is ...
-func (a *Adapter) Get(resType *core.ResourceType, id, version string) (*resource.Resource, error) {
+func (a *Adapter) Get(resType *core.ResourceType, id, version string, included []*attr.Path, excluded []*attr.Path) (*resource.Resource, error) {
 
-	h := &resourceDocument{}
-
-	h, err := (*a.adaptee).Get(id, version)
+	q, err := (*a.adaptee).Find(makeQuery(resType.GetIdentifier(), id, version))
 
 	if err != nil {
 		return nil, err
 	}
 
-	return toResource(h), nil
+	query := Query{q}
+	query.Fields(included, excluded)
+	return query.one()
 }
 
 // Update is ...
 func (a *Adapter) Update(resource *resource.Resource, id string, version string) error {
 	dataResource := a.hydrateResource(resource)
-	return (*a.adaptee).Update(id, version, dataResource)
+	return (*a.adaptee).Update(makeQuery(resource.ResourceType().GetIdentifier(), id, version), dataResource)
 }
 
 // Delete is ...
 func (a *Adapter) Delete(resType *core.ResourceType, id, version string) error {
-	return (*a.adaptee).Delete(id, version)
+	return (*a.adaptee).Delete(makeQuery(resType.GetIdentifier(), id, version))
 }
 
 // Find is ...
