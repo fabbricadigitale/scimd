@@ -2,7 +2,6 @@ package mongo
 
 import (
 	"fmt"
-	"reflect"
 
 	"github.com/fabbricadigitale/scimd/api"
 	"github.com/fabbricadigitale/scimd/api/attr"
@@ -92,13 +91,23 @@ func (a *Adapter) Delete(resType *core.ResourceType, id, version string) error {
 }
 
 // Find is ...
-func (a *Adapter) Find(resType []*core.ResourceType, filter filter.Filter) (storage.Querier, error) {
+func (a *Adapter) Find(resTypes []*core.ResourceType, filter filter.Filter) (storage.Querier, error) {
 
-	q, _ := convertToMongoQuery(filter)
+	or := make([]bson.M, len(resTypes))
+
+	for i, resType := range resTypes {
+		var err error
+		or[i], err = convertToMongoQuery(resType, filter)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	_q := bson.M{
 		"data": bson.M{
-			"$elemMatch": q,
+			"$elemMatch": bson.M{
+				"$or": or,
+			},
 		},
 	}
 
@@ -179,9 +188,9 @@ func toResource(h *resourceDocument) *resource.Resource {
 	return r
 }
 
-func convertToMongoQuery(ft filter.Filter) (m bson.M, err error) {
+func convertToMongoQuery(resType *core.ResourceType, ft filter.Filter) (m bson.M, err error) {
 
-	defer func() {
+	/* defer func() {
 		if r := recover(); r != nil {
 			switch r.(type) {
 			case error:
@@ -192,16 +201,17 @@ func convertToMongoQuery(ft filter.Filter) (m bson.M, err error) {
 				}
 			}
 		}
-	}()
+	}() */
 
 	var conv *convert
-	m, err = conv.do(ft), nil
+	m, err = conv.do(resType, ft), nil
+	m["meta.resouceType"] = resType.GetIdentifier()
 	return m, err
 }
 
 type convert struct{}
 
-func (c *convert) do(f interface{}) bson.M {
+func (c *convert) do(resType *core.ResourceType, f interface{}) bson.M {
 
 	var (
 		left, right bson.M
@@ -213,7 +223,7 @@ func (c *convert) do(f interface{}) bson.M {
 
 		node := f.(*filter.ValuePath)
 
-		right = c.do(node.ValueFilter)
+		right = c.do(resType, node.ValueFilter)
 
 		return bson.M{
 			node.Path.String(): bson.M{
@@ -225,9 +235,9 @@ func (c *convert) do(f interface{}) bson.M {
 
 		node := f.(filter.ValueAnd)
 
-		left = c.do(node.Left)
+		left = c.do(resType, node.Left)
 
-		right = c.do(node.Right)
+		right = c.do(resType, node.Right)
 
 		return bson.M{
 			"$and": []interface{}{left, right},
@@ -237,9 +247,9 @@ func (c *convert) do(f interface{}) bson.M {
 
 		node := f.(filter.ValueOr)
 
-		left = c.do(node.Left)
+		left = c.do(resType, node.Left)
 
-		right = c.do(node.Right)
+		right = c.do(resType, node.Right)
 
 		return bson.M{
 			"$or": []interface{}{left, right},
@@ -249,7 +259,7 @@ func (c *convert) do(f interface{}) bson.M {
 
 		node := f.(filter.ValueNot)
 
-		left = c.do(node.ValueFilter)
+		left = c.do(resType, node.ValueFilter)
 
 		return bson.M{
 			"$nor": []interface{}{left},
@@ -258,15 +268,15 @@ func (c *convert) do(f interface{}) bson.M {
 	case *filter.Group:
 		node := f.(*filter.Group)
 
-		return c.do(node.Filter)
+		return c.do(resType, node.Filter)
 
 	case filter.And:
 		node := f.(filter.And)
 		if node.Left != nil {
-			left = c.do(node.Left)
+			left = c.do(resType, node.Left)
 		}
 		if node.Right != nil {
-			right = c.do(node.Right)
+			right = c.do(resType, node.Right)
 		}
 		return bson.M{
 			"$and": []interface{}{left, right},
@@ -274,37 +284,59 @@ func (c *convert) do(f interface{}) bson.M {
 	case filter.Or:
 		node := f.(filter.Or)
 		if node.Left != nil {
-			left = c.do(node.Left)
+			left = c.do(resType, node.Left)
 		}
 		if node.Right != nil {
-			right = c.do(node.Right)
+			right = c.do(resType, node.Right)
 		}
 		return bson.M{
 			"$or": []interface{}{left, right},
 		}
 	case filter.Not:
 		node := f.(filter.Not)
-		left = c.do(node.Filter)
+		left = c.do(resType, node.Filter)
 		return bson.M{
 			"$nor": []interface{}{left},
 		}
 	case *filter.AttrExpr:
 		node := f.(*filter.AttrExpr)
-		return c.logicalOperators(f, *node)
+		return c.relationalOperators(resType, f, *node)
 	case filter.AttrExpr:
 		node := f.(filter.AttrExpr)
-		return c.logicalOperators(f, node)
+		return c.relationalOperators(resType, f, node)
 	}
 
 	return nil
 }
 
-func (c *convert) logicalOperators(f interface{}, node filter.AttrExpr) bson.M {
+func (c *convert) relationalOperators(resType *core.ResourceType, f interface{}, node filter.AttrExpr) bson.M {
 
-	// The 'co', 'sw' and ew operators can only be used if the attribute type is string
+	// The 'co', 'sw' and 'ew' operators can only be used if the attribute type is string
 	if node.Op == filter.OpContains || node.Op == filter.OpStartsWith || node.Op == filter.OpEndsWith {
-		// (TODO) > checks attribute type (refs https://github.com/fabbricadigitale/scimd/issues/32)
-		if reflect.ValueOf(node.Value).Kind() != reflect.String {
+
+		attrDef := node.Path.FindAttribute(resType)
+
+		if attrDef == nil {
+			detail := fmt.Sprintf("Attribute %s is not supported", node.Path.String())
+			var e *api.InvalidFilterError
+			e = &api.InvalidFilterError{
+				Filter: f.(filter.Filter).String(),
+				Detail: detail,
+			}
+			panic(e)
+		}
+
+		if attrDef.Type != "string" {
+			detail := fmt.Sprintf("Cannot use %s operator on non-string attributes %s", node.Op, node.Path.String())
+			var e *api.InvalidFilterError
+			e = &api.InvalidFilterError{
+				Filter: f.(filter.Filter).String(),
+				Detail: detail,
+			}
+			panic(e)
+		}
+		if _, ok := node.Value.(string); !ok {
+			//reflect.ValueOf(node.Value).Kind() != reflect.String {
 			if node.Value != nil {
 				detail := fmt.Sprintf("Cannot use %s operator with non-string value: %T", node.Op, node.Value)
 
