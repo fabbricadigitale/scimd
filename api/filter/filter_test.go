@@ -10,24 +10,35 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type testErrorListener struct {
+	*antlr.DefaultErrorListener
+	t *testing.T
+}
+
+func (l *testErrorListener) SyntaxError(recognizer antlr.Recognizer, offendingSymbol interface{}, line, column int, msg string, e antlr.RecognitionException) {
+	l.t.Fail()
+}
+
 func TestParser(t *testing.T) {
 	inFile, _ := os.Open("testdata/ok.txt")
 	defer inFile.Close()
 	scanner := bufio.NewScanner(inFile)
 	scanner.Split(bufio.ScanLines)
 
+	l := new(testErrorListener)
+	l.t = t
+
 	for scanner.Scan() {
 		input := scanner.Text()
 
 		stream := antlr.NewInputStream(input)
 		lexer := NewFilterLexer(stream)
-		lexer.RemoveErrorListeners()
+		lexer.AddErrorListener(l)
 		tokens := antlr.NewCommonTokenStream(lexer, 0)
 
 		parser := NewFilterParser(tokens)
-		parser.RemoveErrorListeners()
-		// parser.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
-		parser.BuildParseTrees = true
+		parser.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
+		parser.AddErrorListener(l)
 
 		tree := parser.Root()
 		/*
