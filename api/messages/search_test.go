@@ -39,13 +39,13 @@ func TestSearchRequestResource(t *testing.T) {
 func TestSearchRequestValid(t *testing.T) {
 	var err error
 
-	// Wrong SearchRequest struct tag
+	// Wrong SearchRequest validation tag
 
 	wrongURI := []string{"urn:ietf:params:scim:api:messages:2.0"}
 	err = validation.Validator.Var(wrongURI, "eq=1,dive,eq=urn:ietf:params:scim:api:messages:2.0:SearchRequest")
 	require.Error(t, err)
 
-	// Right SearchRequest struct tag
+	// Right SearchRequest validation tag
 
 	rightURI := []string{"urn:ietf:params:scim:api:messages:2.0:SearchRequest"}
 	err = validation.Validator.Var(rightURI, "eq=1,dive,eq=urn:ietf:params:scim:api:messages:2.0:SearchRequest")
