@@ -3,7 +3,7 @@ package core
 // SchemaExtension ...
 type SchemaExtension struct {
 	Schema   string `json:"schema" validate:"urn,required"`
-	Required bool   `json:"required" validate:"required"`
+	Required bool   `json:"required"`
 }
 
 // ResourceType is a structured resource for "urn:ietf:params:scim:schemas:core:2.0:ResourceType"
@@ -13,7 +13,7 @@ type ResourceType struct {
 	Endpoint         string            `json:"endpoint" validate:"startswith=/,required"`
 	Description      string            `json:"description,omitempty"`
 	Schema           string            `json:"schema" validate:"urn,required"`
-	SchemaExtensions []SchemaExtension `json:"schemaExtensions,omitempty"`
+	SchemaExtensions []SchemaExtension `json:"schemaExtensions,omitempty" validate:"dive"`
 }
 
 // ResourceTypeURI is the Resource Type Configuration schema used by ResourceType
