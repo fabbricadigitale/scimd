@@ -16,7 +16,7 @@ var urn = func(fl validator.FieldLevel) bool {
 	case reflect.String:
 		str := field.String()
 		if strings.HasPrefix(str, schemas.InvalidURNPrefix) {
-			panic(fmt.Sprintf("Invalid URN composition: %+v", field.Interface()))
+			return false
 		}
 		return schemas.URIRegexp.MatchString(str)
 	}
