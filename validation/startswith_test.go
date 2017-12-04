@@ -4,42 +4,25 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	validator "gopkg.in/go-playground/validator.v9"
 )
 
-type TestSW struct {
-	Text    string `validate:"startswith=b"`
-	Integer int    `validate:"startswith=b"`
-}
-
 func TestStartswith(t *testing.T) {
-	x := TestSW{}
-
-	fields := []string{"Text", "Integer"}
-	failtags := []string{"startswith", "startswith"}
-
-	defer func() {
-		r := recover()
-		require.NotNil(t, r)
-		require.Equal(t, "Bad field type int", r)
-	}()
+	var err error
 
 	// Starts with
-	x.Text = "bar"
-
-	errors := Validator.Struct(x)
-	require.NoError(t, errors)
+	okString := "bar"
+	err = Validator.Var(okString, "startswith=b")
+	require.NoError(t, err)
 
 	// Doesn't starts with
-	x.Text = "zar"
+	wrongString := "zar"
+	err = Validator.Var(wrongString, "startswith=b")
+	require.Error(t, err)
 
-	errors = Validator.Struct(x)
-	require.Error(t, errors)
-
-	for e, err := range errors.(validator.ValidationErrors) {
-		require.Equal(t, "TestSW."+fields[e], err.Namespace())
-		require.Equal(t, fields[e], err.Field())
-		require.Equal(t, failtags[e], err.ActualTag())
-	}
+	// Invalid type
+	invalidType := 123
+	require.PanicsWithValue(t, "Bad field type int", func() {
+		Validator.Var(invalidType, "startswith")
+	})
 
 }

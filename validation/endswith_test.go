@@ -4,41 +4,24 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	validator "gopkg.in/go-playground/validator.v9"
 )
 
-type TestEW struct {
-	Text    string `validate:"endswith=r"`
-	Integer int    `validate:"endswith=r"`
-}
-
 func TestEndswith(t *testing.T) {
-	x := TestEW{}
-
-	fields := []string{"Text", "Integer"}
-	failtags := []string{"endswith", "endswith"}
-
-	defer func() {
-		r := recover()
-		require.NotNil(t, r)
-		require.Equal(t, "Bad field type int", r)
-	}()
+	var err error
 
 	// Ends with
-	x.Text = "bar"
-
-	errors := Validator.Struct(x)
-	require.NoError(t, errors)
+	okString := "bar"
+	err = Validator.Var(okString, "endswith=r")
+	require.NoError(t, err)
 
 	// Doesn't ends with
-	x.Text = "bars"
+	wrongString := "barz"
+	err = Validator.Var(wrongString, "endswith=r")
+	require.Error(t, err)
 
-	errors = Validator.Struct(x)
-	require.Error(t, errors)
-
-	for e, err := range errors.(validator.ValidationErrors) {
-		require.Equal(t, "TestEW."+fields[e], err.Namespace())
-		require.Equal(t, fields[e], err.Field())
-		require.Equal(t, failtags[e], err.ActualTag())
-	}
+	// Invalid type
+	invalidType := 123
+	require.PanicsWithValue(t, "Bad field type int", func() {
+		Validator.Var(invalidType, "endswith")
+	})
 }
