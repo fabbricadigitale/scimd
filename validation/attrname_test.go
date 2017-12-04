@@ -39,39 +39,38 @@ func TestAttrName(t *testing.T) {
 
 	// Match Regex
 	x.Name = "bar"
-	err = Validator.Var(x, "attrname")
+	err = Validator.Struct(x)
 	require.NoError(t, err)
 
 	x.Name = "bar0"
-	err = Validator.Var(x, "attrname")
+	err = Validator.Struct(x)
 	require.NoError(t, err)
 
 	// Doesn't match Regex
 	x.Name = "0bar"
-	err = Validator.Var(x, "attrname")
+	err = Validator.Struct(x)
 	require.Error(t, err)
 
 	// Invalid parent type
+	invalidParentType := "bar"
 	require.PanicsWithValue(t, "Invalid parent type string: must be a struct", func() {
-		Validator.Var(x.Name, "attrname")
+		Validator.Var(invalidParentType, "attrname")
 	})
 
 	// Missing Type
-	z.Name = "bar"
 	require.PanicsWithValue(t, "Field Type not found in the Struct", func() {
-		Validator.Var(z, "attrname")
+		Validator.Struct(z)
 	})
 
 	// Invalid Type
-	y.Name = 123
 	require.PanicsWithValue(t, "Bad field type int", func() {
-		Validator.Var(y, "attrname")
+		Validator.Struct(y)
 	})
 
 	// Reference
-	err = Validator.Var(testCorrectReference, "attrname")
+	err = Validator.Struct(testCorrectReference)
 	require.NoError(t, err)
 
-	err = Validator.Var(testWrongReference, "attrname")
+	err = Validator.Struct(testWrongReference)
 	require.Error(t, err)
 }
