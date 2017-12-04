@@ -40,75 +40,97 @@ const (
 
 // Parse parses a SCIM attribute notation into a Path structure.
 func Parse(s string) *Path {
-	a := &Path{}
+	p := &Path{}
 	matches := attrNameExp.FindStringSubmatch(s)
 
 	// to be valid must match ATTRNAME at least
 	l := len(matches)
 	if l > nameIdx {
-		a.URI = matches[uriIdx]
-		a.Name = matches[nameIdx]
+		p.URI = matches[uriIdx]
+		p.Name = matches[nameIdx]
 		if l > subIdx {
-			a.Sub = matches[subIdx]
+			p.Sub = matches[subIdx]
 		}
 	}
-	return a
+	return p
 }
 
-// Valid returns true if a is valid attribute path
-func (a Path) Valid() bool {
-	return len(a.Name) > 0 && !strings.HasPrefix(strings.ToLower(a.URI), schemas.InvalidURNPrefix)
+// Valid returns true if p is valid attribute path
+func (p Path) Valid() bool {
+	return len(p.Name) > 0 && !strings.HasPrefix(strings.ToLower(p.URI), schemas.InvalidURNPrefix)
 }
 
-func (a Path) String() string {
-	if !a.Valid() {
+func (p Path) String() string {
+	if !p.Valid() {
 		return ""
 	}
-	s := a.URI
+	s := p.URI
 	if len(s) > 0 {
 		s += ":"
 	}
-	s += a.Name
-	if len(a.Sub) > 0 {
-		s += "." + a.Sub
+	s += p.Name
+	if len(p.Sub) > 0 {
+		s += "." + p.Sub
 	}
 	return s
 }
 
-func (a *Path) findAttrDef(s *core.Schema) *core.Attribute {
-	def := s.Attributes.ByName(a.Name)
-	if def != nil && a.Sub != "" {
-		def = def.SubAttributes.ByName(a.Sub)
+// FindAttribute returns the core.Attribute matched by p within the given core.ResourceType, if any
+// (todo) Deprecate this in favour of Match()
+func (p Path) FindAttribute(rt *core.ResourceType) *core.Attribute {
+	_, att, subAtt := p.Match(rt)
+
+	if subAtt != nil {
+		return subAtt
 	}
-	return def
+
+	return att
 }
 
-// FindAttribute returns the core.Attribute matched by Path within the given core.ResourceType, if any
-func (a Path) FindAttribute(rt *core.ResourceType) *core.Attribute {
+// MatchSchema returns schema matched by p, if any
+func (p Path) MatchSchema(rt *core.ResourceType) *core.Schema {
 
-	if !a.Valid() {
+	if !p.Valid() || rt == nil {
 		return nil
 	}
 
-	s := rt.GetSchema()
-
-	// if no URI, assume base schema
-	if a.URI == "" {
-		return a.findAttrDef(s)
+	if p.URI == "" {
+		return rt.GetSchema()
 	}
 
 	// (fixme) ToLower() is not enough to ensure URN-equivalence as per https://tools.ietf.org/html/rfc8141#section-3
-	lcURI := strings.ToLower(a.URI)
+	lcURI := strings.ToLower(p.URI)
 
+	s := rt.GetSchema()
 	if lcURI == strings.ToLower(s.ID) {
-		return a.findAttrDef(s)
+		return s
 	}
 
 	for _, s := range rt.GetSchemaExtensions() {
 		if lcURI == strings.ToLower(s.ID) {
-			return a.findAttrDef(s)
+			return s
 		}
 	}
 
 	return nil
+}
+
+// Match returns schema, attribute, and subAttribute matched by p
+func (p Path) Match(rt *core.ResourceType) (schema *core.Schema, attribute *core.Attribute, subAttribute *core.Attribute) {
+
+	schema = p.MatchSchema(rt)
+	if schema == nil {
+		return
+	}
+
+	attribute = schema.Attributes.ByName(p.Name)
+	if attribute == nil {
+		return
+	}
+
+	if p.Sub != "" {
+		subAttribute = attribute.SubAttributes.ByName(p.Sub)
+	}
+
+	return
 }
