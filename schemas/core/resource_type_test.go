@@ -120,11 +120,21 @@ func TestResourceTypeValidation(t *testing.T) {
 	require.NoError(t, errors)
 
 	// nested struct schemaext
+	// Valid URN
 	res.SchemaExtensions = []SchemaExtension{
 		SchemaExtension{
 			Schema: "urn:ietf:params:scim:schemas:core:2.0:User",
 		},
 	}
-	errors = validation.Validator.Struct(res)
+	errors = validation.Validator.Var(res.SchemaExtensions[0].Schema, "urn")
 	require.NoError(t, errors)
+
+	// Invalid URN
+	res.SchemaExtensions = []SchemaExtension{
+		SchemaExtension{
+			Schema: "urn:a:",
+		},
+	}
+	errors = validation.Validator.Var(res.SchemaExtensions[0].Schema, "urn")
+	require.Error(t, errors)
 }
