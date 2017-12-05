@@ -98,7 +98,26 @@ func TestServiceProviderConfigValidation(t *testing.T) {
 		require.Equal(t, failtags[e], err.ActualTag())
 	}
 
-	// (todo) > complete test with positive and negative cases when (and if) struct'll have other validations other than required
+	res.Patch.Supported = true
+	res.Bulk.Supported = true
+	res.Bulk.MaxOperations = 1000
+	res.Bulk.MaxPayloadSize = 1048576
+	res.Filter.Supported = true
+	res.Filter.MaxResults = 200
+	res.ChangePassword.Supported = true
+	res.Sort.Supported = true
+	res.Etag.Supported = true
+	res.AuthenticationSchemes = []authenticationScheme{}
+
+	// Valid URI
+	res.DocumentationURI = "http://example.com/help/scim.html"
+	errors = validation.Validator.Struct(res)
+	require.NoError(t, errors)
+
+	// Invalid URI
+	res.DocumentationURI = "NotAUri"
+	errors = validation.Validator.Struct(res)
+	require.Error(t, errors)
 }
 
 func TestAuthenticationSchemeValidation(t *testing.T) {
@@ -118,6 +137,7 @@ func TestAuthenticationSchemeValidation(t *testing.T) {
 		require.Equal(t, failtags[e], err.ActualTag())
 	}
 
+	// Non matching Type for eq validation tag
 	x.Name = "name"
 	x.Description = "descr"
 	x.Type = "xxx"
@@ -134,9 +154,44 @@ func TestAuthenticationSchemeValidation(t *testing.T) {
 		require.Equal(t, failtags[e], err.ActualTag())
 	}
 
+	// Matching Type for eq validation tag
 	x.Type = "oauth2"
+	errors = validation.Validator.Struct(x)
+	require.NoError(t, errors)
+
+	x.Type = "oauth"
+	errors = validation.Validator.Struct(x)
+	require.NoError(t, errors)
+
+	x.Type = "oauthbearertoken"
+	errors = validation.Validator.Struct(x)
+	require.NoError(t, errors)
+
+	x.Type = "httpbasic"
 
 	errors = validation.Validator.Struct(x)
+	require.NoError(t, errors)
 
-	require.Nil(t, errors)
+	x.Type = "httpdigest"
+	errors = validation.Validator.Struct(x)
+	require.NoError(t, errors)
+
+	// Valid URI
+	x.SpecURI = "http://www.rfc-editor.org/info/rfc2617"
+	errors = validation.Validator.Struct(x)
+	require.NoError(t, errors)
+
+	x.DocumentationURI = "http://example.com/help/httpBasic.html"
+	errors = validation.Validator.Struct(x)
+	require.NoError(t, errors)
+
+	// Invalid URI
+
+	x.SpecURI = "NotAUri"
+	errors = validation.Validator.Struct(x)
+	require.Error(t, errors)
+
+	x.DocumentationURI = "NotAUri"
+	errors = validation.Validator.Struct(x)
+	require.Error(t, errors)
 }
