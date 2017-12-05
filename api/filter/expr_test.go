@@ -1,9 +1,11 @@
 package filter
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/fabbricadigitale/scimd/api/attr"
+	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -162,4 +164,46 @@ func TestStringer(t *testing.T) {
 		AttrExpr{attr.Path{Name: "userType"}, OpEqual, "Intern"},
 	}
 	assert.Equal(t, filter19, f19.String())
+}
+
+func loadRt(t *testing.T) {
+	resTypeRepo := core.GetResourceTypeRepository()
+	if _, err := resTypeRepo.Add("../../schemas/core/testdata/user.json"); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	schemaRepo := core.GetSchemaRepository()
+	if _, err := schemaRepo.Add("../../schemas/core/testdata/user_schema.json"); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+	if _, err := schemaRepo.Add("../../schemas/core/testdata/enterprise_user_schema.json"); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+}
+func TestNormalize(t *testing.T) {
+	loadRt(t)
+	rt := core.GetResourceTypeRepository().Get("User")
+	f1, _ := CompileString(filter12)
+	nf1 := f1.Normalize(rt)
+
+	assert.Equal(
+		t,
+		`urn:ietf:params:scim:schemas:core:2.0:User:userType eq "Employee" and (urn:ietf:params:scim:schemas:core:2.0:User:emails.type eq "work" and urn:ietf:params:scim:schemas:core:2.0:User:emails.value co "@example.com")`,
+		nf1.String(),
+	)
+
+	assert.Equal(
+		t,
+		nf1.String(),
+		nf1.Normalize(rt).String(),
+	)
+
+	fmt.Println(f1.String())
+	fmt.Println(nf1.String())
+	fmt.Println(nf1.Normalize(rt).String())
+
+	// (todo) add more testing cases
 }

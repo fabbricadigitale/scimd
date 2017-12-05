@@ -25,6 +25,7 @@ type Path struct {
 	URI  string
 	Name string
 	Sub  string
+	ctx  map[string]Context
 }
 
 var (
@@ -78,17 +79,16 @@ func (p Path) String() string {
 // FindAttribute returns the core.Attribute matched by p within the given core.ResourceType, if any
 // (todo) Deprecate this in favour of Match()
 func (p Path) FindAttribute(rt *core.ResourceType) *core.Attribute {
-	_, att, subAtt := p.Match(rt)
+	c := p.Context(rt)
 
-	if subAtt != nil {
-		return subAtt
+	if c.SubAttribute != nil {
+		return c.SubAttribute
 	}
 
-	return att
+	return c.Attribute
 }
 
-// MatchSchema returns schema matched by p, if any
-func (p Path) MatchSchema(rt *core.ResourceType) *core.Schema {
+func (p Path) matchSchema(rt *core.ResourceType) *core.Schema {
 
 	if !p.Valid() || rt == nil {
 		return nil
@@ -115,22 +115,58 @@ func (p Path) MatchSchema(rt *core.ResourceType) *core.Schema {
 	return nil
 }
 
-// Match returns schema, attribute, and subAttribute matched by p
-func (p Path) Match(rt *core.ResourceType) (schema *core.Schema, attribute *core.Attribute, subAttribute *core.Attribute) {
+func (p Path) getCtxCache(key string) *Context {
+	if p.ctx != nil {
+		if c, ok := p.ctx[key]; ok {
+			return &c
+		}
+	}
+	return nil
+}
 
-	schema = p.MatchSchema(rt)
-	if schema == nil {
-		return
+func (p Path) setCtxCache(key string, ctx *Context) {
+	if p.ctx == nil {
+		p.ctx = map[string]Context{key: *ctx}
+	} else {
+		p.ctx[key] = *ctx
+	}
+}
+
+// Context returns a Context struct matched by p
+func (p Path) Context(rt *core.ResourceType) *Context {
+
+	key := p.String()
+
+	// Lookup cache
+	if c := p.getCtxCache(key); c != nil {
+		return c
 	}
 
-	attribute = schema.Attributes.ByName(p.Name)
+	schema := p.matchSchema(rt)
+	if schema == nil {
+		return nil
+	}
+
+	attribute := schema.Attributes.ByName(p.Name)
 	if attribute == nil {
-		return
+		return nil
+	}
+
+	c := &Context{
+		Schema:    schema,
+		Attribute: attribute,
 	}
 
 	if p.Sub != "" {
-		subAttribute = attribute.SubAttributes.ByName(p.Sub)
+		c.SubAttribute = attribute.SubAttributes.ByName(p.Sub)
 	}
 
-	return
+	p.setCtxCache(key, c)
+	return c
+}
+
+type Context struct {
+	*core.Schema
+	*core.Attribute
+	SubAttribute *core.Attribute
 }

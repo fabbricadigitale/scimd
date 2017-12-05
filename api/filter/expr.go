@@ -3,7 +3,10 @@ package filter
 import (
 	"encoding/json"
 
+	"github.com/fabbricadigitale/scimd/api"
 	"github.com/fabbricadigitale/scimd/api/attr"
+	"github.com/fabbricadigitale/scimd/schemas/core"
+	"github.com/fabbricadigitale/scimd/schemas/datatype"
 )
 
 // Filter is implemented by any value that has a String method,
@@ -11,7 +14,8 @@ import (
 // and IsFilter method, which differentiates from other interfaces.
 type Filter interface {
 	String() string
-	IsFilter()
+	// Normalize returns the contestualized form of Filter for the given rt
+	Normalize(rt *core.ResourceType) Filter
 }
 
 // ValueFilter is implemented by any value that has a String method,
@@ -19,7 +23,8 @@ type Filter interface {
 // and IsValueFilter method, which differentiates from other interfaces.
 type ValueFilter interface {
 	String() string
-	IsValueFilter()
+	// ToFilter returns an equivalent and normalized Filter assiming ValueFilter is within the given ctx
+	ToFilter(ctx *attr.Context) Filter
 }
 
 // Attribute Operators
@@ -55,8 +60,86 @@ func (e AttrExpr) String() string {
 	return e.Path.String() + " " + e.Op + " " + string(compValue)
 }
 
-func (e AttrExpr) IsFilter()      {}
-func (e AttrExpr) IsValueFilter() {}
+func (e AttrExpr) Normalize(rt *core.ResourceType) Filter {
+	ctx := e.Path.Context(rt)
+
+	var p attr.Path
+	o := e.Op
+	v := e.Value
+
+	if ctx != nil && ctx.Schema != nil && ctx.Attribute != nil {
+
+		p = attr.Path{
+			URI:  ctx.Schema.ID,
+			Name: ctx.Attribute.Name,
+		}
+
+		if ctx.SubAttribute == nil {
+			if ctx.Attribute.Type == datatype.ComplexType {
+				if a := ctx.Attribute.SubAttributes.ByName("value"); a != nil {
+					p.Sub = a.Name
+				}
+			}
+		} else {
+			p.Sub = ctx.SubAttribute.Name
+		}
+
+	} else {
+		// For filtered attributes that are not part of a particular resource
+		// type, the service provider SHALL treat the attribute as if there is
+		// no attribute value, as per https://tools.ietf.org/html/rfc7644#section-3.4.2.1
+		p = attr.Path{} // using zero value to indicate an undefined and not valid attribute path
+		v = nil
+	}
+
+	// (todo) validate Op and Value
+
+	exp := &AttrExpr{
+		Path:  p,
+		Op:    o,
+		Value: v,
+	}
+
+	return exp
+}
+
+func (e AttrExpr) ToFilter(ctx *attr.Context) Filter {
+
+	if ctx == nil {
+		panic("filter: missing ctx")
+	}
+
+	p := e.Path
+	if !p.Valid() || p.URI != "" || p.Sub != "" {
+		panic(&api.InvalidFilterError{
+			Filter: e.String(),
+			Detail: "attribute path within Complex attribute filter grouping cannot have URI nor sub-attribute",
+		})
+	}
+
+	if ctx.Attribute.Type != datatype.ComplexType {
+		panic(&api.InvalidFilterError{
+			Filter: e.String(),
+			Detail: "Complex attribute filter grouping not allowed for non complex attributes",
+		})
+	}
+
+	leaf := ctx.Attribute.SubAttributes.ByName(p.Name)
+
+	if leaf == nil {
+		panic(&api.InvalidFilterError{
+			Filter: e.String(),
+			Detail: "sub-attribute '" + p.Name + "' not found in parent attribute",
+		})
+	}
+
+	return &AttrExpr{
+		Path:  attr.Path{URI: ctx.Schema.ID, Name: ctx.Attribute.Name, Sub: leaf.Name},
+		Op:    e.Op,
+		Value: e.Value,
+	}
+
+}
 
 // Logical Expression
 var _ Filter = (*And)(nil)
@@ -74,7 +157,12 @@ func (op And) String() string {
 	return op.Left.String() + " and " + op.Right.String()
 }
 
-func (op And) IsFilter() {}
+func (op And) Normalize(rt *core.ResourceType) Filter {
+	return &And{
+		Left:  op.Left.Normalize(rt),
+		Right: op.Right.Normalize(rt),
+	}
+}
 
 // Or implements Filter, is used to represent the logical "or"
 type Or struct {
@@ -86,11 +174,22 @@ func (op Or) String() string {
 	return op.Left.String() + " or " + op.Right.String()
 }
 
-func (op Or) IsFilter() {}
+func (op Or) Normalize(rt *core.ResourceType) Filter {
+	return &Or{
+		Left:  op.Left.Normalize(rt),
+		Right: op.Right.Normalize(rt),
+	}
+}
 
 // Not implements Filter, is used to represent the logical "not"
 type Not struct {
 	Filter
+}
+
+func (op Not) Normalize(rt *core.ResourceType) Filter {
+	return &Not{
+		op.Filter.Normalize(rt),
+	}
 }
 
 func (op Not) String() string {
@@ -100,6 +199,12 @@ func (op Not) String() string {
 // Not implements Filter, is used to represent the precedence grouping "( )"
 type Group struct {
 	Filter
+}
+
+func (op Group) Normalize(rt *core.ResourceType) Filter {
+	return &Group{
+		op.Filter.Normalize(rt),
+	}
 }
 
 func (g Group) String() string {
@@ -120,7 +225,12 @@ func (vp ValuePath) String() string {
 	return vp.Path.String() + "[" + vp.ValueFilter.String() + "]"
 }
 
-func (vp ValuePath) IsFilter() {}
+func (vp ValuePath) Normalize(rt *core.ResourceType) Filter {
+	ctx := vp.Path.Context(rt)
+	return &Group{
+		Filter: vp.ValueFilter.ToFilter(ctx),
+	}
+}
 
 // Logical operators for value filtering
 var _ ValueFilter = (*ValueAnd)(nil)
@@ -138,7 +248,12 @@ func (op ValueAnd) String() string {
 	return op.Left.String() + " and " + op.Right.String()
 }
 
-func (op ValueAnd) IsValueFilter() {}
+func (op ValueAnd) ToFilter(ctx *attr.Context) Filter {
+	return &And{
+		Left:  op.Left.ToFilter(ctx),
+		Right: op.Right.ToFilter(ctx),
+	}
+}
 
 // ValueOr implements ValueFilter, is used to represent the logical "or" within a Complex attribute filter grouping (ie. a ValuePath).
 type ValueOr struct {
@@ -150,20 +265,37 @@ func (op ValueOr) String() string {
 	return op.Left.String() + " or " + op.Right.String()
 }
 
-func (op ValueOr) IsValueFilter() {}
+func (op ValueOr) ToFilter(ctx *attr.Context) Filter {
+	return &Or{
+		Left:  op.Left.ToFilter(ctx),
+		Right: op.Right.ToFilter(ctx),
+	}
+}
 
 // ValueNot implements ValueFilter, is used to represent the logical "not" within a Complex attribute filter grouping (ie. a ValuePath).
 type ValueNot struct {
 	ValueFilter
 }
 
+func (op ValueNot) ToFilter(ctx *attr.Context) Filter {
+	return &Not{
+		op.ToFilter(ctx),
+	}
+}
+
 func (op ValueNot) String() string {
 	return "not (" + op.ValueFilter.String() + ")"
 }
 
-// ValueNot implements ValueFilter, is used to represent the precedence grouping "( )" within a Complex attribute filter grouping (ie. a ValuePath).
+// ValueGroup implements ValueFilter, is used to represent the precedence grouping "( )" within a Complex attribute filter grouping (ie. a ValuePath).
 type ValueGroup struct {
 	ValueFilter
+}
+
+func (op ValueGroup) ToFilter(ctx *attr.Context) Filter {
+	return &Group{
+		op.ToFilter(ctx),
+	}
 }
 
 func (g ValueGroup) String() string {
