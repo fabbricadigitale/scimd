@@ -1,7 +1,7 @@
 package mongo
 
 import (
-	"fmt"
+	"regexp"
 
 	"github.com/fabbricadigitale/scimd/api"
 	"github.com/fabbricadigitale/scimd/api/attr"
@@ -41,9 +41,10 @@ var (
 	}
 )
 
-// urnKey identifies the attributes namespace into document resource
+// uriKey identifies the attributes namespace into document resource
 // The name stars with an underscore unlike scim properties that start with alphabetical characters
-const urnKey = "_urn"
+const uriKey = "_uri"
+const notExistingKey = "_"
 
 // New makes and return a new adapter of type storage.Storer using a mongo driver
 func New(url, db, collection string) (storage.Storer, error) {
@@ -135,6 +136,7 @@ func (a *Adapter) hydrateResource(r *resource.Resource) *resourceDocument {
 	h := &resourceDocument{}
 
 	common := make(map[string]interface{})
+	common[uriKey] = ""
 	common["schemas"] = r.Schemas
 	common["id"] = r.ID
 	common["external_id"] = r.ExternalID
@@ -143,7 +145,7 @@ func (a *Adapter) hydrateResource(r *resource.Resource) *resourceDocument {
 	rt := r.ResourceType()
 
 	mCore := make(map[string]interface{})
-	mCore[urnKey] = rt.GetSchema().ID
+	mCore[uriKey] = rt.GetSchema().ID
 	for key, val := range *r.Values(rt.GetSchema().ID) {
 		mCore[key] = val
 	}
@@ -153,7 +155,7 @@ func (a *Adapter) hydrateResource(r *resource.Resource) *resourceDocument {
 		mExt := make(map[string]interface{})
 		if extSch != nil {
 			ns := extSch.GetIdentifier()
-			mExt[urnKey] = ns
+			mExt[uriKey] = ns
 			for key, val := range *r.Values(ns) {
 				mExt[key] = val
 			}
@@ -178,9 +180,9 @@ func toResource(h *resourceDocument) *resource.Resource {
 
 	var p *datatype.Complex
 	for i := 1; i < len(h.Data); i++ {
-		ns := h.Data[i][urnKey].(string)
+		ns := h.Data[i][uriKey].(string)
 		values := h.Data[i]
-		delete(values, urnKey)
+		delete(values, uriKey)
 		(*p) = datatype.Complex(values)
 		r.SetValues(ns, p)
 	}
@@ -190,7 +192,7 @@ func toResource(h *resourceDocument) *resource.Resource {
 
 func convertToMongoQuery(resType *core.ResourceType, ft filter.Filter) (m bson.M, err error) {
 
-	/* defer func() {
+	defer func() {
 		if r := recover(); r != nil {
 			switch r.(type) {
 			case error:
@@ -201,10 +203,10 @@ func convertToMongoQuery(resType *core.ResourceType, ft filter.Filter) (m bson.M
 				}
 			}
 		}
-	}() */
+	}()
 
 	var conv *convert
-	m, err = conv.do(resType, ft), nil
+	m, err = conv.do(resType, ft.Normalize(resType)), nil
 	m["meta.resouceType"] = resType.GetIdentifier()
 	return m, err
 }
@@ -219,59 +221,12 @@ func (c *convert) do(resType *core.ResourceType, f interface{}) bson.M {
 
 	switch f.(type) {
 
-	case *filter.ValuePath:
-
-		node := f.(*filter.ValuePath)
-
-		right = c.do(resType, node.ValueFilter)
-
-		return bson.M{
-			node.Path.String(): bson.M{
-				"$elemMatch": right,
-			},
-		}
-
-	case filter.ValueAnd:
-
-		node := f.(filter.ValueAnd)
-
-		left = c.do(resType, node.Left)
-
-		right = c.do(resType, node.Right)
-
-		return bson.M{
-			"$and": []interface{}{left, right},
-		}
-
-	case filter.ValueOr:
-
-		node := f.(filter.ValueOr)
-
-		left = c.do(resType, node.Left)
-
-		right = c.do(resType, node.Right)
-
-		return bson.M{
-			"$or": []interface{}{left, right},
-		}
-
-	case filter.ValueNot:
-
-		node := f.(filter.ValueNot)
-
-		left = c.do(resType, node.ValueFilter)
-
-		return bson.M{
-			"$nor": []interface{}{left},
-		}
-
 	case *filter.Group:
 		node := f.(*filter.Group)
-
 		return c.do(resType, node.Filter)
 
-	case filter.And:
-		node := f.(filter.And)
+	case *filter.And:
+		node := f.(*filter.And)
 		if node.Left != nil {
 			left = c.do(resType, node.Left)
 		}
@@ -281,8 +236,8 @@ func (c *convert) do(resType *core.ResourceType, f interface{}) bson.M {
 		return bson.M{
 			"$and": []interface{}{left, right},
 		}
-	case filter.Or:
-		node := f.(filter.Or)
+	case *filter.Or:
+		node := f.(*filter.Or)
 		if node.Left != nil {
 			left = c.do(resType, node.Left)
 		}
@@ -292,102 +247,225 @@ func (c *convert) do(resType *core.ResourceType, f interface{}) bson.M {
 		return bson.M{
 			"$or": []interface{}{left, right},
 		}
-	case filter.Not:
-		node := f.(filter.Not)
+	case *filter.Not:
+		node := f.(*filter.Not)
 		left = c.do(resType, node.Filter)
 		return bson.M{
 			"$nor": []interface{}{left},
 		}
 	case *filter.AttrExpr:
 		node := f.(*filter.AttrExpr)
-		return c.relationalOperators(resType, f, *node)
-	case filter.AttrExpr:
-		node := f.(filter.AttrExpr)
 		return c.relationalOperators(resType, f, node)
 	}
 
 	return nil
 }
 
-func (c *convert) relationalOperators(resType *core.ResourceType, f interface{}, node filter.AttrExpr) bson.M {
+func (c *convert) relationalOperators(resType *core.ResourceType, f interface{}, node *filter.AttrExpr) bson.M {
 
-	// The 'co', 'sw' and 'ew' operators can only be used if the attribute type is string
-	if node.Op == filter.OpContains || node.Op == filter.OpStartsWith || node.Op == filter.OpEndsWith {
-
-		attrDef := node.Path.FindAttribute(resType)
-
-		if attrDef == nil {
-			detail := fmt.Sprintf("Attribute %s is not supported", node.Path.String())
-			var e *api.InvalidFilterError
-			e = &api.InvalidFilterError{
-				Filter: f.(filter.Filter).String(),
-				Detail: detail,
-			}
-			panic(e)
-		}
-
-		if attrDef.Type != "string" {
-			detail := fmt.Sprintf("Cannot use %s operator on non-string attributes %s", node.Op, node.Path.String())
-			var e *api.InvalidFilterError
-			e = &api.InvalidFilterError{
-				Filter: f.(filter.Filter).String(),
-				Detail: detail,
-			}
-			panic(e)
-		}
-		if _, ok := node.Value.(string); !ok {
-			//reflect.ValueOf(node.Value).Kind() != reflect.String {
-			if node.Value != nil {
-				detail := fmt.Sprintf("Cannot use %s operator with non-string value: %T", node.Op, node.Value)
-
-				var e *api.InvalidFilterError
-				e = &api.InvalidFilterError{
-					Filter: f.(filter.Filter).String(),
-					Detail: detail,
-				}
-				panic(e)
-			}
-		}
-
-		switch node.Op {
-		case filter.OpContains:
-			return bson.M{
-				node.Path.String(): bson.M{
-					"$regex": bson.RegEx{
-						Pattern: node.Value.(string),
-						Options: "i",
-					},
-				},
-			}
-		case filter.OpStartsWith:
-			return bson.M{
-				node.Path.String(): bson.M{
-					"$regex": bson.RegEx{
-						Pattern: "^" + node.Value.(string),
-						Options: "i",
-					},
-				},
-			}
-		case filter.OpEndsWith:
-			return bson.M{
-				node.Path.String(): bson.M{
-					"$regex": bson.RegEx{
-						Pattern: node.Value.(string) + "$",
-						Options: "i",
-					},
-				},
-			}
-		}
-
-	} else if node.Op == filter.OpPresent {
-		//Not implemented
-	} else {
+	// If any schema attribure was not found node.Value is nil.
+	// For filtered attributes that are not part of a particular resource
+	// type, the service provider SHALL treat the attribute as if there is
+	// no attribute value, as per https://tools.ietf.org/html/rfc7644#section-3.4.2.1
+	if !node.Path.Valid() {
 		return bson.M{
-			node.Path.String(): bson.M{
+			notExistingKey: bson.M{
 				mapOperator[node.Op]: node.Value,
 			},
 		}
 	}
 
-	return nil
+	// The 'co', 'sw' and 'ew' operators can only be used if the attribute type is string
+	if node.Op == filter.OpContains || node.Op == filter.OpStartsWith || node.Op == filter.OpEndsWith {
+		return stringOperators(resType, f, node)
+	} else if node.Op == filter.OpPresent {
+		return prOperator(resType, f, node)
+	} else {
+		return comparisonOperators(resType, f, node)
+	}
+}
+
+func newInvalidFilterError(detail, filter string) *api.InvalidFilterError {
+	var e *api.InvalidFilterError
+	e = &api.InvalidFilterError{
+		Filter: filter,
+		Detail: detail,
+	}
+	return e
+}
+
+func stringOperators(resType *core.ResourceType, f interface{}, node *filter.AttrExpr) bson.M {
+
+	attrDef := node.Path.FindAttribute(resType)
+
+	var path *attr.Path
+	path = &node.Path
+
+	uri, key := convertKey(path)
+	value := node.Value.(string)
+
+	if attrDef.MultiValued {
+
+		switch node.Op {
+
+		case filter.OpContains:
+			return multiValuedQueryPart(uri, key, value, "i", "", "")
+		case filter.OpStartsWith:
+			return multiValuedQueryPart(uri, key, value, "i", "^", "")
+		case filter.OpEndsWith:
+			return multiValuedQueryPart(uri, key, value, "i", "", "$")
+		default:
+			return nil
+		}
+	} else {
+
+		switch node.Op {
+
+		case filter.OpContains:
+			return singleValueQueryPart(uri, key, value, "i", "", "")
+		case filter.OpStartsWith:
+			return singleValueQueryPart(uri, key, value, "i", "^", "")
+		case filter.OpEndsWith:
+			return singleValueQueryPart(uri, key, value, "i", "", "$")
+		default:
+			return nil
+		}
+	}
+}
+
+func multiValuedQueryPart(uri, key, value, option, prePattern, postPattern string) bson.M {
+	return bson.M{
+		"$elemMatch": bson.M{
+			"$and": []interface{}{
+				bson.M{
+					key: bson.M{
+						"$regex": bson.RegEx{
+							Pattern: prePattern + regexp.QuoteMeta(value) + postPattern,
+							Options: option,
+						},
+					},
+				},
+				bson.M{
+					uriKey: bson.M{
+						"$eq": uri,
+					},
+				},
+			},
+		},
+	}
+}
+
+func singleValueQueryPart(uri, key, value, option, prePattern, postPattern string) bson.M {
+	return bson.M{
+		"$and": []interface{}{
+			bson.M{
+				key: bson.M{
+					"$regex": bson.RegEx{
+						Pattern: prePattern + regexp.QuoteMeta(value) + postPattern,
+						Options: option,
+					},
+				},
+			},
+			bson.M{
+				uriKey: bson.M{
+					"$eq": uri,
+				},
+			},
+		},
+	}
+}
+
+func convertKey(p *attr.Path) (urn, key string) {
+	urn = p.URI
+	if p.Valid() {
+		key = p.Name
+		if p.Sub != "" {
+			key += "." + p.Sub
+		}
+	} else {
+		key = notExistingKey
+	}
+	return
+}
+
+func comparisonOperators(resType *core.ResourceType, f interface{}, node *filter.AttrExpr) bson.M {
+	attrDef := node.Path.FindAttribute(resType)
+
+	var path *attr.Path
+	path = &node.Path
+
+	uri, key := convertKey(path)
+
+	if attrDef.MultiValued {
+		return bson.M{
+			"$elemMatch": bson.M{
+				"$and": []interface{}{
+					bson.M{
+						key: bson.M{
+							mapOperator[node.Op]: node.Value,
+						},
+					},
+					bson.M{
+						uriKey: bson.M{
+							"$eq": uri,
+						},
+					},
+				},
+			},
+		}
+
+	}
+	return bson.M{
+		"$and": []interface{}{
+			bson.M{
+				key: bson.M{
+					mapOperator[node.Op]: node.Value,
+				},
+			},
+			bson.M{
+				uriKey: bson.M{
+					"$eq": uri,
+				},
+			},
+		},
+	}
+
+}
+
+func prOperator(resType *core.ResourceType, f interface{}, node *filter.AttrExpr) bson.M {
+	attrDef := node.Path.FindAttribute(resType)
+
+	var path *attr.Path
+	path = &node.Path
+
+	uri, key := convertKey(path)
+
+	existsCriteria := bson.M{key: bson.M{"$exists": true}}
+	nullCriteria := bson.M{key: bson.M{"$ne": nil}}
+	emptyStringCriteria := bson.M{key: bson.M{"$ne": ""}}
+	emptyArrayCriteria := bson.M{key: bson.M{"$not": bson.M{"$size": 0}}}
+	emptyObjectCriteria := bson.M{key: bson.M{"$ne": bson.M{}}}
+
+	criterion := make([]interface{}, 0)
+	criterion = append(criterion, existsCriteria, nullCriteria)
+	if attrDef.MultiValued {
+		criterion = append(criterion, emptyArrayCriteria)
+	} else {
+		switch attrDef.Type {
+		case datatype.StringType:
+			criterion = append(criterion, emptyStringCriteria)
+		case datatype.ComplexType:
+			criterion = append(criterion, emptyObjectCriteria)
+		}
+	}
+	return bson.M{
+		"$and": []interface{}{
+			bson.M{"$and": criterion},
+			bson.M{
+				uriKey: bson.M{
+					"$eq": uri,
+				},
+			},
+		},
+	}
 }

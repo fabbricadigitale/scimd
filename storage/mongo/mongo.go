@@ -123,7 +123,7 @@ func (r ResourceNotFoundError) Error() string {
 func makeQuery(resType, id, version string) bson.M {
 
 	c := bson.M{
-		urnKey:             nil,
+		uriKey:             nil,
 		"id":               id,
 		"meta.resouceType": resType,
 	}
