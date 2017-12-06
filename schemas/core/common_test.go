@@ -72,14 +72,14 @@ func TestCommonValidation(t *testing.T) {
 		require.IsType(t, (validator.ValidationErrors)(nil), errors)
 	}
 
-	// Wrong URN fail on urn validation tag, right ID
+	// Wrong URN fail on urn validation tag, valid ID
 	c.Schemas = []string{"not-a-urn"}
 	c.ID = "test"
 	errors = validation.Validator.StructExcept(c, "Meta")
 	require.Error(t, errors)
 	require.IsType(t, (validator.ValidationErrors)(nil), errors)
 
-	// Right URN and valid ID
+	// Both schemas contents (ie., URNs) and ID valid
 	c.Schemas = []string{"urn:ietf:params:scim:schemas:core:2.0:User"}
 	c.ID = "test"
 	errors = validation.Validator.StructExcept(c, "Meta")
