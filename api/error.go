@@ -23,7 +23,7 @@ type InvalidFilterError struct {
 
 func (e *InvalidFilterError) Error() string {
 	if len(e.Filter) > 0 {
-		return fmt.Sprintf("Filter [%s] is invalid: %s", e.Filter, e.Detail)
+		return fmt.Sprintf("Filter '%s' is invalid: %s", e.Filter, e.Detail)
 	}
 	return fmt.Sprintf("Filter is invalid: %s", e.Detail)
 }

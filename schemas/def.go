@@ -19,3 +19,6 @@ var AttrNameRegexp = regexp.MustCompile("^" + AttrNameExpr + "$")
 
 // ReferenceAttrName is the name of attribute with type "reference"
 const ReferenceAttrName = "$ref"
+
+// ComplexValueAttrName is the name of complex's sub-attribute that represents the attribute's significant value.
+const ComplexValueAttrName = "value"

@@ -132,7 +132,7 @@ func (p Path) setCtxCache(key string, ctx *Context) {
 	}
 }
 
-// Context returns a Context struct matched by p
+// Context fetches from rt a suitable Context for p, if any.
 func (p Path) Context(rt *core.ResourceType) *Context {
 
 	key := p.String()
@@ -165,6 +165,7 @@ func (p Path) Context(rt *core.ResourceType) *Context {
 	return c
 }
 
+// A Context represents a set of definitions related to a Path
 type Context struct {
 	*core.Schema
 	*core.Attribute

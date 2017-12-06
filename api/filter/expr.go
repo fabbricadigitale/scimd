@@ -5,13 +5,14 @@ import (
 
 	"github.com/fabbricadigitale/scimd/api"
 	"github.com/fabbricadigitale/scimd/api/attr"
+	"github.com/fabbricadigitale/scimd/schemas"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/datatype"
 )
 
 // Filter is implemented by any value that has a String method,
 // which returns a SCIM filtering expression as per https://tools.ietf.org/html/rfc7644#section-3.4.2.2,
-// and IsFilter method, which differentiates from other interfaces.
+// and Normalize method, which differentiates from other interfaces.
 type Filter interface {
 	String() string
 	// Normalize returns the contestualized form of Filter for the given rt
@@ -20,10 +21,10 @@ type Filter interface {
 
 // ValueFilter is implemented by any value that has a String method,
 // which returns a SCIM expression for filtering Complex attributes (eg. emails[type eq "work"]) as per https://tools.ietf.org/html/rfc7644#section-3.4.2.2,
-// and IsValueFilter method, which differentiates from other interfaces.
+// and ToFilter method, which differentiates from other interfaces.
 type ValueFilter interface {
 	String() string
-	// ToFilter returns an equivalent and normalized Filter assiming ValueFilter is within the given ctx
+	// ToFilter returns an equivalent and normalized Filter assiming ValueFilter within the given ctx
 	ToFilter(ctx *attr.Context) Filter
 }
 
@@ -76,7 +77,7 @@ func (e AttrExpr) Normalize(rt *core.ResourceType) Filter {
 
 		if ctx.SubAttribute == nil {
 			if ctx.Attribute.Type == datatype.ComplexType {
-				if a := ctx.Attribute.SubAttributes.ByName("value"); a != nil {
+				if a := ctx.Attribute.SubAttributes.ByName(schemas.ComplexValueAttrName); a != nil {
 					p.Sub = a.Name
 				}
 			}
@@ -113,14 +114,14 @@ func (e AttrExpr) ToFilter(ctx *attr.Context) Filter {
 	if !p.Valid() || p.URI != "" || p.Sub != "" {
 		panic(&api.InvalidFilterError{
 			Filter: e.String(),
-			Detail: "attribute path within Complex attribute filter grouping cannot have URI nor sub-attribute",
+			Detail: "paths with URI or sub-attribute name are not supported within a complex attribute filter grouping",
 		})
 	}
 
 	if ctx.Attribute.Type != datatype.ComplexType {
 		panic(&api.InvalidFilterError{
 			Filter: e.String(),
-			Detail: "Complex attribute filter grouping not allowed for non complex attributes",
+			Detail: "complex attribute filter grouping not allowed for non-complex attributes",
 		})
 	}
 
@@ -129,7 +130,7 @@ func (e AttrExpr) ToFilter(ctx *attr.Context) Filter {
 	if leaf == nil {
 		panic(&api.InvalidFilterError{
 			Filter: e.String(),
-			Detail: "sub-attribute '" + p.Name + "' not found in parent attribute",
+			Detail: "sub-attribute '" + p.Name + "' not found in parent attribute definitions",
 		})
 	}
 
