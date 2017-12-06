@@ -8,6 +8,7 @@ import (
 
 	"github.com/fabbricadigitale/scimd/api/filter"
 	"github.com/fabbricadigitale/scimd/schemas/core"
+	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/stretchr/testify/require"
 )
 
@@ -77,3 +78,65 @@ func TestConvertToMongoQuery(t *testing.T) {
 	}
 
 }
+
+func TestCreate(t *testing.T) {
+	resTypeRepo := core.GetResourceTypeRepository()
+	if _, err := resTypeRepo.Add("../../schemas/core/testdata/user.json"); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	schemaRepo := core.GetSchemaRepository()
+	if _, err := schemaRepo.Add("../../schemas/core/testdata/user_schema.json"); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+	if _, err := schemaRepo.Add("../../schemas/core/testdata/enterprise_user_schema.json"); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	// Non-normative of SCIM user resource type [https://tools.ietf.org/html/rfc7643#section-8.2]
+	dat, err := ioutil.ReadFile("../../schemas/resource/testdata/enterprise_user_resource_1.json")
+
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	require.NotNil(t, dat)
+	require.Nil(t, err)
+
+	res := &resource.Resource{}
+	err = json.Unmarshal(dat, res)
+
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	adapter, err := New("mongodb://localhost:27017", "scimd", "resources")
+
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	err = adapter.Create(res)
+
+	if err != nil {
+		t.Log(err)
+	}
+
+	require.Nil(t, err)
+}
+
+// (TODO) > Test hydrateResource adapter method
+
+// (TODO) > Test toResource adapter method
+
+// (TODO) > Test Get adapter method
+
+// (TODO) > Test Delete adapter method
+
+// (TODO) > Test Update adapter method
