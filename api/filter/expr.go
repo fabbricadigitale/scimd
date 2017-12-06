@@ -300,7 +300,7 @@ type ValueNot struct {
 
 func (op ValueNot) ToFilter(ctx *attr.Context) Filter {
 	return &Not{
-		op.ToFilter(ctx),
+		op.ValueFilter.ToFilter(ctx),
 	}
 }
 
@@ -315,7 +315,7 @@ type ValueGroup struct {
 
 func (op ValueGroup) ToFilter(ctx *attr.Context) Filter {
 	return &Group{
-		op.ToFilter(ctx),
+		op.ValueFilter.ToFilter(ctx),
 	}
 }
 

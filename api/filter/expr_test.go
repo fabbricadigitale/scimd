@@ -1,7 +1,6 @@
 package filter
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/fabbricadigitale/scimd/api/attr"
@@ -186,24 +185,39 @@ func loadRt(t *testing.T) {
 func TestNormalize(t *testing.T) {
 	loadRt(t)
 	rt := core.GetResourceTypeRepository().Get("User")
-	f1, _ := CompileString(filter12)
-	nf1 := f1.Normalize(rt)
+
+	//
+	f12, _ := CompileString(filter12)
+	nf12 := f12.Normalize(rt)
 
 	assert.Equal(
 		t,
 		`urn:ietf:params:scim:schemas:core:2.0:User:userType eq "Employee" and (urn:ietf:params:scim:schemas:core:2.0:User:emails.type eq "work" and urn:ietf:params:scim:schemas:core:2.0:User:emails.value co "@example.com")`,
-		nf1.String(),
+		nf12.String(),
 	)
 
 	assert.Equal(
 		t,
-		nf1.String(),
-		nf1.Normalize(rt).String(),
+		nf12.String(),
+		nf12.Normalize(rt).String(),
 	)
 
-	fmt.Println(f1.String())
-	fmt.Println(nf1.String())
-	fmt.Println(nf1.Normalize(rt).String())
+	//
+
+	f17, _ := CompileString(filter17)
+	nf17 := f17.Normalize(rt)
+
+	assert.Equal(
+		t,
+		`(not (urn:ietf:params:scim:schemas:core:2.0:User:emails.type sw null))`,
+		nf17.String(),
+	)
+
+	assert.Equal(
+		t,
+		nf17.String(),
+		nf17.Normalize(rt).String(),
+	)
 
 	// (todo) add more testing cases
 }
