@@ -22,7 +22,7 @@ func TestSchemaRepository(t *testing.T) {
 	schemas := GetSchemaRepository()
 
 	// Malformed JSON
-	_, err0 := schemas.Add("testdata/malformed.json")
+	_, err0 := schemas.Add("../../internal/testdata/malformed.json")
 	require.Error(t, err0)
 	// require.Empty(t, data0)
 
@@ -32,11 +32,11 @@ func TestSchemaRepository(t *testing.T) {
 	// require.Empty(t, data1)
 
 	// Wrong structure
-	_, err2 := schemas.Add("testdata/service_provider_config.json")
+	_, err2 := schemas.Add("../../internal/testdata/service_provider_config.json")
 	require.EqualError(t, err2, "missing identifier")
 	// require.Empty(t, data2)
 
-	data3, err3 := schemas.Add("testdata/user_schema.json")
+	data3, err3 := schemas.Add("../../internal/testdata/user_schema.json")
 	require.NoError(t, err3)
 	require.Implements(t, (*Identifiable)(nil), data3)
 	require.IsType(t, Schema{}, data3)
@@ -55,7 +55,7 @@ func TestResourceTypeRepository(t *testing.T) {
 	rType := GetResourceTypeRepository()
 
 	// Malformed JSON
-	_, err0 := rType.Add("testdata/malformed.json")
+	_, err0 := rType.Add("../../internal/testdata/malformed.json")
 	require.Error(t, err0)
 	// require.Empty(t, data0)
 
@@ -65,11 +65,11 @@ func TestResourceTypeRepository(t *testing.T) {
 	// require.Empty(t, data1)
 
 	// Wrong structure
-	_, err2 := rType.Add("testdata/service_provider_config.json")
+	_, err2 := rType.Add("../../internal/testdata/service_provider_config.json")
 	require.EqualError(t, err2, "missing identifier")
 	// require.Empty(t, data2)
 
-	data3, err3 := rType.Add("testdata/user.json")
+	data3, err3 := rType.Add("../../internal/testdata/user.json")
 	require.NoError(t, err3)
 	require.Implements(t, (*Identifiable)(nil), data3)
 	require.IsType(t, ResourceType{}, data3)

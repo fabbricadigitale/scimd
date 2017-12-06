@@ -1,4 +1,4 @@
-package core
+package integration
 
 import (
 	"encoding/json"
@@ -6,22 +6,21 @@ import (
 	"testing"
 	"time"
 
-	"github.com/fabbricadigitale/scimd/validation"
+	"github.com/fabbricadigitale/scimd/schemas/core"
+	v "github.com/fabbricadigitale/scimd/validation"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	validator "gopkg.in/go-playground/validator.v9"
 )
 
-//var validate *validator.Validate
-
 func TestResourceTypeResource(t *testing.T) {
 	// Non-normative of SCIM user resource type [https: //tools.ietf.org/html/rfc7643#section-8.6]
-	dat, err := ioutil.ReadFile("testdata/user.json")
+	dat, err := ioutil.ReadFile("../../testdata/user.json")
 
 	require.NotNil(t, dat)
 	require.Nil(t, err)
 
-	res := ResourceType{}
+	res := core.ResourceType{}
 	json.Unmarshal(dat, &res)
 
 	assert.Contains(t, res.Schemas, "urn:ietf:params:scim:schemas:core:2.0:ResourceType")
@@ -43,14 +42,14 @@ func TestResourceTypeResource(t *testing.T) {
 		assert.Equal(t, row.value, row.field)
 	}
 
-	assert.Contains(t, res.SchemaExtensions, SchemaExtension{
+	assert.Contains(t, res.SchemaExtensions, core.SchemaExtension{
 		Required: true,
 		Schema:   "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User",
 	})
 }
 
 func TestResourceTypeValidation(t *testing.T) {
-	res := NewResourceType("urn:ietf:params:scim:schemas:core:2.0:User", "ResourceType")
+	res := core.NewResourceType("urn:ietf:params:scim:schemas:core:2.0:User", "ResourceType")
 	res.Name = ""
 	res.Endpoint = ""
 	res.Schema = ""
@@ -59,7 +58,7 @@ func TestResourceTypeValidation(t *testing.T) {
 	res.Meta.Created = &now
 	res.Meta.LastModified = &now
 
-	errors := validation.Validator.Struct(res)
+	errors := v.Validator.Struct(res)
 	require.NotNil(t, errors)
 	require.IsType(t, (validator.ValidationErrors)(nil), errors)
 
@@ -77,7 +76,7 @@ func TestResourceTypeValidation(t *testing.T) {
 	//
 	res.Name = "User"
 
-	errors = validation.Validator.Struct(res)
+	errors = v.Validator.Struct(res)
 
 	require.Len(t, errors, 2)
 
@@ -93,7 +92,7 @@ func TestResourceTypeValidation(t *testing.T) {
 	//
 	res.Endpoint = "WrongEndpoint"
 
-	errors = validation.Validator.Struct(res)
+	errors = v.Validator.Struct(res)
 	require.Len(t, errors, 2)
 
 	for e, err := range errors.(validator.ValidationErrors) {
@@ -103,7 +102,7 @@ func TestResourceTypeValidation(t *testing.T) {
 	}
 
 	res.Endpoint = "/Users"
-	errors = validation.Validator.Struct(res)
+	errors = v.Validator.Struct(res)
 	require.Len(t, errors, 1)
 
 	fields = fields[1:]
@@ -111,30 +110,30 @@ func TestResourceTypeValidation(t *testing.T) {
 
 	// non urn on schema
 	res.Schema = "urn:a:"
-	errors = validation.Validator.Struct(res)
+	errors = v.Validator.Struct(res)
 	require.Error(t, errors)
 
 	// urn on schema
 	res.Schema = "urn:ietf:params:scim:schemas:core:2.0:User"
-	errors = validation.Validator.Struct(res)
+	errors = v.Validator.Struct(res)
 	require.NoError(t, errors)
 
 	// nested struct schemaext
 	// Valid URN
-	res.SchemaExtensions = []SchemaExtension{
-		SchemaExtension{
+	res.SchemaExtensions = []core.SchemaExtension{
+		core.SchemaExtension{
 			Schema: "urn:ietf:params:scim:schemas:core:2.0:User",
 		},
 	}
-	errors = validation.Validator.Struct(res)
+	errors = v.Validator.Struct(res)
 	require.NoError(t, errors)
 
 	// Invalid URN
-	res.SchemaExtensions = []SchemaExtension{
-		SchemaExtension{
+	res.SchemaExtensions = []core.SchemaExtension{
+		core.SchemaExtension{
 			Schema: "notValidUrn",
 		},
 	}
-	errors = validation.Validator.Struct(res)
+	errors = v.Validator.Struct(res)
 	require.Error(t, errors)
 }

@@ -6,33 +6,23 @@ import (
 	defaults "github.com/mcuadros/go-defaults"
 )
 
-type patch struct {
+type supported struct {
 	Supported bool `json:"supported" validate:"required"`
 }
 
 type bulk struct {
-	Supported      bool `json:"supported" validate:"required"`
-	MaxOperations  int  `json:"maxOperations" validate:"required"`
-	MaxPayloadSize int  `json:"maxPayloadSize" validate:"required"`
+	supported
+	MaxOperations  int `json:"maxOperations" validate:"required"`
+	MaxPayloadSize int `json:"maxPayloadSize" validate:"required"`
 }
 
 type filter struct {
-	Supported  bool `json:"supported" validate:"required"`
-	MaxResults int  `json:"maxResults" validate:"required"`
-}
-type changePassword struct {
-	Supported bool `json:"supported" validate:"required"`
+	supported
+	MaxResults int `json:"maxResults" validate:"required"`
 }
 
-type sort struct {
-	Supported bool `json:"supported" validate:"required"`
-}
-
-type etag struct {
-	Supported bool `json:"supported" validate:"required"`
-}
-
-type authenticationScheme struct {
+// AuthenticationScheme is ...
+type AuthenticationScheme struct {
 	Type             string `json:"type" validate:"required,eq=oauth|eq=oauth2|eq=oauthbearertoken|eq=httpbasic|eq=httpdigest"`
 	Name             string `json:"name" validate:"required"`
 	Description      string `json:"description" validate:"required"`
@@ -45,13 +35,13 @@ type authenticationScheme struct {
 type ServiceProviderConfig struct {
 	CommonAttributes
 	DocumentationURI      string                 `json:"documentationUri,omitempty" validate:"omitempty,uri"`
-	Patch                 patch                  `json:"patch" validate:"required"`
+	Patch                 supported              `json:"patch" validate:"required"`
 	Bulk                  bulk                   `json:"bulk" validate:"required"`
 	Filter                filter                 `json:"filter" validate:"required"`
-	ChangePassword        changePassword         `json:"changePassword" validate:"required"`
-	Sort                  sort                   `json:"sort" validate:"required"`
-	Etag                  etag                   `json:"etag" validate:"required"`
-	AuthenticationSchemes []authenticationScheme `json:"authenticationSchemes" validate:"required"`
+	ChangePassword        supported              `json:"changePassword" validate:"required"`
+	Sort                  supported              `json:"sort" validate:"required"`
+	Etag                  supported              `json:"etag" validate:"required"`
+	AuthenticationSchemes []AuthenticationScheme `json:"authenticationSchemes" validate:"required"`
 }
 
 // ServiceProviderConfigURI is the Service Provider Configuration schema used by ServiceProviderConfig

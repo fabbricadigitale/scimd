@@ -1,23 +1,24 @@
-package core
+package integration
 
 import (
 	"encoding/json"
 	"io/ioutil"
 	"testing"
 
-	"github.com/fabbricadigitale/scimd/validation"
+	"github.com/fabbricadigitale/scimd/schemas/core"
+	v "github.com/fabbricadigitale/scimd/validation"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestSchemaResource(t *testing.T) {
 	// Non-normative of SCIM user schama representation [https://tools.ietf.org/html/rfc7643#section-8.7.1]
-	dat, err := ioutil.ReadFile("testdata/user_schema.json")
+	dat, err := ioutil.ReadFile("../../testdata/user_schema.json")
 
 	require.NotNil(t, dat)
 	require.Nil(t, err)
 
-	sch := Schema{}
+	sch := core.Schema{}
 	json.Unmarshal(dat, &sch)
 
 	equalities := []struct {
@@ -36,7 +37,7 @@ func TestSchemaResource(t *testing.T) {
 		assert.Equal(t, row.value, row.field)
 	}
 
-	assert.Contains(t, sch.Attributes, &Attribute{
+	assert.Contains(t, sch.Attributes, &core.Attribute{
 		Name:        "userName",
 		Description: "Unique identifier for the User, typically used by the user to directly authenticate to the service provider. Each User MUST include a non-empty userName value.  This identifier MUST be unique across the service provider's entire set of Users. REQUIRED.",
 		Type:        "string",
@@ -48,7 +49,7 @@ func TestSchemaResource(t *testing.T) {
 		Uniqueness:  "server",
 	})
 
-	sa := []*Attribute{
+	sa := []*core.Attribute{
 		{
 			Name:        "formatted",
 			Description: "The full name, including all middle names, titles, and suffixes as appropriate, formatted for display (e.g., 'Ms. Barbara J Jensen, III').",
@@ -117,7 +118,7 @@ func TestSchemaResource(t *testing.T) {
 		},
 	}
 
-	assert.Contains(t, sch.Attributes, &Attribute{
+	assert.Contains(t, sch.Attributes, &core.Attribute{
 		Name:          "name",
 		Description:   "The components of the user's real name. Providers MAY return just the full name as a single string in the formatted sub-attribute, or they MAY return just the individual component attributes using the other sub-attributes, or they MAY return both.  If both variants are returned, they SHOULD be describing the same name, with the formatted name indicating how the component attributes should be combined.",
 		Type:          "complex",
@@ -131,7 +132,7 @@ func TestSchemaResource(t *testing.T) {
 }
 
 // https://tools.ietf.org/html/rfc7643#section-2.2
-func assertAttributeDefaults(t *testing.T, a *Attribute) {
+func assertAttributeDefaults(t *testing.T, a *core.Attribute) {
 	assert.False(t, a.Required)
 	assert.Empty(t, a.CanonicalValues)
 	assert.False(t, a.CaseExact)
@@ -142,23 +143,23 @@ func assertAttributeDefaults(t *testing.T, a *Attribute) {
 }
 
 func TestNewAttribute(t *testing.T) {
-	a := NewAttribute()
+	a := core.NewAttribute()
 	assertAttributeDefaults(t, a)
 }
 
 func TestAttributeUnmarshalWithDefaults(t *testing.T) {
 	data := []byte(`[{},{"type":"integer"}]`)
-	list := make(Attributes, 0)
+	list := make(core.Attributes, 0)
 
 	require.NoError(t, json.Unmarshal(data, &list))
 	require.Len(t, list, 2)
 
 	first := list[0]
-	require.IsType(t, (*Attribute)(nil), first)
+	require.IsType(t, (*core.Attribute)(nil), first)
 	assertAttributeDefaults(t, first)
 
 	second := list[1]
-	require.IsType(t, (*Attribute)(nil), second)
+	require.IsType(t, (*core.Attribute)(nil), second)
 	assert.Equal(t, "integer", second.Type)
 
 	second.Type = first.Type
@@ -166,16 +167,16 @@ func TestAttributeUnmarshalWithDefaults(t *testing.T) {
 }
 
 func TestAttributeValidation(t *testing.T) {
-	ok := NewAttribute()
-	notOk := NewAttribute()
+	ok := core.NewAttribute()
+	notOk := core.NewAttribute()
 
 	var err error
 
 	ok.Name = "bar"
-	err = validation.Validator.Var(ok, "attrname")
+	err = v.Validator.Var(ok, "attrname")
 	require.NoError(t, err)
 
 	notOk.Name = "0bar"
-	err = validation.Validator.Var(notOk, "attrname")
+	err = v.Validator.Var(notOk, "attrname")
 	require.Error(t, err)
 }

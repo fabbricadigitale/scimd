@@ -1,17 +1,18 @@
-package core
+package integration
 
 import (
 	"testing"
 
-	"github.com/fabbricadigitale/scimd/validation"
+	"github.com/fabbricadigitale/scimd/schemas/core"
+	v "github.com/fabbricadigitale/scimd/validation"
 	"github.com/stretchr/testify/require"
 	validator "gopkg.in/go-playground/validator.v9"
 )
 
 func TestMetaValidation(t *testing.T) {
-	m := &Meta{}
+	m := &core.Meta{}
 
-	errors := validation.Validator.Struct(m)
+	errors := v.Validator.Struct(m)
 	require.NotNil(t, errors)
 	require.IsType(t, (validator.ValidationErrors)(nil), errors)
 
@@ -29,7 +30,7 @@ func TestMetaValidation(t *testing.T) {
 
 	m.Location = "schema://uri"
 
-	errors = validation.Validator.Struct(m)
+	errors = v.Validator.Struct(m)
 
 	fields = fields[1:]
 	failtags = failtags[1:]
@@ -43,9 +44,9 @@ func TestMetaValidation(t *testing.T) {
 }
 
 func TestCommonValidation(t *testing.T) {
-	c := CommonAttributes{}
+	c := core.CommonAttributes{}
 
-	errors := validation.Validator.StructExcept(c, "Meta")
+	errors := v.Validator.StructExcept(c, "Meta")
 	require.NotNil(t, errors)
 	require.IsType(t, (validator.ValidationErrors)(nil), errors)
 
@@ -64,7 +65,7 @@ func TestCommonValidation(t *testing.T) {
 	// Empty Schema fail on gt validation tag, ID fails on excludes validation tag
 	c.Schemas = []string{}
 	c.ID = "bulkId"
-	errors = validation.Validator.StructExcept(c, "Meta")
+	errors = v.Validator.StructExcept(c, "Meta")
 	require.Len(t, errors, 2)
 
 	for _, err := range errors.(validator.ValidationErrors) {
@@ -75,13 +76,13 @@ func TestCommonValidation(t *testing.T) {
 	// Wrong URN fail on urn validation tag, valid ID
 	c.Schemas = []string{"not-a-urn"}
 	c.ID = "test"
-	errors = validation.Validator.StructExcept(c, "Meta")
+	errors = v.Validator.StructExcept(c, "Meta")
 	require.Error(t, errors)
 	require.IsType(t, (validator.ValidationErrors)(nil), errors)
 
 	// Both schemas contents (ie., URNs) and ID valid
 	c.Schemas = []string{"urn:ietf:params:scim:schemas:core:2.0:User"}
 	c.ID = "test"
-	errors = validation.Validator.StructExcept(c, "Meta")
+	errors = v.Validator.StructExcept(c, "Meta")
 	require.NoError(t, errors)
 }
