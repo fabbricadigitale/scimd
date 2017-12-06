@@ -139,7 +139,7 @@ func (a *Adapter) hydrateResource(r *resource.Resource) *resourceDocument {
 	common[uriKey] = ""
 	common["schemas"] = r.Schemas
 	common["id"] = r.ID
-	common["external_id"] = r.ExternalID
+	common["externalId"] = r.ExternalID
 	common["meta"] = r.Meta
 
 	rt := r.ResourceType()
