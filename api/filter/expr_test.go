@@ -28,6 +28,7 @@ const (
 	filter17 = `emails[not (type sw null)]`
 	filter18 = `title pr and userType eq "Employee"`
 	filter19 = `title pr or userType eq "Intern"`
+	filter20 = `id eq "one" and meta[resourceType eq "User"]`
 )
 
 func TestStringer(t *testing.T) {
@@ -186,7 +187,7 @@ func TestNormalize(t *testing.T) {
 	loadRt(t)
 	rt := core.GetResourceTypeRepository().Get("User")
 
-	//
+	// Test value filter
 	f12, _ := CompileString(filter12)
 	nf12 := f12.Normalize(rt)
 
@@ -202,8 +203,7 @@ func TestNormalize(t *testing.T) {
 		nf12.Normalize(rt).String(),
 	)
 
-	//
-
+	// Test not
 	f17, _ := CompileString(filter17)
 	nf17 := f17.Normalize(rt)
 
@@ -217,6 +217,22 @@ func TestNormalize(t *testing.T) {
 		t,
 		nf17.String(),
 		nf17.Normalize(rt).String(),
+	)
+
+	// Test common attributes
+	f20, _ := CompileString(filter20)
+	nf20 := f20.Normalize(rt)
+
+	assert.Equal(
+		t,
+		`id eq "one" and (meta.resourceType eq "User")`,
+		nf20.String(),
+	)
+
+	assert.Equal(
+		t,
+		nf20.String(),
+		nf20.Normalize(rt).String(),
 	)
 
 	// (todo) add more testing cases

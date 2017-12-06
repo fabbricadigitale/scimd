@@ -25,7 +25,7 @@ type Path struct {
 	URI  string
 	Name string
 	Sub  string
-	ctx  map[string]Context
+	ctx  map[string]*Context
 }
 
 var (
@@ -76,23 +76,7 @@ func (p Path) String() string {
 	return s
 }
 
-// FindAttribute returns the core.Attribute matched by p within the given core.ResourceType, if any
-// (todo) Deprecate this in favour of Match()
-func (p Path) FindAttribute(rt *core.ResourceType) *core.Attribute {
-	c := p.Context(rt)
-
-	if c.SubAttribute != nil {
-		return c.SubAttribute
-	}
-
-	return c.Attribute
-}
-
 func (p Path) matchSchema(rt *core.ResourceType) *core.Schema {
-
-	if !p.Valid() || rt == nil {
-		return nil
-	}
 
 	if p.URI == "" {
 		return rt.GetSchema()
@@ -115,54 +99,78 @@ func (p Path) matchSchema(rt *core.ResourceType) *core.Schema {
 	return nil
 }
 
-func (p Path) getCtxCache(key string) *Context {
+func (p Path) getCtxCache(key string) (*Context, bool) {
 	if p.ctx != nil {
 		if c, ok := p.ctx[key]; ok {
-			return &c
+			return c, ok
 		}
 	}
-	return nil
+	return nil, false
 }
 
 func (p Path) setCtxCache(key string, ctx *Context) {
 	if p.ctx == nil {
-		p.ctx = map[string]Context{key: *ctx}
+		p.ctx = map[string]*Context{key: ctx}
 	} else {
-		p.ctx[key] = *ctx
+		p.ctx[key] = ctx
 	}
 }
 
 // Context fetches from rt a suitable Context for p, if any.
-func (p Path) Context(rt *core.ResourceType) *Context {
+func (p Path) Context(rt *core.ResourceType) (ctx *Context) {
 
 	key := p.String()
 
+	defer func() {
+		p.setCtxCache(key, ctx)
+	}()
+
 	// Lookup cache
-	if c := p.getCtxCache(key); c != nil {
-		return c
+	if c, ok := p.getCtxCache(key); ok {
+		ctx = c
+		return
 	}
 
-	schema := p.matchSchema(rt)
-	if schema == nil {
+	if rt == nil || !p.Valid() {
+		return
+	}
+
+	ctx = &Context{}
+
+	// Try common attributes
+	if p.URI == "" {
+		ctx.Attribute = core.Commons().ByName(p.Name)
+		if ctx.Attribute != nil {
+			if p.Sub != "" {
+				ctx.SubAttribute = ctx.Attribute.SubAttributes.ByName(p.Sub)
+				if ctx.SubAttribute == nil {
+					// Unmached path
+					return nil
+				}
+			}
+			return
+		}
+	}
+
+	// Try schema attributes
+	ctx.Schema = p.matchSchema(rt)
+	if ctx.Schema == nil {
+		// Unmached path
 		return nil
 	}
 
-	attribute := schema.Attributes.ByName(p.Name)
-	if attribute == nil {
-		return nil
+	ctx.Attribute = ctx.Schema.Attributes.ByName(p.Name)
+	if ctx.Attribute != nil {
+		if p.Sub != "" {
+			ctx.SubAttribute = ctx.Attribute.SubAttributes.ByName(p.Sub)
+			if ctx.SubAttribute == nil {
+				// Unmached path
+				return nil
+			}
+		}
 	}
 
-	c := &Context{
-		Schema:    schema,
-		Attribute: attribute,
-	}
-
-	if p.Sub != "" {
-		c.SubAttribute = attribute.SubAttributes.ByName(p.Sub)
-	}
-
-	p.setCtxCache(key, c)
-	return c
+	return
 }
 
 // A Context represents a set of definitions related to a Path

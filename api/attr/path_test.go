@@ -72,7 +72,7 @@ func TestPath(t *testing.T) {
 	assert.False(t, ko.Valid())
 }
 
-func TestFindAttribute(t *testing.T) {
+func TestContext(t *testing.T) {
 	resTypeRepo := core.GetResourceTypeRepository()
 	if _, err := resTypeRepo.Add("../../internal/testdata/user.json"); err != nil {
 		t.Log(err)
@@ -93,13 +93,30 @@ func TestFindAttribute(t *testing.T) {
 		Name: "NAME",
 		Sub:  "gIvEnNaMe",
 	}
-	assert.Equal(t, rt.GetSchema().Attributes.ByName("name").SubAttributes.ByName("givenName"), p.FindAttribute(rt))
+	ctx := p.Context(rt)
+	assert.Equal(t, rt.GetSchema(), ctx.Schema)
+	assert.Equal(t, rt.GetSchema().Attributes.ByName("name"), ctx.Attribute)
+	assert.Equal(t, rt.GetSchema().Attributes.ByName("name").SubAttributes.ByName("givenName"), ctx.SubAttribute)
 
 	// Just attribute name
 	p = Path{
 		Name: "userName",
 	}
-	assert.Equal(t, rt.GetSchema().Attributes.ByName("userName"), p.FindAttribute(rt))
+	ctx = p.Context(rt)
+	assert.Equal(t, rt.GetSchema(), ctx.Schema)
+	assert.Equal(t, rt.GetSchema().Attributes.ByName("userName"), ctx.Attribute)
+	assert.Nil(t, ctx.SubAttribute)
+
+	// Common attributes
+	p = Path{
+		Name: "meta",
+		Sub:  "resourceType",
+	}
+	ctx = p.Context(rt)
+
+	assert.Nil(t, ctx.Schema)
+	assert.Equal(t, core.Commons().ByName("meta"), ctx.Attribute)
+	assert.Equal(t, core.Commons().ByName("meta").SubAttributes.ByName("resourceType"), ctx.SubAttribute)
 
 	// (todo) Name and Sub without URI
 

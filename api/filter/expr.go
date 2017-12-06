@@ -81,11 +81,14 @@ func (e AttrExpr) Normalize(rt *core.ResourceType) Filter {
 	o := e.Op
 	v := e.Value
 
-	if ctx != nil && ctx.Schema != nil && ctx.Attribute != nil {
+	if ctx != nil && ctx.Attribute != nil {
 
 		p = attr.Path{
-			URI:  ctx.Schema.ID,
 			Name: ctx.Attribute.Name,
+		}
+
+		if ctx.Schema != nil {
+			p.URI = ctx.Schema.ID
 		}
 
 		if ctx.SubAttribute == nil {
@@ -130,7 +133,7 @@ func (e AttrExpr) ToFilter(ctx *attr.Context) Filter {
 	// type, the service provider SHALL treat the attribute as if there is
 	// no attribute value, as per https://tools.ietf.org/html/rfc7644#section-3.4.2.1
 	// Futhermore, complex's sub-attribute cannot have sub-attribute, so ignore them
-	if ctx != nil && ctx.Schema != nil && ctx.Attribute != nil && ctx.SubAttribute == nil && e.Path.Valid() {
+	if ctx != nil && ctx.Attribute != nil && ctx.SubAttribute == nil && e.Path.Valid() {
 		if e.Path.URI != "" || e.Path.Sub != "" {
 			panic(&api.InvalidFilterError{
 				Filter: e.String(),
@@ -147,7 +150,9 @@ func (e AttrExpr) ToFilter(ctx *attr.Context) Filter {
 
 		leaf := ctx.Attribute.SubAttributes.ByName(e.Path.Name)
 		if leaf != nil {
-			p.URI = ctx.Schema.ID
+			if ctx.Schema != nil {
+				p.URI = ctx.Schema.ID
+			}
 			p.Name = ctx.Attribute.Name
 			p.Sub = leaf.Name
 		}
