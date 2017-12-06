@@ -29,7 +29,7 @@ func TestURN(t *testing.T) {
 	require.NoError(t, err)
 
 	// Valid URN - NSS can contain special characters
-	validURN = "urn:ciao:#?!#(xyz)+a,b.*@g=$_'"
+	validURN = "urn:ciao:!(xyz)+a,b.*@g=$_'"
 	err = Validator.Var(validURN, "urn")
 	require.NoError(t, err)
 
