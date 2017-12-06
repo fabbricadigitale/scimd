@@ -2,6 +2,9 @@ package core
 
 import (
 	"time"
+
+	"github.com/fabbricadigitale/scimd/schemas"
+	"github.com/fabbricadigitale/scimd/schemas/datatype"
 )
 
 // A ScimError is a description of a SCIM error.
@@ -47,4 +50,129 @@ func (c *CommonAttributes) Common() *CommonAttributes {
 // ResourceType returns the ResourceType of a SCIM resource
 func (c *CommonAttributes) ResourceType() *ResourceType {
 	return GetResourceTypeRepository().Get(c.Meta.ResourceType)
+}
+
+var comAttrs Attributes
+
+// Commons returns Attributes are considered to be part of every base resource schema and do not use their own "schemas" URI.
+func Commons() Attributes {
+	return comAttrs
+}
+
+func init() {
+	comAttrs = Attributes{
+		&Attribute{
+			Name: "id",
+			Type: datatype.StringType,
+			// SubAttributes
+			MultiValued: false,
+			Description: "A unique identifier for a SCIM resource as defined by the service provider",
+			Required:    true,
+			// CanonicalValues
+			CaseExact:  true,
+			Mutability: schemas.MutabilityReadOnly,
+			Returned:   schemas.ReturnedAlways,
+			Uniqueness: schemas.UniquenessServer,
+			// ReferenceTypes
+		},
+		&Attribute{
+			Name: "externalId",
+			Type: datatype.StringType,
+			// SubAttributes
+			MultiValued: false,
+			Description: "A String that is an identifier for the resource as defined by the provisioning client",
+			Required:    false,
+			// CanonicalValues
+			CaseExact:  true,
+			Mutability: schemas.MutabilityReadOnly,
+			Returned:   schemas.ReturnedDefault,
+			Uniqueness: schemas.UniquenessNone,
+			// ReferenceTypes
+		},
+		&Attribute{
+			Name: "meta",
+			Type: datatype.ComplexType,
+			SubAttributes: Attributes{
+				&Attribute{
+					Name: "resourceType",
+					Type: datatype.StringType,
+					// SubAttributes
+					MultiValued: false,
+					Description: "The name of the resource type of the resource",
+					Required:    false,
+					// CanonicalValues
+					CaseExact:  true,
+					Mutability: schemas.MutabilityReadOnly,
+					Returned:   schemas.ReturnedDefault,
+					Uniqueness: schemas.UniquenessNone,
+					// ReferenceTypes
+				},
+				&Attribute{
+					Name: "created",
+					Type: datatype.DateTimeType,
+					// SubAttributes
+					MultiValued: false,
+					Description: "The DateTime that the resource was added to the service provider",
+					Required:    false,
+					// CanonicalValues
+					CaseExact:  false,
+					Mutability: schemas.MutabilityReadOnly,
+					Returned:   schemas.ReturnedDefault,
+					Uniqueness: schemas.UniquenessNone,
+					// ReferenceTypes
+				},
+				&Attribute{
+					Name: "lastModified",
+					Type: datatype.DateTimeType,
+					// SubAttributes
+					MultiValued: false,
+					Description: "The most recent DateTime that the details of this resource were updated at the service provider",
+					Required:    false,
+					// CanonicalValues
+					CaseExact:  false,
+					Mutability: schemas.MutabilityReadOnly,
+					Returned:   schemas.ReturnedDefault,
+					Uniqueness: schemas.UniquenessNone,
+					// ReferenceTypes
+				},
+				&Attribute{
+					Name: "location",
+					Type: datatype.StringType,
+					// SubAttributes
+					MultiValued: false,
+					Description: "The URI of the resource being returned",
+					Required:    false,
+					// CanonicalValues
+					CaseExact:  true,
+					Mutability: schemas.MutabilityReadOnly,
+					Returned:   schemas.ReturnedDefault,
+					Uniqueness: schemas.UniquenessNone,
+					// ReferenceTypes
+				},
+				&Attribute{
+					Name: "version",
+					Type: datatype.StringType,
+					// SubAttributes
+					MultiValued: false,
+					Description: "The version of the resource being returned",
+					Required:    false,
+					// CanonicalValues
+					CaseExact:  true,
+					Mutability: schemas.MutabilityReadOnly,
+					Returned:   schemas.ReturnedDefault,
+					Uniqueness: schemas.UniquenessNone,
+					// ReferenceTypes
+				},
+			},
+			MultiValued: false,
+			Description: "A complex attribute containing resource metadata",
+			Required:    false,
+			// CanonicalValues
+			CaseExact:  false,
+			Mutability: schemas.MutabilityReadOnly,
+			Returned:   schemas.ReturnedDefault,
+			Uniqueness: schemas.UniquenessNone,
+			// ReferenceTypes
+		},
+	}
 }

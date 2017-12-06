@@ -22,3 +22,26 @@ const ReferenceAttrName = "$ref"
 
 // ComplexValueAttrName is the name of complex's sub-attribute that represents the attribute's significant value.
 const ComplexValueAttrName = "value"
+
+// Keyword indicating the circumstances under which the value of the attribute can be (re)defined
+const (
+	MutabilityReadOnly  = "readOnly"
+	MutabilityReadWrite = "readWrite" // the default
+	MutabilityImmutable = "immutable"
+	MutabilityWriteOnly = "writeOnly"
+)
+
+// Keyword that indicates when an attribute and associated values are returned in response
+const (
+	ReturnedAlways  = "always"
+	ReturnedNever   = "never"
+	ReturnedDefault = "default" // the default
+	ReturnedRequest = "request"
+)
+
+// Keyword value that specifies how the service provider enforces uniqueness of attribute values
+const (
+	UniquenessNone   = "none" // the default
+	UniquenessServer = "server"
+	UniquenessGlobal = "global"
+)
