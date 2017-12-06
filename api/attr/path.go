@@ -167,7 +167,7 @@ func (p Path) Context(rt *core.ResourceType) *Context {
 
 // A Context represents a set of definitions related to a Path
 type Context struct {
-	*core.Schema
-	*core.Attribute
+	Schema       *core.Schema
+	Attribute    *core.Attribute
 	SubAttribute *core.Attribute
 }

@@ -42,6 +42,19 @@ const (
 	OpPresent            = "pr"
 )
 
+var opMap = map[string]bool{
+	OpEqual:              true,
+	OpNotEqual:           true,
+	OpContains:           true,
+	OpStartsWith:         true,
+	OpEndsWith:           true,
+	OpGreaterThan:        true,
+	OpLessThan:           true,
+	OpGreaterOrEqualThan: true,
+	OpLessOrEqualThan:    true,
+	OpPresent:            true,
+}
+
 var _ Filter = (*AttrExpr)(nil)
 var _ ValueFilter = (*AttrExpr)(nil)
 
@@ -90,10 +103,15 @@ func (e AttrExpr) Normalize(rt *core.ResourceType) Filter {
 		// type, the service provider SHALL treat the attribute as if there is
 		// no attribute value, as per https://tools.ietf.org/html/rfc7644#section-3.4.2.1
 		p = attr.Path{} // using zero value to indicate an undefined and not valid attribute path
-		v = nil
 	}
 
-	// (todo) validate Op and Value
+	if !opMap[o] {
+		panic("Invalid attribute expression: operator '" + o + "' is not supported")
+	}
+
+	if o == OpPresent {
+		v = nil
+	}
 
 	exp := &AttrExpr{
 		Path:  p,
@@ -106,36 +124,38 @@ func (e AttrExpr) Normalize(rt *core.ResourceType) Filter {
 
 func (e AttrExpr) ToFilter(ctx *attr.Context) Filter {
 
-	if ctx == nil {
-		panic("filter: missing ctx")
-	}
+	p := attr.Path{}
 
-	p := e.Path
-	if !p.Valid() || p.URI != "" || p.Sub != "" {
-		panic(&api.InvalidFilterError{
-			Filter: e.String(),
-			Detail: "paths with URI or sub-attribute name are not supported within a complex attribute filter grouping",
-		})
-	}
+	// For filtered attributes that are not part of a particular resource
+	// type, the service provider SHALL treat the attribute as if there is
+	// no attribute value, as per https://tools.ietf.org/html/rfc7644#section-3.4.2.1
+	// Futhermore, complex's sub-attribute cannot have sub-attribute, so ignore them
+	if ctx != nil && ctx.Schema != nil && ctx.Attribute != nil && ctx.SubAttribute == nil && e.Path.Valid() {
+		if e.Path.URI != "" || e.Path.Sub != "" {
+			panic(&api.InvalidFilterError{
+				Filter: e.String(),
+				Detail: "paths with URI or sub-attribute are not supported within a complex attribute filter grouping",
+			})
+		}
 
-	if ctx.Attribute.Type != datatype.ComplexType {
-		panic(&api.InvalidFilterError{
-			Filter: e.String(),
-			Detail: "complex attribute filter grouping not allowed for non-complex attributes",
-		})
-	}
+		if ctx.Attribute.Type != datatype.ComplexType {
+			panic(&api.InvalidFilterError{
+				Filter: e.String(),
+				Detail: "complex attribute filter grouping not allowed for non-complex attributes",
+			})
+		}
 
-	leaf := ctx.Attribute.SubAttributes.ByName(p.Name)
-
-	if leaf == nil {
-		panic(&api.InvalidFilterError{
-			Filter: e.String(),
-			Detail: "sub-attribute '" + p.Name + "' not found in parent attribute definitions",
-		})
+		leaf := ctx.Attribute.SubAttributes.ByName(e.Path.Name)
+		if leaf != nil {
+			p.URI = ctx.Schema.ID
+			p.Name = ctx.Attribute.Name
+			p.Sub = leaf.Name
+		}
+		// else p will left to its zero value to indicate an undefined and not valid attribute path
 	}
 
 	return &AttrExpr{
-		Path:  attr.Path{URI: ctx.Schema.ID, Name: ctx.Attribute.Name, Sub: leaf.Name},
+		Path:  p,
 		Op:    e.Op,
 		Value: e.Value,
 	}
