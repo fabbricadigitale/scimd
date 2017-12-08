@@ -4,20 +4,19 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/leodido/go-urn"
+
 	"github.com/fabbricadigitale/scimd/schemas"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 )
 
 const (
-	// attrPath  = [URI ":"] ATTRNAME *1subAttr ; SCIM attribute name ; URI is SCIM "schema" URI
-	attrPath = `((?P<URI>` + schemas.URIExpr + `)\:)?` + attrName + subAttr + `?`
-
 	// nameChar  = "-" / "_" / DIGIT / ALPHA
 	// ATTRNAME  = ALPHA *(nameChar)
-	attrName = `(?P<ATTRNAME>(` + schemas.AttrNameExpr + `))`
+	attrName = `(?P<ATTRNAME>` + schemas.AttrNameExpr + `)`
 
 	// subAttr   = "." ATTRNAME ; a sub-attribute of a complex attribute
-	subAttr = `(\.(?P<SUBATTRNAME>` + schemas.AttrNameExpr + `))`
+	subAttr = `(?:\.(?P<SUBATTRNAME>` + schemas.AttrNameExpr + `))?`
 )
 
 // A Path represents a parsed SCIM attribute path as per https://tools.ietf.org/html/rfc7644#section-3.10
@@ -29,7 +28,7 @@ type Path struct {
 }
 
 var (
-	attrNameExp = regexp.MustCompile("^" + attrPath + "$")
+	attrNameExp = regexp.MustCompile("(?::" + attrName + subAttr + ")$")
 )
 
 // TODO automatize with attrNameExp.SubexpNames()
@@ -42,23 +41,55 @@ const (
 // Parse parses a SCIM attribute notation into a Path structure.
 func Parse(s string) *Path {
 	p := &Path{}
-	matches := attrNameExp.FindStringSubmatch(s)
 
-	// to be valid must match ATTRNAME at least
-	l := len(matches)
-	if l > nameIdx {
-		p.URI = matches[uriIdx]
-		p.Name = matches[nameIdx]
-		if l > subIdx {
-			p.Sub = matches[subIdx]
+	var in string
+	// Parse input string as an URN
+	u, ok := urn.Parse(s)
+	// Switch input
+	if ok {
+		// Grab specific string
+		in = u.SS
+	} else {
+		// Assume input was <attrname>.<subattrname>
+		in = ":" + s
+	}
+
+	// Parse current input as attribute name
+	matches := attrNameExp.FindStringSubmatch(in)
+
+	// Any valid attribute name give us always 3 matches:
+	// * the full match
+	// * the attribute name
+	// * the subattribute name (empty string when not present)
+	//
+	// When we found an attribute name expression ...
+	if len(matches) == 3 {
+		// And primary input was an URN
+		if ok {
+			// Remove attribute name from the URN's specific string
+			u.SS = strings.TrimSuffix(u.SS, matches[0])
+			// Normalize current URN and store it
+			p.URI = u.Normalize().String()
+			// Store attribute name and subattribute name
+			p.Name = matches[1]
+			p.Sub = matches[2]
+		} else if in == matches[0] {
+			// Store attribute name and subattribute name also when:
+			// original input was not an URN but full match equals our internal input,
+			// which means it was a syntactically valid attribute name expression.
+			p.Name = matches[1]
+			p.Sub = matches[2]
 		}
 	}
+
 	return p
 }
 
 // Valid returns true if p is valid attribute path
+// (todo) > rename in defined or undefined (negating condition)?
+// (note) > an attr exist iff its minimal component (ie., name) exists and it is syntactically valid (parse responsibility)
 func (p Path) Valid() bool {
-	return len(p.Name) > 0 && !strings.HasPrefix(strings.ToLower(p.URI), schemas.InvalidURNPrefix)
+	return len(p.Name) > 0
 }
 
 func (p Path) String() string {
@@ -82,16 +113,15 @@ func (p Path) matchSchema(rt *core.ResourceType) *core.Schema {
 		return rt.GetSchema()
 	}
 
-	// (fixme) ToLower() is not enough to ensure URN-equivalence as per https://tools.ietf.org/html/rfc8141#section-3
-	lcURI := strings.ToLower(p.URI)
-
 	s := rt.GetSchema()
-	if lcURI == strings.ToLower(s.ID) {
+	// Simple equivalence assuming schema ID is a valid already normalized URN
+	if p.URI == s.ID {
 		return s
 	}
 
 	for _, s := range rt.GetSchemaExtensions() {
-		if lcURI == strings.ToLower(s.ID) {
+		// Same assumption as above
+		if p.URI == s.ID {
 			return s
 		}
 	}

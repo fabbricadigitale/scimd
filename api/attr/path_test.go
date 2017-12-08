@@ -19,7 +19,6 @@ const (
 )
 
 func TestPath(t *testing.T) {
-
 	a := Parse(path1)
 
 	assert.Equal(t, "urn:ietf:params:scim:schemas:core:2.0:User", a.URI)
