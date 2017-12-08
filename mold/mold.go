@@ -20,4 +20,5 @@ func init() {
 	Transformer = m.New()
 	Transformer.Register("min", min)
 	Transformer.Register("max", max)
+	Transformer.Register("normurn", normurn)
 }

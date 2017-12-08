@@ -25,7 +25,7 @@ type Meta struct {
 
 // CommonAttributes represents SCIM Common Attributes as per https://tools.ietf.org/html/rfc7643#section-3.1
 type CommonAttributes struct {
-	Schemas []string `json:"schemas" validate:"gt=0,dive,urn,required"`
+	Schemas []string `json:"schemas" validate:"gt=0,dive,urn,required" mold:"dive,normurn"`
 
 	// Common attributes
 	ID         string `json:"id" validate:"excludes=bulkId,required"`
