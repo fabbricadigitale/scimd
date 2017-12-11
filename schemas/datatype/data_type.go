@@ -140,15 +140,58 @@ func New(t string) (DataTyper, error) {
 	case ComplexType:
 		return &Complex{}, nil
 	}
-	return nil, &InvalidaDataTypeError{t}
+	return nil, &InvalidDataTypeError{t}
 }
 
-// InvalidaDataTypeError is a generic invalid type error
-type InvalidaDataTypeError struct {
+// Cast function returns a SCIM Data Type of the given type t that holds the v's value.
+func Cast(v interface{}, t string) (DataTyper, error) {
+
+	switch t {
+	default:
+		return nil, &InvalidDataTypeError{t}
+	case StringType:
+		if cv, ok := v.(string); ok {
+			return String(cv), nil
+		}
+	case BooleanType:
+		if cv, ok := v.(bool); ok {
+			return Boolean(cv), nil
+		}
+	case DecimalType:
+		if cv, ok := v.(float64); ok {
+			return Decimal(cv), nil
+		}
+	case IntegerType:
+		if cv, ok := v.(int64); ok {
+			return Integer(cv), nil
+		}
+	case DateTimeType:
+		if cv, ok := v.(time.Time); ok {
+			return DateTime(cv), nil
+		}
+	case BinaryType:
+		if cv, ok := v.([]byte); ok {
+			return Binary(cv), nil
+		}
+	case ReferenceType:
+		if cv, ok := v.(string); ok {
+			return Reference(cv), nil
+		}
+	case ComplexType:
+		if cv, ok := v.(map[string]interface{}); ok {
+			return Complex(cv), nil
+		}
+	}
+	// (todo) Is nil the correct value to be returned, when casting is not possible?
+	return nil, nil
+}
+
+// InvalidDataTypeError is a generic invalid type error
+type InvalidDataTypeError struct {
 	t string
 }
 
-func (e *InvalidaDataTypeError) Error() string {
+func (e *InvalidDataTypeError) Error() string {
 	return fmt.Sprintf("Invalid type %s", e.t)
 }
 

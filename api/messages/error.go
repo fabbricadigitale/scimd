@@ -28,7 +28,7 @@ func NewError(e error) Error {
 	case *json.SyntaxError:
 		scimError.Status = string(http.StatusBadRequest)
 		scimError.ScimType = "invalidSyntax"
-	case *datatype.InvalidaDataTypeError:
+	case *datatype.InvalidDataTypeError:
 		scimError.Status = string(http.StatusBadRequest)
 		scimError.ScimType = "invalidValue"
 	case *json.UnmarshalTypeError:
