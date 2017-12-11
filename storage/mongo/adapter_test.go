@@ -81,17 +81,17 @@ func TestConvertToMongoQuery(t *testing.T) {
 
 func TestCreate(t *testing.T) {
 	resTypeRepo := core.GetResourceTypeRepository()
-	if _, err := resTypeRepo.Add("../../schemas/core/testdata/user.json"); err != nil {
+	if _, err := resTypeRepo.Add("../../internal/testdata/user.json"); err != nil {
 		t.Log(err)
 		t.Fail()
 	}
 
 	schemaRepo := core.GetSchemaRepository()
-	if _, err := schemaRepo.Add("../../schemas/core/testdata/user_schema.json"); err != nil {
+	if _, err := schemaRepo.Add("../../internal/testdata/user_schema.json"); err != nil {
 		t.Log(err)
 		t.Fail()
 	}
-	if _, err := schemaRepo.Add("../../schemas/core/testdata/enterprise_user_schema.json"); err != nil {
+	if _, err := schemaRepo.Add("../../internal/testdata/enterprise_user_schema.json"); err != nil {
 		t.Log(err)
 		t.Fail()
 	}
@@ -129,6 +129,42 @@ func TestCreate(t *testing.T) {
 	}
 
 	require.Nil(t, err)
+}
+
+func TestGet(t *testing.T) {
+	resTypeRepo := core.GetResourceTypeRepository()
+	if _, err := resTypeRepo.Add("../../internal/testdata/user.json"); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	schemaRepo := core.GetSchemaRepository()
+	if _, err := schemaRepo.Add("../../internal/testdata/user_schema.json"); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+	if _, err := schemaRepo.Add("../../internal/testdata/enterprise_user_schema.json"); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+	adapter, err := New("mongodb://localhost:27017", "scimd", "resources")
+
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	id := "2819c223-7f76-453a-919d-413861904647"
+	resource, err := adapter.Get(resTypeRepo.Get("User"), id, "", nil, nil)
+
+	if err != nil {
+		t.Log(err)
+	}
+
+	require.Nil(t, err)
+	require.NotNil(t, resource)
+
+	fmt.Printf("%+v\n", resource)
 }
 
 // (TODO) > Test hydrateResource adapter method
