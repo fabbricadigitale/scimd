@@ -73,12 +73,12 @@ func (d *Driver) Delete(query bson.M) error {
 }
 
 // Find is the driver method for Find
-func (d *Driver) Find(q bson.M) (*mgo.Query, error) {
+func (d *Driver) Find(q bson.M) (*mgo.Query, func(), error) {
 	c, close := d.getCollection()
-	defer close()
+	//defer close()
 
 	query := c.Find(q)
-	return query, nil
+	return query, close, nil
 }
 
 // mongoErrorWrapper translates mongo errors in specific domain errors
@@ -123,9 +123,9 @@ func (r ResourceNotFoundError) Error() string {
 func makeQuery(resType, id, version string) bson.M {
 
 	c := bson.M{
-		uriKey:             nil,
-		"id":               id,
-		"meta.resouceType": resType,
+		uriKey:              "",
+		"id":                id,
+		"meta.resourceType": resType,
 	}
 
 	if version != "" {

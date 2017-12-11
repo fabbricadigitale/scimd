@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"regexp"
+	"time"
 
 	"github.com/fabbricadigitale/scimd/api"
 	"github.com/fabbricadigitale/scimd/api/attr"
@@ -18,8 +19,7 @@ type Adapter struct {
 	adaptee *Driver
 }
 
-// (fixme) var _ storage.Storer = (*Adapter)(nil)
-// (fixme) global adapter must be avoided
+var _ storage.Storer = (*Adapter)(nil)
 var (
 	// OpEqual              = "eq"
 	// OpNotEqual           = "ne"
@@ -69,7 +69,8 @@ func (a *Adapter) Create(res *resource.Resource) error {
 // Get is ...
 func (a *Adapter) Get(resType *core.ResourceType, id, version string, included []*attr.Path, excluded []*attr.Path) (*resource.Resource, error) {
 
-	q, err := (*a.adaptee).Find(makeQuery(resType.GetIdentifier(), id, version))
+	q, close, err := (*a.adaptee).Find(makeQuery(resType.GetIdentifier(), id, version))
+	defer close()
 
 	if err != nil {
 		return nil, err
@@ -112,7 +113,8 @@ func (a *Adapter) Find(resTypes []*core.ResourceType, filter filter.Filter) (sto
 		},
 	}
 
-	query, err := (*a.adaptee).Find(_q)
+	query, close, err := (*a.adaptee).Find(_q)
+	defer close()
 	if err != nil {
 		return nil, err
 	}
@@ -171,23 +173,54 @@ func toResource(h *resourceDocument) *resource.Resource {
 	hCommon := h.Data[0]
 	r := &resource.Resource{
 		CommonAttributes: core.CommonAttributes{
-			Schemas:    hCommon["schemas"].([]string),
+			Schemas:    toStringSlice(hCommon["schemas"].([]interface{})), // (fixme)
 			ID:         hCommon["id"].(string),
-			ExternalID: hCommon["external_id"].(string),
-			Meta:       hCommon["meta"].(core.Meta),
+			ExternalID: hCommon["externalId"].(string),
+			Meta:       toMeta(hCommon["meta"].(map[string]interface{})),
 		},
 	}
 
-	var p *datatype.Complex
 	for i := 1; i < len(h.Data); i++ {
 		ns := h.Data[i][uriKey].(string)
 		values := h.Data[i]
 		delete(values, uriKey)
-		(*p) = datatype.Complex(values)
-		r.SetValues(ns, p)
+		p := datatype.Complex(values)
+		r.SetValues(ns, &p)
 	}
 
 	return r
+}
+
+func toStringSlice(iSlice []interface{}) []string {
+	len := len(iSlice)
+	slice := make([]string, len)
+
+	for _, val := range iSlice {
+		slice = append(slice, val.(string))
+	}
+	return slice
+}
+
+func toMeta(m map[string]interface{}) core.Meta {
+	meta := core.Meta{}
+
+	created, err := time.Parse(time.RFC3339, m["created"].(string))
+	if err != nil {
+		panic(err) //fixme > internal server error
+	}
+
+	lastModified, err := time.Parse(time.RFC3339, m["lastModified"].(string))
+	if err != nil {
+		panic(err) //fixme > internal server error
+	}
+
+	meta.Created = &created
+	meta.LastModified = &lastModified
+	meta.Location = m["location"].(string)
+	meta.ResourceType = m["resourceType"].(string)
+	meta.Version = m["version"].(string)
+
+	return meta
 }
 
 func convertToMongoQuery(resType *core.ResourceType, ft filter.Filter) (m bson.M, err error) {
@@ -207,7 +240,7 @@ func convertToMongoQuery(resType *core.ResourceType, ft filter.Filter) (m bson.M
 
 	var conv *convert
 	m, err = conv.do(resType, ft.Normalize(resType)), nil
-	m["meta.resouceType"] = resType.GetIdentifier()
+	m["meta.resourceType"] = resType.GetIdentifier()
 	return m, err
 }
 
@@ -296,7 +329,7 @@ func newInvalidFilterError(detail, filter string) *api.InvalidFilterError {
 
 func stringOperators(resType *core.ResourceType, f interface{}, node *filter.AttrExpr) bson.M {
 
-	attrDef := node.Path.FindAttribute(resType)
+	attrDef := node.Path.Context(resType).Attribute
 
 	var path *attr.Path
 	path = &node.Path
@@ -389,7 +422,7 @@ func convertKey(p *attr.Path) (urn, key string) {
 }
 
 func comparisonOperators(resType *core.ResourceType, f interface{}, node *filter.AttrExpr) bson.M {
-	attrDef := node.Path.FindAttribute(resType)
+	attrDef := node.Path.Context(resType).Attribute
 
 	var path *attr.Path
 	path = &node.Path
@@ -433,7 +466,7 @@ func comparisonOperators(resType *core.ResourceType, f interface{}, node *filter
 }
 
 func prOperator(resType *core.ResourceType, f interface{}, node *filter.AttrExpr) bson.M {
-	attrDef := node.Path.FindAttribute(resType)
+	attrDef := node.Path.Context(resType).Attribute
 
 	var path *attr.Path
 	path = &node.Path
