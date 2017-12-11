@@ -108,7 +108,6 @@ func (p Path) String() string {
 }
 
 func (p Path) matchSchema(rt *core.ResourceType) *core.Schema {
-
 	if p.URI == "" {
 		return rt.GetSchema()
 	}
