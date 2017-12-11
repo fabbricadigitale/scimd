@@ -173,7 +173,7 @@ func toResource(h *resourceDocument) *resource.Resource {
 	hCommon := h.Data[0]
 	r := &resource.Resource{
 		CommonAttributes: core.CommonAttributes{
-			Schemas:    toStringSlice(hCommon["schemas"].([]interface{})), // (fixme)
+			Schemas:    toStringSlice(hCommon["schemas"].([]interface{})),
 			ID:         hCommon["id"].(string),
 			ExternalID: hCommon["externalId"].(string),
 			Meta:       toMeta(hCommon["meta"].(map[string]interface{})),
@@ -206,12 +206,16 @@ func toMeta(m map[string]interface{}) core.Meta {
 
 	created, err := time.Parse(time.RFC3339, m["created"].(string))
 	if err != nil {
-		panic(err) //fixme > internal server error
+		panic(&api.InternalServerError{
+			Detail: err.Error(),
+		})
 	}
 
 	lastModified, err := time.Parse(time.RFC3339, m["lastModified"].(string))
 	if err != nil {
-		panic(err) //fixme > internal server error
+		panic(&api.InternalServerError{
+			Detail: err.Error(),
+		})
 	}
 
 	meta.Created = &created
