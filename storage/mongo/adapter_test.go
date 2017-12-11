@@ -2,177 +2,199 @@ package mongo
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
+	"strconv"
 	"testing"
 
 	"github.com/fabbricadigitale/scimd/api/filter"
 	"github.com/fabbricadigitale/scimd/schemas/core"
-	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/mgo.v2/bson"
 )
 
-var filters = []string{
-	`emails[type eq "work" and value co "@example.com"]`,
-	`emails[type eq "work" and value co "@example.com"] or ims[type eq "xmpp" and value co "@foo.com"]`,
-	`userType eq "Employee" and emails[type eq "work" and value co "@example.com"]`,
-	`title pr`,
-	`emails[not (type sw null)]`,
-	`userType eq "Employee" and (emails co "example.com" or emails.value co "example.org")`,
-	`userType eq "Employee" and emails.type eq "work"`,
-	`userType eq "Employee" and (emails.type eq "work")`,
-	`emails.type eq "work"`,
-	`userName eq "bjensen" and name.familyName sw "J"`,
-	`not (userName.Child eq "strings")`,
-	`userName sw "J"`,
-	`emails co "example.com"`,
-	`emails.type co "work"`,
-	`emails.type ne true`,
-	`userType ne "Employee" and not (emails co "example.com" or emails.value co "example.org")`,
-	`userName eq "bjensen" and name.familyName sw "J"`,
-	`userType ne "Employee" and not (emails co "example.com" or emails.value co "example.org")`,
-	`userName eq "bjensen"`,
-	`meta.lastModified gt "2011-05-13T04:42:34Z"`,
-	`meta.lastModified ge "2011-05-13T04:42:34Z"`,
-	`meta.lastModified lt "2011-05-13T04:42:34Z"`,
-	`meta.lastModified le "2011-05-13T04:42:34Z"`,
-	`name.familyName co "O'Malley"`,
-	`not (userName eq "strings")`,
+type mongoCase struct {
+	filter string // the input filter
+	query1 bson.M // the query with unknown attributes (ie., no resource type and schema repository)
+	query2 bson.M // the complete query
+}
+
+var mongoTests = []mongoCase{
+	{
+		`emails[type eq "work" and value co "@example.com"]`,
+		bson.M{"meta.resourceType": "User", "$and": []interface{}{bson.M{"_": bson.M{"$eq": "work"}}, bson.M{"_": bson.M{"": "@example.com"}}}},
+		bson.M{"$and": []interface{}{bson.M{"$elemMatch": bson.M{"$and": []interface{}{bson.M{"emails.type": bson.M{"$eq": "work"}}, bson.M{"_uri": bson.M{"$eq": "urn:ietf:params:scim:schemas:core:2.0:User"}}}}}, bson.M{"$elemMatch": bson.M{"$and": []interface{}{bson.M{"emails.value": bson.M{"$regex": bson.RegEx{Pattern: "@example\\.com", Options: "i"}}}, bson.M{"_uri": bson.M{"$eq": "urn:ietf:params:scim:schemas:core:2.0:User"}}}}}}, "meta.resourceType": "User"},
+	},
+	{
+		`emails[type eq "work" and value co "@example.com"] or ims[type eq "xmpp" and value co "@foo.com"]`,
+		bson.M{"$or": []interface{}{bson.M{"$and": []interface{}{bson.M{"_": bson.M{"$eq": "work"}}, bson.M{"_": bson.M{"": "@example.com"}}}}, bson.M{"$and": []interface{}{bson.M{"_": bson.M{"$eq": "xmpp"}}, bson.M{"_": bson.M{"": "@foo.com"}}}}}, "meta.resourceType": "User"},
+		bson.M{"$or": []interface{}{bson.M{"$and": []interface{}{bson.M{"$elemMatch": bson.M{"$and": []interface{}{bson.M{"emails.type": bson.M{"$eq": "work"}}, bson.M{"_uri": bson.M{"$eq": "urn:ietf:params:scim:schemas:core:2.0:User"}}}}}, bson.M{"$elemMatch": bson.M{"$and": []interface{}{bson.M{"emails.value": bson.M{"$regex": bson.RegEx{Pattern: "@example\\.com", Options: "i"}}}, bson.M{"_uri": bson.M{"$eq": "urn:ietf:params:scim:schemas:core:2.0:User"}}}}}}}, bson.M{"$and": []interface{}{bson.M{"$elemMatch": bson.M{"$and": []interface{}{bson.M{"ims.type": bson.M{"$eq": "xmpp"}}, bson.M{"_uri": bson.M{"$eq": "urn:ietf:params:scim:schemas:core:2.0:User"}}}}}, bson.M{"$elemMatch": bson.M{"$and": []interface{}{bson.M{"ims.value": bson.M{"$regex": bson.RegEx{Pattern: "@foo\\.com", Options: "i"}}}, bson.M{"_uri": bson.M{"$eq": "urn:ietf:params:scim:schemas:core:2.0:User"}}}}}}}}, "meta.resourceType": "User"},
+	},
+	/*
+		// (todo) > complete test cases .. good luck
+			{
+				`userType eq "Employee" and emails[type eq "work" and value co "@example.com"]`,
+				``,
+				``,
+			},
+			{
+				`title pr`,
+				``,
+				``,
+			},
+			{
+				`emails[not (type sw null)]`,
+				``,
+				``,
+			},
+			{
+				`userType eq "Employee" and (emails co "example.com" or emails.value co "example.org")`,
+				``,
+				``,
+			},
+			{
+				`userType eq "Employee" and emails.type eq "work"`,
+				``,
+				``,
+			},
+			{
+				`userType eq "Employee" and (emails.type eq "work")`,
+				``,
+				``,
+			},
+			{
+				`emails.type eq "work"`,
+				``,
+				``,
+			},
+			{
+				`userName eq "bjensen" and name.familyName sw "J"`,
+				``,
+				``,
+			},
+			{
+				`not (userName.Child eq "strings")`,
+				``,
+				``,
+			},
+			{
+				`userName sw "J"`,
+				``,
+				``,
+			},
+			{
+				`emails co "example.com"`,
+				``,
+				``,
+			},
+			{
+				`emails.type co "work"`,
+				``,
+				``,
+			},
+			{
+				`emails.type ne true`,
+				``,
+				``,
+			},
+			{
+				`userType ne "Employee" and not (emails co "example.com" or emails.value co "example.org")`,
+				``,
+				``,
+			},
+			{
+				`userName eq "bjensen" and name.familyName sw "J"`,
+				``,
+				``,
+			},
+			{
+				`userType ne "Employee" and not (emails co "example.com" or emails.value co "example.org")`,
+				``,
+				``,
+			},
+			{
+				`userName eq "bjensen"`,
+				``,
+				``,
+			},
+			{
+				`meta.lastModified gt "2011-05-13T04:42:34Z"`,
+				``,
+				``,
+			},
+			{
+				`meta.lastModified ge "2011-05-13T04:42:34Z"`,
+				``,
+				``,
+			},
+			{
+				`meta.lastModified lt "2011-05-13T04:42:34Z"`,
+				``,
+				``,
+			},
+			{
+				`meta.lastModified le "2011-05-13T04:42:34Z"`,
+				``,
+				``,
+			},
+			{
+				`name.familyName co "O'Malley"`,
+				``,
+				``,
+			},
+			{
+				`not (userName eq "strings")`,
+				``,
+				``,
+			},
+	*/
+}
+
+func ierror(index int) string {
+	return "Test case num. " + strconv.Itoa(index+1)
+}
+
+func herror(index int, test mongoCase) string {
+	return ierror(index) + ", input `" + test.filter + "`"
 }
 
 func TestConvertToMongoQuery(t *testing.T) {
-
-	for i, str := range filters {
-
-		resTypeRepo := core.GetResourceTypeRepository()
-		if _, err := resTypeRepo.Add("../../schemas/core/testdata/user.json"); err != nil {
-			t.Log(err)
-			t.Fail()
-		}
-
-		schemaRepo := core.GetSchemaRepository()
-		if _, err := schemaRepo.Add("../../schemas/core/testdata/user_schema.json"); err != nil {
-			t.Log(err)
-			t.Fail()
-		}
-
-		dat, err := ioutil.ReadFile("../../schemas/core/testdata/user.json")
-
-		require.NotNil(t, dat)
-		require.Nil(t, err)
-
-		res := core.ResourceType{}
-		json.Unmarshal(dat, &res)
-
-		ft, err := filter.CompileString(str)
-		if err != nil {
-			t.Log(err)
-		}
-		m, err := convertToMongoQuery(&res, ft)
-		if err != nil {
-			t.Log(err)
-		}
-		fmt.Printf("%d ----------------\n", i)
-		fmt.Printf("Filter %s\n", str)
-		fmt.Printf("Converted: %+v\n\n\n", m)
-	}
-
-}
-
-func TestCreate(t *testing.T) {
-	resTypeRepo := core.GetResourceTypeRepository()
-	if _, err := resTypeRepo.Add("../../internal/testdata/user.json"); err != nil {
-		t.Log(err)
-		t.Fail()
-	}
-
-	schemaRepo := core.GetSchemaRepository()
-	if _, err := schemaRepo.Add("../../internal/testdata/user_schema.json"); err != nil {
-		t.Log(err)
-		t.Fail()
-	}
-	if _, err := schemaRepo.Add("../../internal/testdata/enterprise_user_schema.json"); err != nil {
-		t.Log(err)
-		t.Fail()
-	}
-
-	// Non-normative of SCIM user resource type [https://tools.ietf.org/html/rfc7643#section-8.2]
-	dat, err := ioutil.ReadFile("../../schemas/resource/testdata/enterprise_user_resource_1.json")
-
-	if err != nil {
-		t.Log(err)
-		t.Fail()
-	}
-
+	dat, err := ioutil.ReadFile("../../internal/testdata/user.json")
 	require.NotNil(t, dat)
 	require.Nil(t, err)
 
-	res := &resource.Resource{}
-	err = json.Unmarshal(dat, res)
+	res := core.ResourceType{}
+	json.Unmarshal(dat, &res)
 
-	if err != nil {
-		t.Log(err)
-		t.Fail()
+	for ii, tt := range mongoTests {
+		t.Run("AllAttributesUnknown", func(t *testing.T) {
+			ft, err := filter.CompileString(tt.filter)
+			require.NoError(t, err, herror(ii, tt))
+
+			m, err := convertToMongoQuery(&res, ft)
+			require.NoError(t, err, herror(ii, tt))
+
+			require.Equal(t, tt.query1, m, herror(ii, tt))
+		})
 	}
 
-	adapter, err := New("mongodb://localhost:27017", "scimd", "resources")
-
-	if err != nil {
-		t.Log(err)
-		t.Fail()
-	}
-
-	err = adapter.Create(res)
-
-	if err != nil {
-		t.Log(err)
-	}
-
-	require.Nil(t, err)
-}
-
-func TestGet(t *testing.T) {
+	// Now we load within repositories the resource type and the schema
 	resTypeRepo := core.GetResourceTypeRepository()
-	if _, err := resTypeRepo.Add("../../internal/testdata/user.json"); err != nil {
-		t.Log(err)
-		t.Fail()
-	}
+	_, err = resTypeRepo.Add("../../internal/testdata/user.json")
+	require.NoError(t, err)
 
 	schemaRepo := core.GetSchemaRepository()
-	if _, err := schemaRepo.Add("../../internal/testdata/user_schema.json"); err != nil {
-		t.Log(err)
-		t.Fail()
+	_, err = schemaRepo.Add("../../internal/testdata/user_schema.json")
+	require.NoError(t, err)
+
+	for ii, tt := range mongoTests {
+		t.Run("ValidAttributesKnown", func(t *testing.T) {
+			ft, err := filter.CompileString(tt.filter)
+			require.NoError(t, err, herror(ii, tt))
+
+			m, err := convertToMongoQuery(&res, ft)
+			require.NoError(t, err, herror(ii, tt))
+
+			require.Equal(t, tt.query2, m, herror(ii, tt))
+		})
 	}
-	if _, err := schemaRepo.Add("../../internal/testdata/enterprise_user_schema.json"); err != nil {
-		t.Log(err)
-		t.Fail()
-	}
-	adapter, err := New("mongodb://localhost:27017", "scimd", "resources")
-
-	if err != nil {
-		t.Log(err)
-		t.Fail()
-	}
-
-	id := "2819c223-7f76-453a-919d-413861904647"
-	resource, err := adapter.Get(resTypeRepo.Get("User"), id, "", nil, nil)
-
-	if err != nil {
-		t.Log(err)
-	}
-
-	require.Nil(t, err)
-	require.NotNil(t, resource)
-
-	fmt.Printf("%+v\n", resource)
 }
-
-// (TODO) > Test hydrateResource adapter method
-
-// (TODO) > Test toResource adapter method
-
-// (TODO) > Test Get adapter method
-
-// (TODO) > Test Delete adapter method
-
-// (TODO) > Test Update adapter method

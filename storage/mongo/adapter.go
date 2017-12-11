@@ -228,7 +228,6 @@ func toMeta(m map[string]interface{}) core.Meta {
 }
 
 func convertToMongoQuery(resType *core.ResourceType, ft filter.Filter) (m bson.M, err error) {
-
 	defer func() {
 		if r := recover(); r != nil {
 			switch r.(type) {
