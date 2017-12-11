@@ -11,14 +11,14 @@ type supported struct {
 }
 
 type bulk struct {
-	supported
-	MaxOperations  int `json:"maxOperations" validate:"required"`
-	MaxPayloadSize int `json:"maxPayloadSize" validate:"required"`
+	Supported      bool `json:"supported" validate:"required"`
+	MaxOperations  int  `json:"maxOperations" validate:"required"`
+	MaxPayloadSize int  `json:"maxPayloadSize" validate:"required"`
 }
 
 type filter struct {
-	supported
-	MaxResults int `json:"maxResults" validate:"required"`
+	Supported  bool `json:"supported" validate:"required"`
+	MaxResults int  `json:"maxResults" validate:"required"`
 }
 
 // AuthenticationScheme is ...

@@ -132,7 +132,7 @@ func TestAuthenticationSchemeValidation(t *testing.T) {
 	failtags := []string{"required", "required", "required"}
 
 	for e, err := range errors.(validator.ValidationErrors) {
-		exp := "authenticationScheme." + fields[e]
+		exp := "AuthenticationScheme." + fields[e]
 		require.Equal(t, exp, err.Namespace())
 		require.Equal(t, fields[e], err.Field())
 		require.Equal(t, failtags[e], err.ActualTag())
@@ -149,7 +149,7 @@ func TestAuthenticationSchemeValidation(t *testing.T) {
 	failtags = []string{"eq=oauth|eq=oauth2|eq=oauthbearertoken|eq=httpbasic|eq=httpdigest"}
 
 	for e, err := range errors.(validator.ValidationErrors) {
-		exp := "authenticationScheme." + fields[e]
+		exp := "AuthenticationScheme." + fields[e]
 		require.Equal(t, exp, err.Namespace())
 		require.Equal(t, fields[e], err.Field())
 		require.Equal(t, failtags[e], err.ActualTag())
