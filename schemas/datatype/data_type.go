@@ -182,7 +182,7 @@ func Cast(v interface{}, t string) (DataTyper, error) {
 			return Complex(cv), nil
 		}
 	}
-	// (todo) Is nil the correct value to be returned, when casting is not possible?
+	// Those values are not Data Types are considered to be Null
 	return nil, nil
 }
 
