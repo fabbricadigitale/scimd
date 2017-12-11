@@ -20,9 +20,8 @@ func TestSearchResource(t *testing.T) {
 
 	var filter = new(Filter)
 	*filter = "userName eq john"
-	var index, count uint
+	var index uint
 	index = 1
-	count = 0
 
 	equalities := []struct {
 		value interface{}
@@ -34,7 +33,7 @@ func TestSearchResource(t *testing.T) {
 		{"userName", s.SortBy},
 		{"ascending", s.SortOrder},
 		{index, s.StartIndex},
-		{count, s.Count},
+		{0, s.Count},
 	}
 
 	for _, row := range equalities {
