@@ -8,14 +8,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type testCase struct {
+type minTestCase struct {
 	val interface{} // input value
 	min interface{} // minimum threshold
 	pos bool        // whether this is a positive test case or not - ie., should pass or not
 	res interface{} // resulting value
 }
 
-var tests = []testCase{
+var minTests = []minTestCase{
 	// less than the minimum threshold
 	{float32(0.15), float64(0.25), true, float32(0.25)},
 
@@ -28,13 +28,12 @@ var tests = []testCase{
 	{float64(0.4), "notanum", false, nil},
 }
 
-func herror(index int, test testCase) string {
+func herror(index int, test minTestCase) string {
 	return fmt.Sprintf("Test case num. %d. Result must be %+v when input %+v is less than threshold %+v", index+1, test.res, test.val, test.min)
 }
 
 func TestMin(t *testing.T) {
-
-	for i, test := range tests {
+	for i, test := range minTests {
 		input := test.val
 		err := Transformer.Field(context.Background(), &input, fmt.Sprintf("min=%f", test.min))
 		if test.pos {
