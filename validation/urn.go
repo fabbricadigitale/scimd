@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"reflect"
 
-	u "github.com/leodido/go-urn"
 	validator "gopkg.in/go-playground/validator.v9"
+	u "gopkg.in/leodido/go-urn.v1"
 )
 
 var urn = func(fl validator.FieldLevel) bool {

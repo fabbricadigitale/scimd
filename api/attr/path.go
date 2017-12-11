@@ -4,10 +4,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/leodido/go-urn"
-
 	"github.com/fabbricadigitale/scimd/schemas"
 	"github.com/fabbricadigitale/scimd/schemas/core"
+	urn "github.com/leodido/go-urn"
 )
 
 const (

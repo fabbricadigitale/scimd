@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/leodido/go-urn"
-
+	urn "github.com/leodido/go-urn"
 	m "gopkg.in/go-playground/mold.v2"
 )
 
