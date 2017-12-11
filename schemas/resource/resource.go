@@ -23,7 +23,15 @@ var _ Valuer = (*Resource)(nil)
 
 // SetValues is the method to set Resource attributes by schema namespace
 func (r *Resource) SetValues(ns string, values *datatype.Complex) {
-	r.data[ns] = values
+	if r.data == nil {
+		r.data = make(map[string]*datatype.Complex)
+	}
+
+	if values == nil {
+		delete(r.data, ns)
+	} else {
+		r.data[ns] = values
+	}
 }
 
 // Values is the method to access the attributes by schema namespace
