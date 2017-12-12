@@ -1,8 +1,11 @@
 package core
 
-import "github.com/fabbricadigitale/scimd/schemas/datatype"
-import "fmt"
-import "reflect"
+import (
+	"fmt"
+	"reflect"
+
+	"github.com/fabbricadigitale/scimd/schemas/datatype"
+)
 
 // A IncompatibleTypeError is a SCIM error describing when a value is not compatible with attribute type.
 type IncompatibleTypeError struct {
@@ -29,11 +32,29 @@ func enforceSingle(attribute *Attribute, data interface{}) (datatype.DataTyper, 
 
 }
 
-func enforceMulti(attribute *Attribute, data []interface{}) ([]datatype.DataTyper, error) {
-	ret := make([]datatype.DataTyper, len(data))
+func enforceMulti(attribute *Attribute, data interface{}) ([]datatype.DataTyper, error) {
+	var l int
+	var v reflect.Value
 
-	for i, p := range data {
-		value, err := enforceSingle(attribute, p)
+	t := reflect.TypeOf(data)
+
+	switch t.Kind() {
+	case reflect.Array:
+		fallthrough
+	case reflect.Slice:
+		v = reflect.ValueOf(data)
+		l = v.Len()
+		// go ahead
+	default:
+		return nil, &IncompatibleTypeError{
+			expected: "[]" + attribute.Type,
+			actual:   t.String(),
+		}
+	}
+
+	ret := make([]datatype.DataTyper, l)
+	for i := 0; i < l; i++ {
+		value, err := enforceSingle(attribute, v.Index(i).Interface())
 		if err != nil {
 			return nil, err
 		}
@@ -46,13 +67,7 @@ func enforceMulti(attribute *Attribute, data []interface{}) ([]datatype.DataType
 func (attribute *Attribute) Enforce(data interface{}) (interface{}, error) {
 
 	if attribute.MultiValued {
-		if mv, ok := data.([]interface{}); ok {
-			return enforceMulti(attribute, mv)
-		}
-		return nil, &IncompatibleTypeError{
-			expected: "[]" + attribute.Type,
-			actual:   reflect.TypeOf(data).String(),
-		}
+		return enforceMulti(attribute, data)
 	}
 
 	return enforceSingle(attribute, data)
