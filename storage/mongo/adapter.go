@@ -305,7 +305,7 @@ func (c *convert) relationalOperators(resType *core.ResourceType, f interface{},
 	// For filtered attributes that are not part of a particular resource
 	// type, the service provider SHALL treat the attribute as if there is
 	// no attribute value, as per https://tools.ietf.org/html/rfc7644#section-3.4.2.1
-	if !node.Path.Valid() {
+	if node.Path.Undefined() {
 		return bson.M{
 			notExistingKey: bson.M{
 				mapOperator[node.Op]: node.Value,
@@ -410,7 +410,7 @@ func singleValueQueryPart(uri, key, value, option, prePattern, postPattern strin
 
 func convertKey(p *attr.Path) (urn, key string) {
 	urn = p.URI
-	if p.Valid() {
+	if !p.Undefined() {
 		key = p.Name
 		if p.Sub != "" {
 			key += "." + p.Sub

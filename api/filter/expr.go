@@ -133,7 +133,7 @@ func (e AttrExpr) ToFilter(ctx *attr.Context) Filter {
 	// type, the service provider SHALL treat the attribute as if there is
 	// no attribute value, as per https://tools.ietf.org/html/rfc7644#section-3.4.2.1
 	// Futhermore, complex's sub-attribute cannot have sub-attribute, so ignore them
-	if ctx != nil && ctx.Attribute != nil && ctx.SubAttribute == nil && e.Path.Valid() {
+	if ctx != nil && ctx.Attribute != nil && ctx.SubAttribute == nil && !e.Path.Undefined() {
 		if e.Path.URI != "" || e.Path.Sub != "" {
 			panic(&api.InvalidFilterError{
 				Filter: e.String(),

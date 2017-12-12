@@ -26,7 +26,7 @@ func TestPath(t *testing.T) {
 
 	assert.Equal(t, path1, a.String())
 
-	assert.True(t, a.Valid())
+	assert.False(t, a.Undefined())
 
 	b := Parse(path2)
 
@@ -65,10 +65,10 @@ func TestPath(t *testing.T) {
 	assert.Equal(t, path6, f.String())
 
 	g := Parse(path7)
-	assert.False(t, g.Valid())
+	assert.True(t, g.Undefined())
 
 	ko := Parse(invalidUrn)
-	assert.False(t, ko.Valid())
+	assert.True(t, ko.Undefined())
 }
 
 func TestContext(t *testing.T) {

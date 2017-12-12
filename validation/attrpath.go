@@ -15,7 +15,7 @@ var attrPath = func(fl validator.FieldLevel) bool {
 	switch field.Kind() {
 	case reflect.String:
 		str := field.String()
-		return attr.Parse(str).Valid()
+		return !attr.Parse(str).Undefined()
 	}
 
 	panic(fmt.Sprintf("Bad field type %T", field.Interface()))

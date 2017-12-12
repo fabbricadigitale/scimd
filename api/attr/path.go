@@ -84,15 +84,15 @@ func Parse(s string) *Path {
 	return p
 }
 
-// Valid returns true if p is valid attribute path
-// (todo) > rename in defined or undefined (negating condition)?
-// (note) > an attr exist iff its minimal component (ie., name) exists and it is syntactically valid (parse responsibility)
-func (p Path) Valid() bool {
-	return len(p.Name) > 0
+// Undefined returns true if p does not satisfy the minimal path attribute definition.
+// An Path is defined when its minimal component (ie., Name) exists, that's not implay validity
+// (syntactically validation is a Parse responsibility).
+func (p Path) Undefined() bool {
+	return len(p.Name) == 0
 }
 
 func (p Path) String() string {
-	if !p.Valid() {
+	if p.Undefined() {
 		return ""
 	}
 	s := p.URI
@@ -159,7 +159,7 @@ func (p Path) Context(rt *core.ResourceType) (ctx *Context) {
 		return
 	}
 
-	if rt == nil || !p.Valid() {
+	if rt == nil || p.Undefined() {
 		return
 	}
 
