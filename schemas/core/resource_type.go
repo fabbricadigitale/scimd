@@ -40,7 +40,7 @@ func (rt ResourceType) GetSchema() *Schema {
 	return GetSchemaRepository().Get(rt.Schema)
 }
 
-// GetSchemaExtensions returns a map of resource's extensions Schema(s)
+// GetSchemaExtensions returns a map of resource's extensions Schema(s) indexed by URN
 func (rt ResourceType) GetSchemaExtensions() map[string]*Schema {
 	repo := GetSchemaRepository()
 	schExts := rt.SchemaExtensions
@@ -49,4 +49,13 @@ func (rt ResourceType) GetSchemaExtensions() map[string]*Schema {
 		schemas[ext.Schema] = repo.Get(ext.Schema)
 	}
 	return schemas
+}
+
+// GetSchemas returns a map containing all the Schema(s) indexed by URN
+func (rt ResourceType) GetSchemas() map[string]*Schema {
+	s := rt.GetSchema()
+	m := rt.GetSchemaExtensions()
+	m[s.GetIdentifier()] = s
+
+	return m
 }
