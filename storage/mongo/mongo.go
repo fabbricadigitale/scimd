@@ -121,7 +121,6 @@ func (r ResourceNotFoundError) Error() string {
 }
 
 func makeQuery(resType, id, version string) bson.M {
-
 	c := bson.M{
 		uriKey:              "",
 		"id":                id,

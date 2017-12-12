@@ -61,14 +61,12 @@ func New(url, db, collection string) (storage.Storer, error) {
 
 // Create is ...
 func (a *Adapter) Create(res *resource.Resource) error {
-
 	dataResource := a.hydrateResource(res)
 	return (*a.adaptee).Create(dataResource)
 }
 
 // Get is ...
 func (a *Adapter) Get(resType *core.ResourceType, id, version string, included []*attr.Path, excluded []*attr.Path) (*resource.Resource, error) {
-
 	q, close, err := (*a.adaptee).Find(makeQuery(resType.GetIdentifier(), id, version))
 	defer close()
 
@@ -94,7 +92,6 @@ func (a *Adapter) Delete(resType *core.ResourceType, id, version string) error {
 
 // Find is ...
 func (a *Adapter) Find(resTypes []*core.ResourceType, filter filter.Filter) (storage.Querier, error) {
-
 	or := make([]bson.M, len(resTypes))
 
 	for i, resType := range resTypes {
@@ -169,7 +166,6 @@ func (a *Adapter) hydrateResource(r *resource.Resource) *resourceDocument {
 }
 
 func toResource(h *resourceDocument) *resource.Resource {
-
 	hCommon := h.Data[0]
 	r := &resource.Resource{
 		CommonAttributes: core.CommonAttributes{
@@ -180,12 +176,20 @@ func toResource(h *resourceDocument) *resource.Resource {
 		},
 	}
 
+	sMap := r.ResourceType().GetSchemas()
+
 	for i := 1; i < len(h.Data); i++ {
 		ns := h.Data[i][uriKey].(string)
 		values := h.Data[i]
 		delete(values, uriKey)
-		p := datatype.Complex(values)
-		r.SetValues(ns, &p)
+
+		if s, ok := sMap[uriKey]; ok {
+			p, err := s.Enforce(values)
+			if err != nil {
+				panic(err)
+			}
+			r.SetValues(ns, p)
+		}
 	}
 
 	return r
@@ -250,7 +254,6 @@ func convertToMongoQuery(resType *core.ResourceType, ft filter.Filter) (m bson.M
 type convert struct{}
 
 func (c *convert) do(resType *core.ResourceType, f interface{}) bson.M {
-
 	var (
 		left, right bson.M
 	)
@@ -298,7 +301,6 @@ func (c *convert) do(resType *core.ResourceType, f interface{}) bson.M {
 }
 
 func (c *convert) relationalOperators(resType *core.ResourceType, f interface{}, node *filter.AttrExpr) bson.M {
-
 	// If any schema attribure was not found node.Value is nil.
 	// For filtered attributes that are not part of a particular resource
 	// type, the service provider SHALL treat the attribute as if there is
@@ -331,7 +333,6 @@ func newInvalidFilterError(detail, filter string) *api.InvalidFilterError {
 }
 
 func stringOperators(resType *core.ResourceType, f interface{}, node *filter.AttrExpr) bson.M {
-
 	attrDef := node.Path.Context(resType).Attribute
 
 	var path *attr.Path
@@ -341,9 +342,7 @@ func stringOperators(resType *core.ResourceType, f interface{}, node *filter.Att
 	value := node.Value.(string)
 
 	if attrDef.MultiValued {
-
 		switch node.Op {
-
 		case filter.OpContains:
 			return multiValuedQueryPart(uri, key, value, "i", "", "")
 		case filter.OpStartsWith:
@@ -354,9 +353,7 @@ func stringOperators(resType *core.ResourceType, f interface{}, node *filter.Att
 			return nil
 		}
 	} else {
-
 		switch node.Op {
-
 		case filter.OpContains:
 			return singleValueQueryPart(uri, key, value, "i", "", "")
 		case filter.OpStartsWith:
