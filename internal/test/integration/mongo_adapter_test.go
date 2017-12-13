@@ -111,12 +111,12 @@ func TestMongoGet(t *testing.T) {
 	require.Equal(t, id, resource.ID)
 }
 
-// (todo) > Test hydrateResource adapter method
 
-// (todo) > Test toResource adapter method
 
 // (todo) > Test Get adapter method
 
 // (todo) > Test Delete adapter method
 
 // (todo) > Test Update adapter method
+
+// (todo) > Test Find adapter method
