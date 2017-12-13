@@ -23,18 +23,10 @@ type Path struct {
 	URI  string
 	Name string
 	Sub  string
-	ctx  map[string]*Context
 }
 
 var (
 	attrNameExp = regexp.MustCompile("(?::" + attrName + subAttr + ")$")
-)
-
-// TODO automatize with attrNameExp.SubexpNames()
-const (
-	uriIdx  = 2
-	nameIdx = 3
-	subIdx  = 7
 )
 
 // Parse parses a SCIM attribute notation into a Path structure.
@@ -127,37 +119,10 @@ func (p Path) matchSchema(rt *core.ResourceType) *core.Schema {
 	return nil
 }
 
-func (p Path) getCtxCache(key string) (*Context, bool) {
-	if p.ctx != nil {
-		if c, ok := p.ctx[key]; ok {
-			return c, ok
-		}
-	}
-	return nil, false
-}
-
-func (p Path) setCtxCache(key string, ctx *Context) {
-	if p.ctx == nil {
-		p.ctx = map[string]*Context{key: ctx}
-	} else {
-		p.ctx[key] = ctx
-	}
-}
-
 // Context fetches from rt a suitable Context for p, if any.
 func (p Path) Context(rt *core.ResourceType) (ctx *Context) {
 
-	key := p.String()
-
-	defer func() {
-		p.setCtxCache(key, ctx)
-	}()
-
-	// Lookup cache
-	if c, ok := p.getCtxCache(key); ok {
-		ctx = c
-		return
-	}
+	// (todo) implement caching
 
 	if rt == nil || p.Undefined() {
 		return
@@ -208,6 +173,7 @@ type Context struct {
 	SubAttribute *core.Attribute
 }
 
+// Path returns a Path built from a given Context
 func (ctx *Context) Path() *Path {
 	p := Path{}
 
