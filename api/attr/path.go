@@ -191,3 +191,35 @@ func (ctx *Context) Path() *Path {
 
 	return &p
 }
+
+// Paths returns a slice of Path given a resource type rt.
+//
+// It flattens the attributes of rt's schemas returning their contextualized Path representations.
+// When a fx is provided it returns only the attribute paths statisfying fx(attribute).
+func Paths(rt *core.ResourceType, fx func(attribute *core.Attribute) bool) []*Path {
+	// Tautology
+	if fx == nil {
+		fx = func(attribute *core.Attribute) bool {
+			return true
+		}
+	}
+
+	// Accumulation iterating over all contexts
+	acc := []*Path{}
+	for _, sc := range rt.GetSchemas() {
+		ctx := &Context{
+			Schema: sc,
+		}
+
+		for _, a1 := range sc.Attributes.Some(fx) {
+			ctx.Attribute = a1
+			for _, a2 := range a1.SubAttributes.Some(fx) {
+				ctx.SubAttribute = a2
+				acc = append(acc, ctx.Path())
+			}
+			acc = append(acc, ctx.Path())
+		}
+	}
+
+	return acc
+}
