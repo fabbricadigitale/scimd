@@ -207,3 +207,21 @@ type Context struct {
 	Attribute    *core.Attribute
 	SubAttribute *core.Attribute
 }
+
+func (ctx *Context) Path() *Path {
+	p := Path{}
+
+	if ctx.Schema != nil {
+		p.URI = ctx.Schema.ID
+	}
+
+	if ctx.Attribute != nil {
+		p.Name = ctx.Attribute.Name
+	}
+
+	if ctx.SubAttribute != nil {
+		p.Sub = ctx.SubAttribute.Name
+	}
+
+	return &p
+}
