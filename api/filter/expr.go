@@ -93,7 +93,7 @@ func (e AttrExpr) Normalize(rt *core.ResourceType) Filter {
 
 		if ctx.SubAttribute == nil {
 			if ctx.Attribute.Type == datatype.ComplexType {
-				if a := ctx.Attribute.SubAttributes.ByName(schemas.ComplexValueAttrName); a != nil {
+				if a := ctx.Attribute.SubAttributes.WithName(schemas.ComplexValueAttrName); a != nil {
 					p.Sub = a.Name
 				}
 			}
@@ -148,7 +148,7 @@ func (e AttrExpr) ToFilter(ctx *attr.Context) Filter {
 			})
 		}
 
-		leaf := ctx.Attribute.SubAttributes.ByName(e.Path.Name)
+		leaf := ctx.Attribute.SubAttributes.WithName(e.Path.Name)
 		if leaf != nil {
 			if ctx.Schema != nil {
 				p.URI = ctx.Schema.ID

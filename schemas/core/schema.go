@@ -17,8 +17,8 @@ func (e *SchemaError) Error() string { return e.msg }
 // Attributes is a slice of Attribute that holds definitions of attributes included within a Schema Definition.
 type Attributes []*Attribute
 
-// ByName returns the *Attribute with the given name, performing a insensitive match. It returns nil if no attribute was found.
-func (attributes Attributes) ByName(name string) *Attribute {
+// WithName returns the *Attribute with the given name, performing a insensitive match. It returns nil if no attribute was found.
+func (attributes Attributes) WithName(name string) *Attribute {
 	name = strings.ToLower(name)
 	for _, a := range attributes {
 		if name == strings.ToLower(a.Name) {
@@ -26,6 +26,17 @@ func (attributes Attributes) ByName(name string) *Attribute {
 		}
 	}
 	return nil
+}
+
+// Some tests whether attributes satisfy f(attribute) and return them.
+func (attributes Attributes) Some(f func(attribute *Attribute) bool) Attributes {
+	ret := make(Attributes, 0)
+	for _, a := range attributes {
+		if f(a) {
+			ret = append(ret, a)
+		}
+	}
+	return ret
 }
 
 // Attribute describes a single attribute included within a Schema Definition.

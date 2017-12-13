@@ -94,8 +94,8 @@ func TestContext(t *testing.T) {
 	}
 	ctx := p.Context(rt)
 	assert.Equal(t, rt.GetSchema(), ctx.Schema)
-	assert.Equal(t, rt.GetSchema().Attributes.ByName("name"), ctx.Attribute)
-	assert.Equal(t, rt.GetSchema().Attributes.ByName("name").SubAttributes.ByName("givenName"), ctx.SubAttribute)
+	assert.Equal(t, rt.GetSchema().Attributes.WithName("name"), ctx.Attribute)
+	assert.Equal(t, rt.GetSchema().Attributes.WithName("name").SubAttributes.WithName("givenName"), ctx.SubAttribute)
 
 	// Just attribute name
 	p = Path{
@@ -103,7 +103,7 @@ func TestContext(t *testing.T) {
 	}
 	ctx = p.Context(rt)
 	assert.Equal(t, rt.GetSchema(), ctx.Schema)
-	assert.Equal(t, rt.GetSchema().Attributes.ByName("userName"), ctx.Attribute)
+	assert.Equal(t, rt.GetSchema().Attributes.WithName("userName"), ctx.Attribute)
 	assert.Nil(t, ctx.SubAttribute)
 
 	// Common attributes
@@ -114,8 +114,8 @@ func TestContext(t *testing.T) {
 	ctx = p.Context(rt)
 
 	assert.Nil(t, ctx.Schema)
-	assert.Equal(t, core.Commons().ByName("meta"), ctx.Attribute)
-	assert.Equal(t, core.Commons().ByName("meta").SubAttributes.ByName("resourceType"), ctx.SubAttribute)
+	assert.Equal(t, core.Commons().WithName("meta"), ctx.Attribute)
+	assert.Equal(t, core.Commons().WithName("meta").SubAttributes.WithName("resourceType"), ctx.SubAttribute)
 
 	// (todo) Name and Sub without URI
 

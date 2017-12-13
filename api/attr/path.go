@@ -167,10 +167,10 @@ func (p Path) Context(rt *core.ResourceType) (ctx *Context) {
 
 	// Try common attributes
 	if p.URI == "" {
-		ctx.Attribute = core.Commons().ByName(p.Name)
+		ctx.Attribute = core.Commons().WithName(p.Name)
 		if ctx.Attribute != nil {
 			if p.Sub != "" {
-				ctx.SubAttribute = ctx.Attribute.SubAttributes.ByName(p.Sub)
+				ctx.SubAttribute = ctx.Attribute.SubAttributes.WithName(p.Sub)
 				if ctx.SubAttribute == nil {
 					// Unmached path
 					return nil
@@ -187,10 +187,10 @@ func (p Path) Context(rt *core.ResourceType) (ctx *Context) {
 		return nil
 	}
 
-	ctx.Attribute = ctx.Schema.Attributes.ByName(p.Name)
+	ctx.Attribute = ctx.Schema.Attributes.WithName(p.Name)
 	if ctx.Attribute != nil {
 		if p.Sub != "" {
-			ctx.SubAttribute = ctx.Attribute.SubAttributes.ByName(p.Sub)
+			ctx.SubAttribute = ctx.Attribute.SubAttributes.WithName(p.Sub)
 			if ctx.SubAttribute == nil {
 				// Unmached path
 				return nil
