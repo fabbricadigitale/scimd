@@ -1,12 +1,16 @@
 package mongo
 
 import (
+	"fmt"
+
 	"github.com/fabbricadigitale/scimd/api/attr"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/storage"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
+
+const RootKey = "data"
 
 // Query is
 type Query struct {
@@ -54,12 +58,15 @@ func (res *Query) Fields(included []*attr.Path, excluded []*attr.Path) storage.Q
 	var field bson.M
 	field = make(bson.M)
 
+	var key string
 	for _, val := range included {
-		field[val.String()] = 1
+		key = fmt.Sprintf("%s.%s", RootKey, val.String())
+		field[key] = 1
 	}
 
 	for _, val := range excluded {
-		field[val.String()] = 0
+		key = fmt.Sprintf("%s.%s", RootKey, val.String())
+		field[key] = 0
 	}
 
 	res.q = res.q.Select(field)
