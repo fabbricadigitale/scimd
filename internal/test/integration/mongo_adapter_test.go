@@ -109,9 +109,28 @@ func TestMongoGet(t *testing.T) {
 
 	require.NotNil(t, resource)
 	require.Equal(t, id, resource.ID)
+
+	// Excluding externalId
+	id = "2819c223-7f76-453a-919d-413861904647"
+	//exc := "externalId"
+	resource, err = adapter.Get(resTypeRepo.Get("User"), id, "", nil)
+	require.NoError(t, err)
+
+	require.NotNil(t, resource)
+	require.Equal(t, "", resource.ExternalID)
+
+	// Non-existing ID
+	id = "2819c223-7f76-453a-919d-413861904640"
+	resource, err = adapter.Get(resTypeRepo.Get("User"), id, "", nil)
+	require.Nil(t, resource)
+	require.EqualError(t, err, "not found")
+
+	// Empty ID
+	resource, err = adapter.Get(resTypeRepo.Get("User"), "", "", nil)
+	require.Nil(t, resource)
+	require.EqualError(t, err, "not found")
+
 }
-
-
 
 // (todo) > Test Get adapter method
 
