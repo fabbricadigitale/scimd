@@ -167,13 +167,18 @@ func (a *Adapter) hydrateResource(r *resource.Resource) *resourceDocument {
 
 func toResource(h *resourceDocument) *resource.Resource {
 	hCommon := h.Data[0]
+
 	r := &resource.Resource{
 		CommonAttributes: core.CommonAttributes{
-			Schemas:    toStringSlice(hCommon["schemas"].([]interface{})),
-			ID:         hCommon["id"].(string),
-			ExternalID: hCommon["externalId"].(string),
-			Meta:       toMeta(hCommon["meta"].(map[string]interface{})),
+			Schemas: toStringSlice(hCommon["schemas"].([]interface{})),
+			ID:      hCommon["id"].(string),
+			Meta:    toMeta(hCommon["meta"].(map[string]interface{})),
 		},
+	}
+
+	// externalId is not a required field, it is omitted if empty
+	if hCommon["externalId"] != nil {
+		r.CommonAttributes.ExternalID = hCommon["externalId"].(string)
 	}
 
 	sMap := r.ResourceType().GetSchemas()
@@ -226,7 +231,11 @@ func toMeta(m map[string]interface{}) core.Meta {
 	meta.LastModified = &lastModified
 	meta.Location = m["location"].(string)
 	meta.ResourceType = m["resourceType"].(string)
-	meta.Version = m["version"].(string)
+
+	// version is not a required field, it is omitted if empty
+	if m["version"] != nil {
+		meta.Version = m["version"].(string)
+	}
 
 	return meta
 }
