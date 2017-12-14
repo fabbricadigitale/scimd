@@ -98,6 +98,15 @@ func (p Path) String() string {
 	return s
 }
 
+// Transform applies f(facet) to p's facets (URN, attribute, and sub-attribute name) and returns a new transformed Path
+func (p Path) Transform(f func(facet string) string) *Path {
+	return &Path{
+		URI:  f(p.URI),
+		Name: f(p.Name),
+		Sub:  f(p.Sub),
+	}
+}
+
 func (p Path) matchSchema(rt *core.ResourceType) *core.Schema {
 	if p.URI == "" {
 		return rt.GetSchema()
