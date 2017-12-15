@@ -11,6 +11,8 @@ import (
 
 	"gopkg.in/ory-am/dockertest.v3"
 
+	"github.com/fabbricadigitale/scimd/api/attr"
+	"github.com/fabbricadigitale/scimd/api/filter"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/storage"
@@ -132,10 +134,69 @@ func TestMongoGet(t *testing.T) {
 
 }
 
-// (todo) > Test Get adapter method
+func TestMongoDelete(t *testing.T) {
+	require.NotNil(t, resTypeRepo)
+	require.NotNil(t, schemaRepo)
+	require.NotNil(t, adapter)
 
-// (todo) > Test Delete adapter method
+	// Delete object with specified id
+	id := "2819c223-7f76-453a-919d-413861904648"
+	err := adapter.Delete(resTypeRepo.Get("User"), id, "")
+	require.NoError(t, err)
+
+	id = "2819c223-7f76-453a-919d-111111111111"
+	err = adapter.Delete(resTypeRepo.Get("User"), id, "")
+	require.Error(t, err)
+}
 
 // (todo) > Test Update adapter method
 
-// (todo) > Test Find adapter method
+func TestMongoFind(t *testing.T) {
+	require.NotNil(t, resTypeRepo)
+	require.NotNil(t, schemaRepo)
+	require.NotNil(t, adapter)
+
+	res := []*core.ResourceType{
+		&core.ResourceType{
+			CommonAttributes: core.CommonAttributes{
+				Schemas: []string{"urn:ietf:params:scim:schemas:core:2.0:ResourceType"},
+				ID:      "User",
+				Meta: core.Meta{
+					Location:     "https://example.com/v2/ResourceTypes/User",
+					ResourceType: "ResourceType",
+				},
+			},
+			Name:        "User",
+			Endpoint:    "/User",
+			Description: "User Account",
+			Schema:      "urn:ietf:params:scim:schemas:core:2.0:User",
+			SchemaExtensions: []core.SchemaExtension{
+				core.SchemaExtension{
+					Schema:   "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User",
+					Required: true,
+				},
+			},
+		},
+	}
+
+	var f filter.Filter = filter.AttrExpr{
+		Path: attr.Path{
+			URI:  "urn:ietf:params:scim:schemas:core:2.0:User",
+			Name: "userName",
+			Sub:  "",
+		},
+		Op:    filter.OpEqual,
+		Value: "bjensen@example.com",
+	}
+
+	q, err := adapter.Find(res, f)
+	require.NotNil(t, q)
+	require.NoError(t, err)
+
+	// Invalid schema urn
+
+	res[0].Schema = "invalid-urn"
+	q, err = adapter.Find(res, f)
+	require.Nil(t, q)
+	require.Error(t, err)
+}
