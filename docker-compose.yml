@@ -1,9 +1,0 @@
-version: '3.3'
-services: 
-  mongo:
-    volumes:
-      - ./storage/setup/example-data-dump:/data/example-data-dump
-    image: mongo:latest
-    container_name: "mongoscim"
-    ports:
-      - 27017:27017
