@@ -43,7 +43,6 @@ var (
 
 // New makes and return a new adapter of type storage.Storer using a mongo driver
 func New(url, db, collection string) (storage.Storer, error) {
-
 	adapter := &Adapter{}
 	driver, err := CreateDriver(url, db, collection)
 	if err != nil {
@@ -52,6 +51,11 @@ func New(url, db, collection string) (storage.Storer, error) {
 	adapter.adaptee = driver
 
 	return adapter, nil
+}
+
+// Ping ...
+func (a *Adapter) Ping() error {
+	return a.adaptee.session.Ping()
 }
 
 // Create is ...

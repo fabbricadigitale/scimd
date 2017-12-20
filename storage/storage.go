@@ -25,6 +25,8 @@ type Querier interface {
 
 // Storer is the target interface
 type Storer interface {
+	Ping() error
+
 	Create(res *resource.Resource) error
 
 	Get(resType *core.ResourceType, id, version string, included []*attr.Path, excluded []*attr.Path) (*resource.Resource, error)
