@@ -1,16 +1,12 @@
 package mongo
 
 import (
-	"fmt"
-
 	"github.com/fabbricadigitale/scimd/api/attr"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/storage"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
-
-const RootKey = "data"
 
 // Query is
 type Query struct {
@@ -33,9 +29,9 @@ func (res *Query) Count() (n int, err error) {
 // Sort is
 func (res *Query) Sort(by *attr.Path, asc bool) storage.Querier {
 	if asc {
-		res.q = res.q.Sort(by.String())
+		res.q = res.q.Sort(pathToKey(*by))
 	} else {
-		res.q = res.q.Sort("-" + by.String())
+		res.q = res.q.Sort("-" + pathToKey(*by))
 	}
 	return res
 }
@@ -58,15 +54,12 @@ func (res *Query) Fields(included []*attr.Path, excluded []*attr.Path) storage.Q
 	var field bson.M
 	field = make(bson.M)
 
-	var key string
-	for _, val := range included {
-		key = fmt.Sprintf("%s.%s", RootKey, val.String())
-		field[key] = 1
+	for _, p := range included {
+		field[pathToKey(*p)] = 1
 	}
 
-	for _, val := range excluded {
-		key = fmt.Sprintf("%s.%s", RootKey, val.String())
-		field[key] = 0
+	for _, p := range excluded {
+		field[pathToKey(*p)] = 0
 	}
 
 	res.q = res.q.Select(field)
@@ -74,12 +67,12 @@ func (res *Query) Fields(included []*attr.Path, excluded []*attr.Path) storage.Q
 }
 
 func (res *Query) one() (*resource.Resource, error) {
-	resDoc := &resourceDocument{}
-	err := res.q.One(resDoc)
+	d := &document{}
+	err := res.q.One(d)
 	if err != nil {
 		return nil, err
 	}
-	return toResource(resDoc), nil
+	return toResource(d), nil
 }
 
 // Iter executes the query and returns an iterator capable of going over all
@@ -92,13 +85,12 @@ func (res *Query) Iter() storage.Iter {
 
 // Next retrieves the next resource from the result set, blocking if necessary.
 func (it *Iter) Next() *resource.Resource {
-
-	resDoc := &resourceDocument{}
-	n := it.i.Next(resDoc)
+	d := &document{}
+	n := it.i.Next(d)
 	if !n {
 		return nil
 	}
-	return toResource(resDoc)
+	return toResource(d)
 }
 
 // Done returns true only if a follow up Next call is guaranteed

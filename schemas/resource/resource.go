@@ -36,6 +36,9 @@ func (r *Resource) SetValues(ns string, values *datatype.Complex) {
 
 // Values is the method to access the attributes by schema namespace
 func (r *Resource) Values(ns string) *datatype.Complex {
+	if r.data == nil {
+		return nil
+	}
 	return r.data[ns]
 }
 

@@ -52,7 +52,7 @@ func TestMongoGet(t *testing.T) {
 	require.NotNil(t, schemaRepo)
 	require.NotNil(t, adapter)
 
-	id := "2819c223-7f76-453a-919d-413861904647"
+	id := "2819c223-7f76-453a-919d-ab1234567891"
 	resource, err := adapter.Get(resTypeRepo.Get("User"), id, "", nil, nil)
 	require.NoError(t, err)
 

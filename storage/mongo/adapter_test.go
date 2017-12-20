@@ -22,12 +22,12 @@ var mongoTests = []mongoCase{
 	{
 		`emails[type eq "work" and value co "@example.com"]`,
 		bson.M{"meta.resourceType": "User", "$and": []interface{}{bson.M{"_": bson.M{"$eq": "work"}}, bson.M{"_": bson.M{"": "@example.com"}}}},
-		bson.M{"$and": []interface{}{bson.M{"$elemMatch": bson.M{"$and": []interface{}{bson.M{"emails.type": bson.M{"$eq": "work"}}, bson.M{"_uri": bson.M{"$eq": "urn:ietf:params:scim:schemas:core:2.0:User"}}}}}, bson.M{"$elemMatch": bson.M{"$and": []interface{}{bson.M{"emails.value": bson.M{"$regex": bson.RegEx{Pattern: "@example\\.com", Options: "i"}}}, bson.M{"_uri": bson.M{"$eq": "urn:ietf:params:scim:schemas:core:2.0:User"}}}}}}, "meta.resourceType": "User"},
+		bson.M{"$and": []interface{}{bson.M{"urn:ietf:params:scim:schemas:core:2°0:User.emails.type": bson.M{"$eq": "work"}}, bson.M{"urn:ietf:params:scim:schemas:core:2°0:User.emails.value": bson.M{"$regex": bson.RegEx{Pattern: "@example\\.com", Options: "i"}}}}, "meta.resourceType": "User"},
 	},
 	{
 		`emails[type eq "work" and value co "@example.com"] or ims[type eq "xmpp" and value co "@foo.com"]`,
 		bson.M{"$or": []interface{}{bson.M{"$and": []interface{}{bson.M{"_": bson.M{"$eq": "work"}}, bson.M{"_": bson.M{"": "@example.com"}}}}, bson.M{"$and": []interface{}{bson.M{"_": bson.M{"$eq": "xmpp"}}, bson.M{"_": bson.M{"": "@foo.com"}}}}}, "meta.resourceType": "User"},
-		bson.M{"$or": []interface{}{bson.M{"$and": []interface{}{bson.M{"$elemMatch": bson.M{"$and": []interface{}{bson.M{"emails.type": bson.M{"$eq": "work"}}, bson.M{"_uri": bson.M{"$eq": "urn:ietf:params:scim:schemas:core:2.0:User"}}}}}, bson.M{"$elemMatch": bson.M{"$and": []interface{}{bson.M{"emails.value": bson.M{"$regex": bson.RegEx{Pattern: "@example\\.com", Options: "i"}}}, bson.M{"_uri": bson.M{"$eq": "urn:ietf:params:scim:schemas:core:2.0:User"}}}}}}}, bson.M{"$and": []interface{}{bson.M{"$elemMatch": bson.M{"$and": []interface{}{bson.M{"ims.type": bson.M{"$eq": "xmpp"}}, bson.M{"_uri": bson.M{"$eq": "urn:ietf:params:scim:schemas:core:2.0:User"}}}}}, bson.M{"$elemMatch": bson.M{"$and": []interface{}{bson.M{"ims.value": bson.M{"$regex": bson.RegEx{Pattern: "@foo\\.com", Options: "i"}}}, bson.M{"_uri": bson.M{"$eq": "urn:ietf:params:scim:schemas:core:2.0:User"}}}}}}}}, "meta.resourceType": "User"},
+		bson.M{"$or": []interface{}{bson.M{"$and": []interface{}{bson.M{"urn:ietf:params:scim:schemas:core:2°0:User.emails.type": bson.M{"$eq": "work"}}, bson.M{"urn:ietf:params:scim:schemas:core:2°0:User.emails.value": bson.M{"$regex": bson.RegEx{Pattern: "@example\\.com", Options: "i"}}}}}, bson.M{"$and": []interface{}{bson.M{"urn:ietf:params:scim:schemas:core:2°0:User.ims.type": bson.M{"$eq": "xmpp"}}, bson.M{"urn:ietf:params:scim:schemas:core:2°0:User.ims.value": bson.M{"$regex": bson.RegEx{Pattern: "@foo\\.com", Options: "i"}}}}}}, "meta.resourceType": "User"},
 	},
 	/*
 		// (todo) > complete test cases .. good luck

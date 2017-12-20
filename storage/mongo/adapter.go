@@ -41,11 +41,6 @@ var (
 	}
 )
 
-// uriKey identifies the attributes namespace into document resource
-// The name stars with an underscore unlike scim properties that start with alphabetical characters
-const uriKey = "_uri"
-const notExistingKey = "_"
-
 // New makes and return a new adapter of type storage.Storer using a mongo driver
 func New(url, db, collection string) (storage.Storer, error) {
 
@@ -61,7 +56,7 @@ func New(url, db, collection string) (storage.Storer, error) {
 
 // Create is ...
 func (a *Adapter) Create(res *resource.Resource) error {
-	dataResource := a.hydrateResource(res)
+	dataResource := a.toDoc(res)
 	return (*a.adaptee).Create(dataResource)
 }
 
@@ -81,7 +76,7 @@ func (a *Adapter) Get(resType *core.ResourceType, id, version string, included [
 
 // Update is ...
 func (a *Adapter) Update(resource *resource.Resource, id string, version string) error {
-	dataResource := a.hydrateResource(resource)
+	dataResource := a.toDoc(resource)
 	return (*a.adaptee).Update(makeQuery(resource.ResourceType().GetIdentifier(), id, version), dataResource)
 }
 
@@ -103,11 +98,7 @@ func (a *Adapter) Find(resTypes []*core.ResourceType, filter filter.Filter) (sto
 	}
 
 	_q := bson.M{
-		"data": bson.M{
-			"$elemMatch": bson.M{
-				"$or": or,
-			},
-		},
+		"$or": or,
 	}
 
 	query, close, err := (*a.adaptee).Find(_q)
@@ -120,80 +111,79 @@ func (a *Adapter) Find(resTypes []*core.ResourceType, filter filter.Filter) (sto
 	}, nil
 }
 
-// resourceDocument is a ready-to-store format for Resource
-type resourceDocument struct {
-	Data []map[string]interface{}
+func pathToKey(p attr.Path) string {
+	ep := p.Transform(keyEscape)
+	if ep.Undefined() {
+		return notExistingKey
+	}
+
+	if ep.URI == "" {
+		return ep.String()
+	}
+
+	ns := ep.URI
+	ep.URI = ""
+	return ns + "." + ep.String()
 }
 
-// This method translate Resource to a ready-to-store document
-// The document has a Data property, array of []map[string]interface{},  with a fixed order:
-// index = 0 -> common attributes
-// index = 1 -> core attributes
-// index > 1 -> extensions attributes
-func (a *Adapter) hydrateResource(r *resource.Resource) *resourceDocument {
+func makeQuery(resType, id, version string) bson.M {
+	q := bson.M{
+		"id":                id,
+		"meta.resourceType": resType,
+	}
 
-	h := &resourceDocument{}
+	if version != "" {
+		q["meta.version"] = version
+	}
 
-	common := make(map[string]interface{})
-	common[uriKey] = ""
-	common["schemas"] = r.Schemas
-	common["id"] = r.ID
-	common["externalId"] = r.ExternalID
-	common["meta"] = r.Meta
+	return q
+}
+
+// This method translate resource.Resource to a ready-to-store document
+// Document's structure is define as following:
+//  - Common attributes are placed as root keys
+//  - For each schema (including base one) a key equals to the corrisponding schema's URI holds an object populated with the corrisponding complex
+//  - Complex attributes are converted to mongo objects with corrisponding keys and nested fields
+func (a *Adapter) toDoc(r *resource.Resource) *document {
 
 	rt := r.ResourceType()
 
-	mCore := make(map[string]interface{})
-	mCore[uriKey] = rt.GetSchema().ID
-	for key, val := range *r.Values(rt.GetSchema().ID) {
-		mCore[key] = val
+	d := document{
+		"schemas":    r.Schemas,
+		"id":         r.ID,
+		"externalId": r.ExternalID,
+		"meta":       fromMeta(&r.Meta),
 	}
-	h.Data = append(h.Data, common, mCore)
 
-	for _, extSch := range rt.GetSchemaExtensions() {
-		mExt := make(map[string]interface{})
-		if extSch != nil {
-			ns := extSch.GetIdentifier()
-			mExt[uriKey] = ns
-			for key, val := range *r.Values(ns) {
-				mExt[key] = val
-			}
+	for ns := range rt.GetSchemas() {
+		if c := map[string]interface{}(*r.Values(ns)); c != nil {
+			d[ns] = c
 		}
-		h.Data = append(h.Data, mExt)
 	}
-
-	return h
+	return &d
 }
 
-func toResource(h *resourceDocument) *resource.Resource {
-	hCommon := h.Data[0]
+func toResource(d *document) *resource.Resource {
+
+	dd := (*d)
 
 	r := &resource.Resource{
 		CommonAttributes: core.CommonAttributes{
-			Schemas: toStringSlice(hCommon["schemas"].([]interface{})),
-			ID:      hCommon["id"].(string),
-			Meta:    toMeta(hCommon["meta"].(map[string]interface{})),
+			Schemas: toStringSlice(dd["schemas"].([]interface{})),
+			ID:      dd["id"].(string),
+			Meta:    toMeta(dd["meta"].(bson.M)),
 		},
 	}
 
-	// externalId is not a required field, it is omitted if empty
-	if hCommon["externalId"] != nil {
-		r.CommonAttributes.ExternalID = hCommon["externalId"].(string)
-	}
+	rt := r.ResourceType()
 
-	sMap := r.ResourceType().GetSchemas()
-
-	for i := 1; i < len(h.Data); i++ {
-		ns := h.Data[i][uriKey].(string)
-		values := h.Data[i]
-		delete(values, uriKey)
-
-		if s, ok := sMap[uriKey]; ok {
-			p, err := s.Enforce(values)
+	for ns, s := range rt.GetSchemas() {
+		if values := dd[ns]; values != nil {
+			c, err := s.Enforce(values.(bson.M))
 			if err != nil {
 				panic(err)
 			}
-			r.SetValues(ns, p)
+			r.SetValues(ns, c)
 		}
 	}
 
@@ -210,27 +200,35 @@ func toStringSlice(iSlice []interface{}) []string {
 	return slice
 }
 
+func fromMeta(meta *core.Meta) map[string]interface{} {
+	if meta == nil {
+		return nil
+	}
+
+	m := map[string]interface{}{
+		"location":     meta.Location,
+		"resourceType": meta.ResourceType,
+		"created":      meta.Created,
+		"lastModified": meta.LastModified,
+	}
+
+	// version is not a required field, it is omitted if empty
+	if meta.Version != "" {
+		m["version"] = meta.Version
+	}
+
+	return m
+}
+
 func toMeta(m map[string]interface{}) core.Meta {
-	meta := core.Meta{}
-
-	created, err := time.Parse(time.RFC3339, m["created"].(string))
-	if err != nil {
-		panic(&api.InternalServerError{
-			Detail: err.Error(),
-		})
+	created := m["created"].(time.Time)
+	lastMod := m["lastModified"].(time.Time)
+	meta := core.Meta{
+		Created:      &created,
+		LastModified: &lastMod,
+		Location:     m["location"].(string),
+		ResourceType: m["resourceType"].(string),
 	}
-
-	lastModified, err := time.Parse(time.RFC3339, m["lastModified"].(string))
-	if err != nil {
-		panic(&api.InternalServerError{
-			Detail: err.Error(),
-		})
-	}
-
-	meta.Created = &created
-	meta.LastModified = &lastModified
-	meta.Location = m["location"].(string)
-	meta.ResourceType = m["resourceType"].(string)
 
 	// version is not a required field, it is omitted if empty
 	if m["version"] != nil {
@@ -309,6 +307,9 @@ func (c *convert) do(resType *core.ResourceType, f interface{}) bson.M {
 	return nil
 }
 
+// Represent a mongo key that's always not present
+const notExistingKey = "_"
+
 func (c *convert) relationalOperators(resType *core.ResourceType, f interface{}, node *filter.AttrExpr) bson.M {
 	// If any schema attribure was not found node.Value is nil.
 	// For filtered attributes that are not part of a particular resource
@@ -342,145 +343,46 @@ func newInvalidFilterError(detail, filter string) *api.InvalidFilterError {
 }
 
 func stringOperators(resType *core.ResourceType, f interface{}, node *filter.AttrExpr) bson.M {
-	attrDef := node.Path.Context(resType).Attribute
-
-	var path *attr.Path
-	path = &node.Path
-
-	uri, key := convertKey(path)
+	key := pathToKey(node.Path)
 	value := node.Value.(string)
 
-	if attrDef.MultiValued {
-		switch node.Op {
-		case filter.OpContains:
-			return multiValuedQueryPart(uri, key, value, "i", "", "")
-		case filter.OpStartsWith:
-			return multiValuedQueryPart(uri, key, value, "i", "^", "")
-		case filter.OpEndsWith:
-			return multiValuedQueryPart(uri, key, value, "i", "", "$")
-		default:
-			return nil
-		}
-	} else {
-		switch node.Op {
-		case filter.OpContains:
-			return singleValueQueryPart(uri, key, value, "i", "", "")
-		case filter.OpStartsWith:
-			return singleValueQueryPart(uri, key, value, "i", "^", "")
-		case filter.OpEndsWith:
-			return singleValueQueryPart(uri, key, value, "i", "", "$")
-		default:
-			return nil
-		}
+	switch node.Op {
+	case filter.OpContains:
+		return regexQueryPart(key, value, "i", "", "")
+	case filter.OpStartsWith:
+		return regexQueryPart(key, value, "i", "^", "")
+	case filter.OpEndsWith:
+		return regexQueryPart(key, value, "i", "", "$")
+	default:
+		return nil
 	}
 }
 
-func multiValuedQueryPart(uri, key, value, option, prePattern, postPattern string) bson.M {
+func regexQueryPart(key, value, option, prePattern, postPattern string) bson.M {
 	return bson.M{
-		"$elemMatch": bson.M{
-			"$and": []interface{}{
-				bson.M{
-					key: bson.M{
-						"$regex": bson.RegEx{
-							Pattern: prePattern + regexp.QuoteMeta(value) + postPattern,
-							Options: option,
-						},
-					},
-				},
-				bson.M{
-					uriKey: bson.M{
-						"$eq": uri,
-					},
-				},
+		key: bson.M{
+			"$regex": bson.RegEx{
+				Pattern: prePattern + regexp.QuoteMeta(value) + postPattern,
+				Options: option,
 			},
 		},
 	}
-}
-
-func singleValueQueryPart(uri, key, value, option, prePattern, postPattern string) bson.M {
-	return bson.M{
-		"$and": []interface{}{
-			bson.M{
-				key: bson.M{
-					"$regex": bson.RegEx{
-						Pattern: prePattern + regexp.QuoteMeta(value) + postPattern,
-						Options: option,
-					},
-				},
-			},
-			bson.M{
-				uriKey: bson.M{
-					"$eq": uri,
-				},
-			},
-		},
-	}
-}
-
-func convertKey(p *attr.Path) (urn, key string) {
-	urn = p.URI
-	if !p.Undefined() {
-		key = p.Name
-		if p.Sub != "" {
-			key += "." + p.Sub
-		}
-	} else {
-		key = notExistingKey
-	}
-	return
 }
 
 func comparisonOperators(resType *core.ResourceType, f interface{}, node *filter.AttrExpr) bson.M {
-	attrDef := node.Path.Context(resType).Attribute
-
-	var path *attr.Path
-	path = &node.Path
-
-	uri, key := convertKey(path)
-
-	if attrDef.MultiValued {
-		return bson.M{
-			"$elemMatch": bson.M{
-				"$and": []interface{}{
-					bson.M{
-						key: bson.M{
-							mapOperator[node.Op]: node.Value,
-						},
-					},
-					bson.M{
-						uriKey: bson.M{
-							"$eq": uri,
-						},
-					},
-				},
-			},
-		}
-
-	}
+	key := pathToKey(node.Path)
 	return bson.M{
-		"$and": []interface{}{
-			bson.M{
-				key: bson.M{
-					mapOperator[node.Op]: node.Value,
-				},
-			},
-			bson.M{
-				uriKey: bson.M{
-					"$eq": uri,
-				},
-			},
+		key: bson.M{
+			mapOperator[node.Op]: node.Value,
 		},
 	}
 
 }
 
 func prOperator(resType *core.ResourceType, f interface{}, node *filter.AttrExpr) bson.M {
+
 	attrDef := node.Path.Context(resType).Attribute
-
-	var path *attr.Path
-	path = &node.Path
-
-	uri, key := convertKey(path)
+	key := pathToKey(node.Path)
 
 	existsCriteria := bson.M{key: bson.M{"$exists": true}}
 	nullCriteria := bson.M{key: bson.M{"$ne": nil}}
@@ -501,13 +403,6 @@ func prOperator(resType *core.ResourceType, f interface{}, node *filter.AttrExpr
 		}
 	}
 	return bson.M{
-		"$and": []interface{}{
-			bson.M{"$and": criterion},
-			bson.M{
-				uriKey: bson.M{
-					"$eq": uri,
-				},
-			},
-		},
+		key: bson.M{"$and": criterion},
 	}
 }

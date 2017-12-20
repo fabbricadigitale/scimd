@@ -41,21 +41,21 @@ func (d *Driver) getCollection() (*mgo.Collection, func()) {
 }
 
 // Create is the driver method for Create
-func (d *Driver) Create(res *resourceDocument) error {
+func (d *Driver) Create(doc *document) error {
 	// Not yet implemented
 	c, close := d.getCollection()
 	defer close()
 
-	return d.errorWrapper(c.Insert(res))
+	return d.errorWrapper(c.Insert(doc))
 }
 
 // Update is the driver method for Update
-func (d *Driver) Update(query bson.M, resource *resourceDocument) error {
+func (d *Driver) Update(query bson.M, doc *document) error {
 	c, close := d.getCollection()
 	defer close()
 
-	err := c.Update(query, *resource)
-	return d.errorWrapper(err, resource.Data[0]["id"])
+	err := c.Update(query, *doc)
+	return d.errorWrapper(err, (*doc)["id"])
 }
 
 // Delete is the driver method for Delete
@@ -118,19 +118,4 @@ type ResourceNotFoundError struct {
 
 func (r ResourceNotFoundError) Error() string {
 	return fmt.Sprintf("%v - id %v", r.msg, r.id)
-}
-
-func makeQuery(resType, id, version string) bson.M {
-	c := bson.M{
-		uriKey:              "",
-		"id":                id,
-		"meta.resourceType": resType,
-	}
-
-	if version != "" {
-		c["meta.version"] = version
-	}
-
-	query := bson.M{"data": bson.M{"$elemMatch": c}}
-	return query
 }
