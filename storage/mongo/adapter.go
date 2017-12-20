@@ -194,8 +194,8 @@ func toStringSlice(iSlice []interface{}) []string {
 	len := len(iSlice)
 	slice := make([]string, len)
 
-	for _, val := range iSlice {
-		slice = append(slice, val.(string))
+	for i, val := range iSlice {
+		slice[i] = val.(string)
 	}
 	return slice
 }
