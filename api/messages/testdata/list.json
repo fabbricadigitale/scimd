@@ -1,0 +1,23 @@
+{
+  "schemas": [
+    "urn:ietf:params:scim:api:messages:2.0:ListResponse"
+  ],
+  "totalResults": 2,
+  "itemsPerPage": 3,
+  "startIndex": 1,
+  "Resources": [
+    {
+      "schemas": [
+        "urn:ietf:params:scim:schemas:core:2.0:User"
+      ],
+      "id": "123",
+      "externaId": "456",
+      "userName": "Ale",
+      "meta": {
+        "location": "https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646",
+        "resourceType": "User",
+        "version": "Wa330bc54f0671c9"
+      }
+    }
+  ]
+}
