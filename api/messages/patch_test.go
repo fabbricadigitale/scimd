@@ -2,6 +2,7 @@ package messages
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"testing"
 
@@ -62,6 +63,7 @@ func TestPatchResource(t *testing.T) {
 			}]
 		}]
 		}`, string(b))
+	fmt.Println(string(b))
 }
 
 func TestPatchOpValid(t *testing.T) {
