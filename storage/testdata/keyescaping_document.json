@@ -1,0 +1,83 @@
+{
+    "schemas": [
+        "urn:ietf:params:scim:schemas:core:2.0:User"
+    ],
+    "id": "2819c223-7f76-453a-919d-000000000000",
+    "externalId": "666",
+    "userName": "gettingDelete",
+    "name": {
+        "formatted": "Mr. Getting F Deleted, I'm",
+        "familyName": "Deleted",
+        "givenName": "Getting",
+        "middleName": "Freaking",
+        "honorificPrefix": "Mr.",
+        "honorificSuffix": "I'm"
+    },
+    "dot.dollar$" : "foo",
+    "displayName": "Getting Deleted",
+    "nickName": "Deletos",
+    "profileUrl": "https://login.example.com/gfdeleted",
+    "emails": [
+        {
+            "value": "gfdeleted@example.com",
+            "type": "work",
+            "primary": true
+        },
+        {
+            "value": "gfdeleted@fork.org",
+            "type": "home"
+        }
+    ],
+    "addresses": [
+        {
+            "type": "work",
+            "streetAddress": "637 Keyser Ridge Road",
+            "locality": "Greensboro",
+            "region": "NC",
+            "postalCode": "27401",
+            "country": "USA",
+            "formatted": "637 Keyser Ridge Road\nGreensboro, NC 27401 USA",
+            "primary": true
+        },
+        {
+            "type": "home",
+            "streetAddress": "456 Greensboro Blvd",
+            "locality": "Greensboro",
+            "region": "NC",
+            "postalCode": "27401",
+            "country": "USA",
+            "formatted": "456 Greensboro Blvd\nGreensboro, NC 27401 USA"
+        }
+    ],
+    "phoneNumbers": [
+        {
+            "value": "336-485-7643",
+            "type": "work"
+        },
+        {
+            "value": "336-485-3456",
+            "type": "mobile"
+        }
+    ],
+    "userType": "Employee",
+    "title": "Electronic home entertainment equipment installer",
+    "preferredLanguage": "en-US",
+    "locale": "en-US",
+    "timezone": "America/Los_Angeles",
+    "active": true,
+    "password": "t1meMa$heet",
+    "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User": {
+        "employeeNumber": "701984",
+        "costCenter": "4130",
+        "organization": "Universal Studios",
+        "division": "Theme Park",
+        "department": "Tour Operations"
+    },
+    "meta": {
+        "resourceType": "User",
+        "created": "2010-01-23T04:56:22Z",
+        "lastModified": "2011-05-13T04:42:34Z",
+        "version": "W\/\"a330bc54f0671c9\"",
+        "location": "https://example.com/v2/Users/2819c223-7f76-453a-919d-000000000000"
+    }
+}
