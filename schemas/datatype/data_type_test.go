@@ -10,6 +10,38 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type castTest struct {
+	t string
+	v interface{}
+	r DataTyper
+	e error
+}
+
+type complexLike map[string]interface{}
+
+var castTable = []castTest{
+	// error
+	castTest{"non-existing-type", nil, nil, &InvalidDataTypeError{t: "non-existing-type"}},
+
+	// ok
+	castTest{StringType, "just a string", String("just a string"), nil},
+	castTest{ComplexType, make(map[string]interface{}), Complex{}, nil},
+	castTest{ComplexType, complexLike{"foo": "bar"}, Complex{"foo": "bar"}, nil},
+
+	// not castable
+	castTest{ComplexType, make(map[int]string), nil, nil},
+
+	// (todo) add more cases
+}
+
+func TestCast(t *testing.T) {
+	for _, test := range castTable {
+		r, e := Cast(test.v, test.t)
+		assert.Equal(t, test.r, r)
+		assert.Equal(t, test.e, e)
+	}
+}
+
 func TestUnassigned(t *testing.T) {
 	c := make(Complex)
 

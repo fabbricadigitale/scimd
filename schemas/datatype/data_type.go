@@ -3,6 +3,7 @@ package datatype
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"time"
 )
 
@@ -143,47 +144,31 @@ func New(t string) (DataTyper, error) {
 	return nil, &InvalidDataTypeError{t}
 }
 
+var rTypes = map[string]reflect.Type{
+	StringType:    reflect.TypeOf(*new(String)),
+	BooleanType:   reflect.TypeOf(*new(Boolean)),
+	DecimalType:   reflect.TypeOf(*new(Decimal)),
+	IntegerType:   reflect.TypeOf(*new(Integer)),
+	DateTimeType:  reflect.TypeOf(*new(DateTime)),
+	BinaryType:    reflect.TypeOf(*new(Binary)),
+	ReferenceType: reflect.TypeOf(*new(Reference)),
+	ComplexType:   reflect.TypeOf(Complex{}),
+}
+
 // Cast function returns a SCIM Data Type of the given type t that holds the v's value.
 func Cast(v interface{}, t string) (DataTyper, error) {
 
-	switch t {
-	default:
-		return nil, &InvalidDataTypeError{t}
-	case StringType:
-		if cv, ok := v.(string); ok {
-			return String(cv), nil
+	if rt := rTypes[t]; rt != nil {
+		rv := reflect.ValueOf(v)
+		rv = reflect.Indirect(rv)
+		if rv.Type().ConvertibleTo(rt) {
+			return rv.Convert(rt).Interface().(DataTyper), nil
 		}
-	case BooleanType:
-		if cv, ok := v.(bool); ok {
-			return Boolean(cv), nil
-		}
-	case DecimalType:
-		if cv, ok := v.(float64); ok {
-			return Decimal(cv), nil
-		}
-	case IntegerType:
-		if cv, ok := v.(int64); ok {
-			return Integer(cv), nil
-		}
-	case DateTimeType:
-		if cv, ok := v.(time.Time); ok {
-			return DateTime(cv), nil
-		}
-	case BinaryType:
-		if cv, ok := v.([]byte); ok {
-			return Binary(cv), nil
-		}
-	case ReferenceType:
-		if cv, ok := v.(string); ok {
-			return Reference(cv), nil
-		}
-	case ComplexType:
-		if cv, ok := v.(map[string]interface{}); ok {
-			return Complex(cv), nil
-		}
+		// Those values are not within Data Types must be considered to be Null
+		return nil, nil
 	}
-	// Those values are not Data Types are considered to be Null
-	return nil, nil
+
+	return nil, &InvalidDataTypeError{t}
 }
 
 // InvalidDataTypeError is a generic invalid type error
