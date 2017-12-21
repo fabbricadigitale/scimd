@@ -18,8 +18,8 @@ Also, it defines the **Data Type** of the value that can be bound to the attribu
 All runtime operations match attribute names in a *case-sensitive* way (exact match), expect the following cases:
 
 * Unmarshalling matches JSON keys to the names defined by the schema, preferring an exact match but also accepting a *case-insensitive* match. As result, decoded names are normalized according to its schema.
+*  Filtering accepts *case-insensitive* matches for attribute paths
 *  **(TODO)** When an attribute name is included in a request body, it should be normalized as unmarshalling does.
-*  **(TODO)** Filtering should accept *case-insensitive* matches for attribute paths
 
 ### Data Types
 
@@ -122,8 +122,8 @@ A resource is an artifact managed by `scimd` that's described by a Resource Type
 
 All resources:
 * are `struct`
-* embed `core.Common` for common attribures (ie. `Schemas`, `ID`, `Meta`, etc)
-> Members of `core.Common` use Go primitive `type`s, not *Data Types*
+* embed `core.CommonAttributes` for common attribures (ie. `Schemas`, `ID`, `Meta`, etc)
+> Members of `core.CommonAttributes` use Go primitive `type`s, not *Data Types*
 
 `scimd` implements two different kinds of resources.
 
@@ -152,21 +152,23 @@ To handle any other type of resource (including *User Resource*, *Group Resource
 
 A *mapped resource*:
 
-* still embed `core.Common` for common attribures (ie. `Schemas`, `ID`, `Meta`, etc)
-* has a `map` of `datatype.Complex` indexed by schema URI
-* each `datatype.Complex` (that's another `map`) can hold values needed by the bound schema
-
-Notes:
-> Members of `core.Common` use Go primitive `type`s, instead `map`s hold *Data Types*
-
-> `resource.Resource` is **NOT** responsible to enforce attributes structure and characteristics defined by bound schemas *(other APIs are needed to accomplish that)*.
+* embed `core.CommonAttributes` for common attribures (ie. `Schemas`, `ID`, `Meta`, etc)
+* has a `map` of `datatype.Complex` indexed by namespace (ie. the schema's URI)
+* each item of the above map can hold values needed by the bound schema, items are accessible using the `Values()` method passing the namespace
 
 In this way, it can represent data for any schemas (or composition of them in case of extensions).
 
-Finally, you need to know that:
-* it can hold data that may not be consistent with the schemas definition
-* JSON marshalling/unmarshalling will ignore extraneous attributes and will enforce Data Types according to schemas definition
-* to determinate the "state" of an attribute within `map`s use [Unassigned and Null](#unassigned-and-null-values) rules
+Notes:
+> A *mapped resource* can hold data that may not be consistent with the schemas definition.
+> Indeed, items returned `Values()` are `datatype.Complex` (that's a `map[string]interface{}`) even if they should contains *Data Types* only however any value of any type can be assigned. To determinate the "state" of an attribute's value use [Unassigned and Null](#unassigned-and-null-values) rules.
+> Finally, mind that members of `core.CommonAttributes` use Go primitive `type`s, not *Data Types*
+
+
+
+> Furthermore, `resource.Resource` is **NOT** responsible to enforce attributes structure and characteristics defined by bound schemas,
+> to enforce a specific schema and related Data Types use the `Enforce()` method of `core.Schema` instances.
+
+>  Anyway, JSON marshalling/unmarshalling will ignore extraneous attributes and will enforce *Data Types* according to schemas definition
 
 
 
