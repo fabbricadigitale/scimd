@@ -20,7 +20,7 @@ func TestSearchResource(t *testing.T) {
 
 	var filter = new(Filter)
 	*filter = "userName eq john"
-	var index uint
+	var index int
 	index = 1
 
 	equalities := []struct {
