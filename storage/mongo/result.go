@@ -27,11 +27,11 @@ func (res *Query) Count() (n int, err error) {
 }
 
 // Sort is
-func (res *Query) Sort(by *attr.Path, asc bool) storage.Querier {
+func (res *Query) Sort(by attr.Path, asc bool) storage.Querier {
 	if asc {
-		res.q = res.q.Sort(pathToKey(*by))
+		res.q = res.q.Sort(pathToKey(by))
 	} else {
-		res.q = res.q.Sort("-" + pathToKey(*by))
+		res.q = res.q.Sort("-" + pathToKey(by))
 	}
 	return res
 }
@@ -49,20 +49,22 @@ func (res *Query) Limit(n int) storage.Querier {
 }
 
 // Fields is
-func (res *Query) Fields(included []*attr.Path, excluded []*attr.Path) storage.Querier {
+func (res *Query) Fields(fields map[attr.Path]bool) storage.Querier {
 
-	var field bson.M
-	field = make(bson.M)
+	var selector bson.M
+	selector = make(bson.M)
 
-	for _, p := range included {
-		field[pathToKey(*p)] = 1
-	}
+	if fields != nil {
+		for p, on := range fields {
+			var s int
+			if on {
+				s = 1
+			}
+			selector[pathToKey(p)] = s
+		}
+	} // else an empty selector is set
 
-	for _, p := range excluded {
-		field[pathToKey(*p)] = 0
-	}
-
-	res.q = res.q.Select(field)
+	res.q = res.q.Select(selector)
 	return res
 }
 

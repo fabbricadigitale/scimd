@@ -1,10 +1,6 @@
 package query
 
 import (
-	"reflect"
-
-	"github.com/fabbricadigitale/scimd/schemas/datatype"
-
 	"github.com/fabbricadigitale/scimd/api"
 	"github.com/fabbricadigitale/scimd/api/attr"
 	"github.com/fabbricadigitale/scimd/api/filter"
@@ -38,16 +34,57 @@ func makeAttr(a string) (*attr.Path, error) {
 	}
 }
 
-func Resource(s storage.Storer, resType *core.ResourceType, id string, attrs *api.Attributes) (core.ResourceTyper, error) {
+func Attributes(resTypes []*core.ResourceType, attrs *api.Attributes) (fields map[attr.Path]bool, err error) {
+	var in, ex []*attr.Path
+	fields = make(map[attr.Path]bool)
 
-	// (todo) Fields projection
+	// When specified, the default list of attributes SHALL be
+	// overridden, and each resource returned MUST contain the
+	// minimum set of resource attributes and any attributes or
+	// sub-attributes explicitly requested by the "attributes"
+	// parameter (https://tools.ietf.org/html/rfc7644#section-3.9, https://tools.ietf.org/html/rfc7644#section-3.4.2.5)
+	if len(attrs.Attributes) > 0 {
+		in, err = makeAttrs(attrs.Attributes)
+		if err != nil {
+			return
+		}
+	}
 
-	res, err := s.Get(resType, id, "", nil, nil)
+	// When specified, each resource returned MUST
+	// contain the minimum set of resource attributes.
+	// Additionally, the default set of attributes minus those
+	// attributes listed in "excludedAttributes" is returned (https://tools.ietf.org/html/rfc7644#section-3.9)
+	// (todo) > Specifing excludedAttribute whose schema "returned" parameter setting is "always" has no effect (https://tools.ietf.org/html/rfc7644#section-3.4.2.5)
+	if len(attrs.ExcludedAttributes) > 0 {
+		ex, err = makeAttrs(attrs.ExcludedAttributes)
+		if err != nil {
+			return
+		}
+	}
 
+	// Fields projection
+	if in != nil || ex != nil {
+		for _, rt := range resTypes {
+			for _, p := range attr.Projection(rt, in, ex) {
+				fields[*p] = true
+			}
+		}
+	}
+
+	return
+}
+
+func Resource(s storage.Storer, resType *core.ResourceType, id string, attrs *api.Attributes) (res core.ResourceTyper, err error) {
+
+	fields, err := Attributes([]*core.ResourceType{resType}, attrs)
+	if err != nil {
+		return
+	}
+
+	res, err = s.Get(resType, id, "", fields)
 	if err != nil {
 		return nil, err
 	}
-
 	if res == nil {
 		return nil, &api.NotFoundError{Subject: id}
 	}
@@ -74,33 +111,13 @@ func Resources(s storage.Storer, resTypes []*core.ResourceType, search *api.Sear
 	}
 
 	// Fields projection
-	var in, ex []*attr.Path
-
-	// When specified, the default list of attributes SHALL be
-	// overridden, and each resource returned MUST contain the
-	// minimum set of resource attributes and any attributes or
-	// sub-attributes explicitly requested by the "attributes"
-	// parameter (https://tools.ietf.org/html/rfc7644#section-3.9, https://tools.ietf.org/html/rfc7644#section-3.4.2.5)
-	if len(search.Attributes.Attributes) > 0 {
-		in, err = makeAttrs(search.Attributes.Attributes)
-		if err != nil {
-			return
-		}
+	fields, err := Attributes(resTypes, &search.Attributes)
+	if err != nil {
+		return
 	}
-
-	// When specified, each resource returned MUST
-	// contain the minimum set of resource attributes.
-	// Additionally, the default set of attributes minus those
-	// attributes listed in "excludedAttributes" is returned (https://tools.ietf.org/html/rfc7644#section-3.9)
-	// (todo) > Specifing excludedAttribute whose schema "returned" parameter setting is "always" has no effect (https://tools.ietf.org/html/rfc7644#section-3.4.2.5)
-	if len(search.Attributes.ExcludedAttributes) > 0 {
-		in, err = makeAttrs(search.Attributes.ExcludedAttributes)
-		if err != nil {
-			return
-		}
+	if fields != nil {
+		q.Fields(fields)
 	}
-
-	q.Fields(in, ex)
 
 	// Count
 	list.TotalResults, err = q.Count()
@@ -123,7 +140,7 @@ func Resources(s storage.Storer, resTypes []*core.ResourceType, search *api.Sear
 		if err != nil {
 			return
 		}
-		q.Sort(sortBy, search.SortOrder != api.DescendingOrder)
+		q.Sort(*sortBy, search.SortOrder != api.DescendingOrder)
 	}
 
 	// Finally, fetch resources
@@ -133,55 +150,4 @@ func Resources(s storage.Storer, resTypes []*core.ResourceType, search *api.Sear
 	}
 
 	return
-}
-
-func checkAttributeByProperty(attribute *core.Attribute, property, value string) bool {
-	a := reflect.ValueOf(attribute)
-	v := reflect.Indirect(a).FieldByName(property)
-	if v.Interface() == value {
-		return true
-	}
-	return false
-}
-
-func getSchemasAttributes(resType *core.ResourceType, property, value string) []*attr.Path {
-	var as []*attr.Path
-	as = make([]*attr.Path, 0)
-	schemas := resType.GetSchemas()
-	for _, schema := range schemas {
-		for _, attribute := range schema.Attributes {
-			if attribute.Type == datatype.ComplexType {
-				for _, subAttribute := range attribute.SubAttributes {
-					if checkAttributeByProperty(subAttribute, property, value) {
-						as = append(as, newContext(schema, attribute, subAttribute).Path())
-					}
-				}
-			} else {
-				if checkAttributeByProperty(attribute, property, value) {
-					as = append(as, newContext(schema, attribute, nil).Path())
-				}
-			}
-
-		}
-
-	}
-	return as
-}
-
-func newContext(schema *core.Schema, attribute *core.Attribute, subAttribute *core.Attribute) *attr.Context {
-	ctx := attr.Context{}
-
-	if schema != nil {
-		ctx.Schema = schema
-	}
-
-	if attribute != nil {
-		ctx.Attribute = attribute
-	}
-
-	if subAttribute != nil {
-		ctx.SubAttribute = subAttribute
-	}
-
-	return &ctx
 }

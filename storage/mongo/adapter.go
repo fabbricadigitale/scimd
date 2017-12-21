@@ -65,7 +65,7 @@ func (a *Adapter) Create(res *resource.Resource) error {
 }
 
 // Get is ...
-func (a *Adapter) Get(resType *core.ResourceType, id, version string, included []*attr.Path, excluded []*attr.Path) (*resource.Resource, error) {
+func (a *Adapter) Get(resType *core.ResourceType, id, version string, fields map[attr.Path]bool) (*resource.Resource, error) {
 	q, close, err := (*a.adaptee).Find(makeQuery(resType.GetIdentifier(), id, version))
 	defer close()
 
@@ -74,7 +74,7 @@ func (a *Adapter) Get(resType *core.ResourceType, id, version string, included [
 	}
 
 	query := Query{q}
-	query.Fields(included, excluded)
+	query.Fields(fields)
 	return query.one()
 }
 

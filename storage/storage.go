@@ -14,10 +14,10 @@ type Iter interface {
 }
 
 type Querier interface {
-	Fields(included []*attr.Path, excluded []*attr.Path) Querier
+	Fields(map[attr.Path]bool) Querier
 	Skip(int) Querier
 	Limit(int) Querier
-	Sort(by *attr.Path, asc bool) Querier
+	Sort(by attr.Path, asc bool) Querier
 
 	Count() (n int, err error)
 	Iter() Iter
@@ -29,7 +29,7 @@ type Storer interface {
 
 	Create(res *resource.Resource) error
 
-	Get(resType *core.ResourceType, id, version string, included []*attr.Path, excluded []*attr.Path) (*resource.Resource, error)
+	Get(resType *core.ResourceType, id, version string, fields map[attr.Path]bool) (*resource.Resource, error)
 
 	Update(resType *resource.Resource, id, version string) error
 
