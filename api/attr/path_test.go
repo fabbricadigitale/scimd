@@ -145,18 +145,6 @@ func TestPath(t *testing.T) {
 }
 
 func TestContext(t *testing.T) {
-	resTypeRepo := core.GetResourceTypeRepository()
-	if _, err := resTypeRepo.Add("../../internal/testdata/user.json"); err != nil {
-		t.Log(err)
-		t.Fail()
-	}
-
-	schemaRepo := core.GetSchemaRepository()
-	if _, err := schemaRepo.Add("../../internal/testdata/user_schema.json"); err != nil {
-		t.Log(err)
-		t.Fail()
-	}
-
 	rt := resTypeRepo.Get("User")
 
 	// FQN path / case insesitive
@@ -197,18 +185,6 @@ func TestContext(t *testing.T) {
 }
 
 func TestPaths(t *testing.T) {
-	resTypeRepo := core.GetResourceTypeRepository()
-	if _, err := resTypeRepo.Add("../../internal/testdata/user.json"); err != nil {
-		t.Log(err)
-		t.Fail()
-	}
-
-	schemaRepo := core.GetSchemaRepository()
-	if _, err := schemaRepo.Add("../../internal/testdata/user_schema.json"); err != nil {
-		t.Log(err)
-		t.Fail()
-	}
-
 	rt := resTypeRepo.Get("User")
 
 	for _, tt := range attributesTest {
@@ -222,4 +198,7 @@ func TestPaths(t *testing.T) {
 		}
 		require.Equal(t, tt.expected, results)
 	}
+
+	// res = Paths(rt, nil)
+	// require.
 }

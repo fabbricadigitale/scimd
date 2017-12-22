@@ -120,31 +120,28 @@ var projectionTestCases = []projectionTestCase{
 	{
 		[]string{},
 		[]string{
-			"password",
-			"id",
+			"password", // never
+			"id",       // always
 		},
 		allUserAttrs,
 	},
 	{
 		[]string{},
 		[]string{
-			"password",
+			"password", //never
 		},
 		allUserAttrs,
 	},
 	{
 		[]string{
-			"id",
+			"id", // always
 		},
 		[]string{
-			"password",
+			"password", //never
 		},
 		minimalUserAttributes,
 	},
 }
-
-var resTypeRepo core.ResourceTypeRepository
-var schemaRepo core.SchemaRepository
 
 func contains(s []string, e string) bool {
 	for _, a := range s {
@@ -153,20 +150,6 @@ func contains(s []string, e string) bool {
 		}
 	}
 	return false
-}
-
-func TestMain(m *testing.M) {
-	// Test setup
-	resTypeRepo = core.GetResourceTypeRepository()
-	resTypeRepo.Add("../../internal/testdata/user.json")
-
-	schemaRepo = core.GetSchemaRepository()
-	schemaRepo.Add("../../internal/testdata/user_schema.json")
-
-	// Test run
-	m.Run()
-
-	// No teardown, came back to home please
 }
 
 func TestProjection(t *testing.T) {
