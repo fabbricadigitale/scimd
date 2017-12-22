@@ -113,16 +113,28 @@ func TestMongoGet(t *testing.T) {
 	require.Equal(t, id, resource.ID)
 
 	// Excluding externalId
-	id = "2819c223-7f76-453a-919d-413861904647"
-	//exc := "externalId"
-	resource, err = adapter.Get(resTypeRepo.Get("User"), id, "", nil)
+	id = "2819c223-7f76-453a-919d-ab1234567891"
+	m := make(map[attr.Path]bool)
+	m[attr.Path{
+		Name: "userName",
+	}] = true
+	m[attr.Path{
+		Name: "schemas",
+	}] = true
+	m[attr.Path{
+		Name: "id",
+	}] = true
+	m[attr.Path{
+		Name: "meta",
+	}] = true
+	resource, err = adapter.Get(resTypeRepo.Get("User"), id, "", m)
 	require.NoError(t, err)
 
 	require.NotNil(t, resource)
 	require.Equal(t, "", resource.ExternalID)
 
 	// Non-existing ID
-	id = "2819c223-7f76-453a-919d-413861904640"
+	id = "2819c223-7f76-453a-919d-ab1234567898"
 	resource, err = adapter.Get(resTypeRepo.Get("User"), id, "", nil)
 	require.Nil(t, resource)
 	require.EqualError(t, err, "not found")
