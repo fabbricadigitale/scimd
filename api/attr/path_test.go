@@ -5,7 +5,59 @@ import (
 
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
+
+type attributeTest struct {
+	attribute []string
+	expected  []string
+}
+
+var attributesTest = []attributeTest{
+	// Existing attribute
+	{
+		[]string{
+			"userName",
+		},
+		[]string{
+			"urn:ietf:params:scim:schemas:core:2.0:User:userName",
+		},
+	},
+	{
+		[]string{
+			"emails",
+		},
+		[]string{
+			"urn:ietf:params:scim:schemas:core:2.0:User:emails",
+		},
+	},
+	// Non-existing attribute
+	{
+		[]string{
+			"username",
+		},
+		[]string{
+			"",
+		},
+	},
+	// Existing Common Attributes (do not have a schema)
+	{
+		[]string{
+			"id",
+		},
+		[]string{
+			"id",
+		},
+	},
+	{
+		[]string{
+			"externalId",
+		},
+		[]string{
+			"externalId",
+		},
+	},
+}
 
 const (
 	path1      = `urn:ietf:params:scim:schemas:core:2.0:User:name`
@@ -121,4 +173,32 @@ func TestContext(t *testing.T) {
 
 	// (todo) Schema ex
 
+}
+
+func TestPaths(t *testing.T) {
+	resTypeRepo := core.GetResourceTypeRepository()
+	if _, err := resTypeRepo.Add("../../internal/testdata/user.json"); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	schemaRepo := core.GetSchemaRepository()
+	if _, err := schemaRepo.Add("../../internal/testdata/user_schema.json"); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	rt := resTypeRepo.Get("User")
+
+	for _, tt := range attributesTest {
+		attr := Paths(rt, func(attribute *core.Attribute) bool {
+			return contains(tt.attribute, attribute.Name)
+		})
+
+		results := make([]string, 1)
+		for i, r := range attr {
+			results[i] = r.String()
+		}
+		require.Equal(t, tt.expected, results)
+	}
 }
