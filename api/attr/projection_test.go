@@ -109,13 +109,36 @@ var projectionTestCases = []projectionTestCase{
 		[]string{},
 		minimalUserAttributes,
 	},
-	//
 	{
 		[]string{
 			"password", // never
 			"id",       // always
 		},
 		[]string{},
+		minimalUserAttributes,
+	},
+	{
+		[]string{},
+		[]string{
+			"password",
+			"id",
+		},
+		allUserAttrs,
+	},
+	{
+		[]string{},
+		[]string{
+			"password",
+		},
+		allUserAttrs,
+	},
+	{
+		[]string{
+			"id",
+		},
+		[]string{
+			"password",
+		},
 		minimalUserAttributes,
 	},
 }
