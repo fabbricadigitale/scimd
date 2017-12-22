@@ -36,9 +36,7 @@ var attributesTest = []attributeTest{
 		[]string{
 			"username",
 		},
-		[]string{
-			"",
-		},
+		[]string{},
 	},
 	// Existing Common Attributes (do not have a schema)
 	{
@@ -55,6 +53,29 @@ var attributesTest = []attributeTest{
 		},
 		[]string{
 			"externalId",
+		},
+	},
+	// Attribute and one of its subattributes
+	{
+		[]string{
+			"name",
+			"familyName", // 2nd level
+		},
+		[]string{
+			"urn:ietf:params:scim:schemas:core:2.0:User:name",
+			"urn:ietf:params:scim:schemas:core:2.0:User:name.familyName", // 2nd level
+		},
+	},
+	{
+		[]string{
+			"name",
+			"familyName", // 2nd level
+			"userName",
+		},
+		[]string{
+			"urn:ietf:params:scim:schemas:core:2.0:User:userName",
+			"urn:ietf:params:scim:schemas:core:2.0:User:name",
+			"urn:ietf:params:scim:schemas:core:2.0:User:name.familyName", // 2nd level
 		},
 	},
 }
@@ -195,7 +216,7 @@ func TestPaths(t *testing.T) {
 			return contains(tt.attribute, attribute.Name)
 		})
 
-		results := make([]string, 1)
+		results := make([]string, len(attr))
 		for i, r := range attr {
 			results[i] = r.String()
 		}
