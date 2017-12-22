@@ -41,6 +41,9 @@ func init() {
 // - Mongodb restrictions on Fields Names ( https://docs.mongodb.com/manual/reference/limits/#Restrictions-on-Field-Names )
 // - https://jira.mongodb.org/browse/DOCS-9311
 func keyEscape(k string) string {
+	if k == "" {
+		return k
+	}
 	if !keyRegexp.MatchString(k) {
 		panic("mongo: invalid key: " + k)
 	}
