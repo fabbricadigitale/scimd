@@ -4,7 +4,7 @@
     ],
     "documentationUri": "/help/scim.html",
     "patch": {
-      "supported": true
+      "supported": false
     },
     "bulk": {
       "supported": false,
