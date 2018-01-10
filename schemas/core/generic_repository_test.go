@@ -83,3 +83,41 @@ func TestResourceTypeRepository(t *testing.T) {
 }
 
 // (todo): test list
+
+func TestResourceTypeRepositoryList(t *testing.T) {
+	repos := GetResourceTypeRepository()
+
+	data, err := repos.Add("../../internal/testdata/user.json")
+	require.NoError(t, err)
+	require.Implements(t, (*Identifiable)(nil), data)
+	require.IsType(t, ResourceType{}, data)
+
+	data2, err2 := repos.Add("../../internal/testdata/user_resource.json")
+	require.NoError(t, err2)
+	require.Implements(t, (*Identifiable)(nil), data2)
+	require.IsType(t, ResourceType{}, data2)
+
+	list := repos.List()
+	require.NotNil(t, list)
+	require.Len(t, list, 2)
+	require.IsType(t, []ResourceType{}, list)
+}
+
+func TestSchemaRepositoryList(t *testing.T) {
+	repos := GetSchemaRepository()
+
+	data, err := repos.Add("../../internal/testdata/user_schema.json")
+	require.NoError(t, err)
+	require.Implements(t, (*Identifiable)(nil), data)
+	require.IsType(t, Schema{}, data)
+
+	data2, err2 := repos.Add("../../internal/testdata/enterprise_user_schema.json")
+	require.NoError(t, err2)
+	require.Implements(t, (*Identifiable)(nil), data2)
+	require.IsType(t, Schema{}, data2)
+
+	list := repos.List()
+	require.NotNil(t, list)
+	require.Len(t, list, 2)
+	require.IsType(t, []Schema{}, list)
+}
