@@ -1,10 +1,16 @@
 package main
 
 import (
+	"github.com/stretchr/testify/require"
+	"github.com/fabbricadigitale/scimd/schemas/core"
 	"testing"
 )
 
 func TestConfig(t *testing.T) {
+
+	spc := config()
+	require.IsType(t, spc, &core.ServiceProviderConfig{})
+
 	// (todo)
 	// phase 1
 	// - x = # of JSON files within default/schemas directory
