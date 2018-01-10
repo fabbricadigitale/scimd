@@ -49,7 +49,7 @@ func config() *core.ServiceProviderConfig {
 
 	// Resource types
 	rtypes := core.GetResourceTypeRepository()
-	for _, p := range filesFromDir(defaultSchemasPath) {
+	for _, p := range filesFromDir(defaultResourcesPath) {
 		rtypes.Add(p)
 	}
 
