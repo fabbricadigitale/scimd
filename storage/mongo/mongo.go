@@ -54,7 +54,7 @@ func (d *Driver) Update(query bson.M, doc *document) error {
 	c, close := d.getCollection()
 	defer close()
 
-	err := c.Update(query, *doc)
+	err := c.Update(query, doc)
 	return d.errorWrapper(err, (*doc)["id"])
 }
 
