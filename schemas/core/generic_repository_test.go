@@ -81,3 +81,5 @@ func TestResourceTypeRepository(t *testing.T) {
 
 	// (todo): test lock
 }
+
+// (todo): test list

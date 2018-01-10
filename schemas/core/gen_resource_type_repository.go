@@ -18,10 +18,26 @@ type repositoryResourceType struct {
 
 // ResourceTypeRepository is the ...
 type ResourceTypeRepository interface {
-	Get(key string) *ResourceType
+	Get(key string) *ResourceType // (fixme) > evaluate whether make senses to do not return a pointer ...
 	Add(filename string) (ResourceType, error)
+	List() []ResourceType
 }
 
+// List returns all elements
+func (repo *repositoryResourceType) List() []ResourceType {
+	repo.mu.RLock()
+	defer repo.mu.RUnlock()
+	res := make([]ResourceType, len(repo.items))
+	i := 0
+	for _, elem := range repo.items {
+		res[i] = elem
+		i++
+	}
+
+	return res
+}
+
+// Get provides the element for a given key, or nil if it does not exist within the repository.
 func (repo *repositoryResourceType) Get(key string) *ResourceType {
 	repo.mu.RLock()
 	defer repo.mu.RUnlock()
@@ -31,6 +47,7 @@ func (repo *repositoryResourceType) Get(key string) *ResourceType {
 	return nil
 }
 
+// Add allows to load an element and to store it within this repository
 func (repo *repositoryResourceType) Add(filename string) (ResourceType, error) {
 	var data ResourceType
 

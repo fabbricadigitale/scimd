@@ -25,10 +25,26 @@ type repositoryGeneric struct {
 
 // GenericRepository is the ...
 type GenericRepository interface {
-	Get(key string) *Elem
+	Get(key string) *Elem // (fixme) > evaluate whether make senses to do not return a pointer ...
 	Add(filename string) (Elem, error)
+	List() []Elem
 }
 
+// List returns all elements
+func (repo *repositoryGeneric) List() []Elem {
+	repo.mu.RLock()
+	defer repo.mu.RUnlock()
+	res := make([]Elem, len(repo.items))
+	i := 0
+	for _, elem := range repo.items {
+		res[i] = elem
+		i++
+	}
+
+	return res
+}
+
+// Get provides the element for a given key, or nil if it does not exist within the repository.
 func (repo *repositoryGeneric) Get(key string) *Elem {
 	repo.mu.RLock()
 	defer repo.mu.RUnlock()
@@ -38,6 +54,7 @@ func (repo *repositoryGeneric) Get(key string) *Elem {
 	return nil
 }
 
+// Add allows to load an element and to store it within this repository
 func (repo *repositoryGeneric) Add(filename string) (Elem, error) {
 	var data Elem
 

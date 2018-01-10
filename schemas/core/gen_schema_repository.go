@@ -18,10 +18,26 @@ type repositorySchema struct {
 
 // SchemaRepository is the ...
 type SchemaRepository interface {
-	Get(key string) *Schema
+	Get(key string) *Schema // (fixme) > evaluate whether make senses to do not return a pointer ...
 	Add(filename string) (Schema, error)
+	List() []Schema
 }
 
+// List returns all elements
+func (repo *repositorySchema) List() []Schema {
+	repo.mu.RLock()
+	defer repo.mu.RUnlock()
+	res := make([]Schema, len(repo.items))
+	i := 0
+	for _, elem := range repo.items {
+		res[i] = elem
+		i++
+	}
+
+	return res
+}
+
+// Get provides the element for a given key, or nil if it does not exist within the repository.
 func (repo *repositorySchema) Get(key string) *Schema {
 	repo.mu.RLock()
 	defer repo.mu.RUnlock()
@@ -31,6 +47,7 @@ func (repo *repositorySchema) Get(key string) *Schema {
 	return nil
 }
 
+// Add allows to load an element and to store it within this repository
 func (repo *repositorySchema) Add(filename string) (Schema, error) {
 	var data Schema
 
