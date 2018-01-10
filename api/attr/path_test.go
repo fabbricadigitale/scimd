@@ -159,6 +159,5 @@ func TestPaths(t *testing.T) {
 		require.Equal(t, tt.expected, results)
 	}
 
-	// res = Paths(rt, nil)
-	// require.
+	// (todo)> test that Paths(rt, nil) returns all attributes (ignoring their returned characteristic)
 }
