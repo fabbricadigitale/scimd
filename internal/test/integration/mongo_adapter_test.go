@@ -9,14 +9,13 @@ import (
 	"path"
 	"testing"
 
-	"gopkg.in/ory-am/dockertest.v3"
-
 	"github.com/fabbricadigitale/scimd/api/attr"
 	"github.com/fabbricadigitale/scimd/api/filter"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/storage"
 	"github.com/fabbricadigitale/scimd/storage/mongo"
+	"github.com/ory/dockertest"
 	"github.com/stretchr/testify/require"
 )
 
@@ -152,7 +151,7 @@ func TestMongoDelete(t *testing.T) {
 	require.NotNil(t, adapter)
 
 	// Delete object with specified id
-	id := "2819c223-7f76-453a-919d-413861904648"
+	id := "2819c223-7f76-453a-919d-ab1234567891"
 	err := adapter.Delete(resTypeRepo.Get("User"), id, "")
 	require.NoError(t, err)
 
@@ -161,7 +160,23 @@ func TestMongoDelete(t *testing.T) {
 	require.Error(t, err)
 }
 
-// (todo) > Test Update adapter method
+func TestMongoUpdate(t *testing.T) {
+	require.NotNil(t, resTypeRepo)
+	require.NotNil(t, schemaRepo)
+	require.NotNil(t, adapter)
+
+	id := "2819c223-7f76-453a-919d-ab1234567891"
+	dat, err := ioutil.ReadFile("../../testdata/user_to_update.json")
+	require.NoError(t, err)
+	require.NotNil(t, dat)
+
+	res := &resource.Resource{}
+	err = json.Unmarshal(dat, res)
+	require.NoError(t, err)
+
+	err = adapter.Update(res, id, "")
+	require.NoError(t, err)
+}
 
 func TestMongoFind(t *testing.T) {
 	require.NotNil(t, resTypeRepo)
