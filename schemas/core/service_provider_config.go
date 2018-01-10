@@ -33,7 +33,8 @@ type AuthenticationScheme struct {
 
 // ServiceProviderConfig is a structured resource for "urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig"
 type ServiceProviderConfig struct {
-	CommonAttributes
+	Schemas               []string               `json:"schemas" validate:"gt=0,dive,urn,required" mold:"dive,normurn"`
+	Meta                  Meta                   `json:"meta" validate:"required"`
 	DocumentationURI      string                 `json:"documentationUri,omitempty" validate:"omitempty,uri"`
 	Patch                 supported              `json:"patch" validate:"required"`
 	Bulk                  bulk                   `json:"bulk" validate:"required"`
@@ -50,13 +51,12 @@ const ServiceProviderConfigURI = "urn:ietf:params:scim:schemas:core:2.0:ServiceP
 // NewServiceProviderConfig returns a new ServiceProviderConfig filled with defaults
 func NewServiceProviderConfig() *ServiceProviderConfig {
 	spc := &ServiceProviderConfig{
-		CommonAttributes: *NewCommon(ServiceProviderConfigURI, "ServiceProviderConfig", ""),
+		Schemas: []string{ServiceProviderConfigURI},
+		Meta:    Meta{ResourceType: "ServiceProviderConfig"},
 	}
 	defaults.SetDefaults(spc)
 	return spc
 }
-
-var _ ResourceTyper = (*ServiceProviderConfig)(nil)
 
 // UnmarshalJSON unmarshals an Attribute taking into account defaults
 func (spc *ServiceProviderConfig) UnmarshalJSON(data []byte) error {
