@@ -27,6 +27,11 @@ import (
 // A: { a | a.Returned == "always" }
 //
 // D: I if I != ∅ || { d | d.Returned == "default" }
+//
+// Furthermore, attributes with Mutability == "writeOnly" cannot be returned too.
+// So, pragmatically, they are treated as Returned == "never", as per: 
+// - https://tools.ietf.org/html/rfc7643#section-7 
+//
 func Projection(ctx *core.ResourceType, included []*Path, excluded []*Path) []*Path {
 	always := set.New()
 	for _, a := range Paths(ctx, withReturned(schemas.ReturnedAlways)) {
@@ -34,7 +39,7 @@ func Projection(ctx *core.ResourceType, included []*Path, excluded []*Path) []*P
 	}
 
 	never := set.New()
-	for _, n := range Paths(ctx, withReturned(schemas.ReturnedNever)) {
+	for _, n := range Paths(ctx, cannotBeReturned) {
 		never.Add(*n)
 	}
 
@@ -70,6 +75,10 @@ func getPathSlice(ret set.Interface) []*Path {
 		res = append(res, &v)
 	}
 	return res
+}
+
+func cannotBeReturned(attribute *core.Attribute) bool {
+	return attribute.Returned == schemas.ReturnedNever || attribute.Mutability == schemas.MutabilityWriteOnly
 }
 
 func withReturned(equalTo string) func(attribute *core.Attribute) bool {
