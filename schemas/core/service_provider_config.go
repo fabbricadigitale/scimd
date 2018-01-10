@@ -7,18 +7,18 @@ import (
 )
 
 type supported struct {
-	Supported bool `json:"supported" validate:"required"`
+	Supported bool `json:"supported"`
 }
 
 type bulk struct {
-	Supported      bool `json:"supported" validate:"required"`
-	MaxOperations  int  `json:"maxOperations" validate:"required"`
-	MaxPayloadSize int  `json:"maxPayloadSize" validate:"required"`
+	Supported      bool `json:"supported"`
+	MaxOperations  int  `json:"maxOperations" validate:"gte=0"`
+	MaxPayloadSize int  `json:"maxPayloadSize" validate:"gte=0"`
 }
 
 type filter struct {
-	Supported  bool `json:"supported" validate:"required"`
-	MaxResults int  `json:"maxResults" validate:"required"`
+	Supported  bool `json:"supported"`
+	MaxResults int  `json:"maxResults" validate:"gte=0"`
 }
 
 // AuthenticationScheme is ...
