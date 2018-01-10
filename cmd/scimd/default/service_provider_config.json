@@ -1,0 +1,43 @@
+  {
+    "schemas": [
+      "urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig"
+    ],
+    "documentationUri": "/help/scim.html",
+    "patch": {
+      "supported": true
+    },
+    "bulk": {
+      "supported": false,
+      "maxOperations": 1000,
+      "maxPayloadSize": 1048576
+    },
+    "filter": {
+      "supported": true,
+      "maxResults": 200
+    },
+    "changePassword": {
+      "supported": false
+    },
+    "sort": {
+      "supported": true
+    },
+    "etag": {
+      "supported": true
+    },
+    "authenticationSchemes": [
+      {
+        "name": "HTTP Basic",
+        "description": "Authentication scheme using the HTTP Basic Standard",
+        "specUri": "http://www.rfc-editor.org/info/rfc2617",
+        "documentationUri": "/help/httpBasic.html",
+        "type": "httpbasic"
+      }
+    ],
+    "meta": {
+      "location": "/v2/ServiceProviderConfig",
+      "resourceType": "ServiceProviderConfig",
+      "created": "2010-01-23T04:56:22Z",
+      "lastModified": "2011-05-13T04:42:34Z",
+      "version": "W\/\"3694e05e9dff594\""
+    }
+  }
