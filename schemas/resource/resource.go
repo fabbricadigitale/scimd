@@ -10,6 +10,7 @@ import (
 // Valuer is the interface implemented by types that can hold resource's values
 type Valuer interface {
 	Values(ns string) *datatype.Complex
+	SetValues(ns string, values *datatype.Complex)
 }
 
 // Resource represents a mapped resource. It implements both core.ResourceTyper and Valuer
