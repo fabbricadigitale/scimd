@@ -79,6 +79,53 @@ func (p Path) Context(rt *core.ResourceType) (ctx *Context) {
 	return
 }
 
+
+// Contexts returns a slice of Context given a resource type rt.
+//
+// It flattens the attributes of rt's schemas returning their Context representations.
+// When a fx is provided it returns only the attribute statisfying fx(attribute).
+func Contexts(rt *core.ResourceType, fx func(attribute *core.Attribute) bool) []Context {
+	// Tautology
+	if fx == nil {
+		fx = func(attribute *core.Attribute) bool {
+			return true
+		}
+	}
+
+	// Accumulation iterating over all contexts
+	acc := []Context{}
+
+	commonCtx := Context{} // Common attributes have no schema
+	for _, c1 := range core.Commons().Some(fx) {
+		commonCtx.Attribute = c1
+		commonCtx.SubAttribute = nil
+		acc = append(acc, commonCtx)
+		for _, c2 := range c1.SubAttributes.Some(fx) {
+			commonCtx.SubAttribute = c2
+			acc = append(acc, commonCtx)
+		}
+	}
+
+	for _, sc := range rt.GetSchemas() {
+		if sc != nil {
+			ctx := Context{
+				Schema: sc,
+			}
+			for _, a1 := range sc.Attributes.Some(fx) {
+				ctx.Attribute = a1
+				ctx.SubAttribute = nil
+				acc = append(acc, ctx)
+				for _, a2 := range a1.SubAttributes.Some(fx) {
+					ctx.SubAttribute = a2
+					acc = append(acc, ctx)
+				}
+			}
+		}
+	}
+
+	return acc
+}
+
 func (ctx *Context) getValuerValues(valuer resource.Valuer) *datatype.Complex {
 	if ctx.Schema == nil {
 		return nil

@@ -133,43 +133,12 @@ func (p Path) matchSchema(rt *core.ResourceType) *core.Schema {
 // It flattens the attributes of rt's schemas returning their contextualized Path representations.
 // When a fx is provided it returns only the attribute paths statisfying fx(attribute).
 func Paths(rt *core.ResourceType, fx func(attribute *core.Attribute) bool) []*Path {
-	// Tautology
-	if fx == nil {
-		fx = func(attribute *core.Attribute) bool {
-			return true
-		}
-	}
 
-	// Accumulation iterating over all contexts
-	acc := []*Path{}
+	ctxs := Contexts(rt, fx)
+	acc := make([]*Path, len(ctxs))
 
-	commonCtx := &Context{} // Common attributes have no schema
-	for _, c1 := range core.Commons().Some(fx) {
-		commonCtx.Attribute = c1
-		commonCtx.SubAttribute = nil
-		acc = append(acc, commonCtx.Path())
-		for _, c2 := range c1.SubAttributes.Some(fx) {
-			commonCtx.SubAttribute = c2
-			acc = append(acc, commonCtx.Path())
-		}
-	}
-
-	for _, sc := range rt.GetSchemas() {
-		if sc != nil {
-			ctx := &Context{
-				Schema: sc,
-			}
-
-			for _, a1 := range sc.Attributes.Some(fx) {
-				ctx.Attribute = a1
-				ctx.SubAttribute = nil
-				acc = append(acc, ctx.Path())
-				for _, a2 := range a1.SubAttributes.Some(fx) {
-					ctx.SubAttribute = a2
-					acc = append(acc, ctx.Path())
-				}
-			}
-		}
+	for i, ctx := range ctxs {
+		acc[i] = ctx.Path()
 	}
 
 	return acc
