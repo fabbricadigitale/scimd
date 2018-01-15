@@ -1,16 +1,10 @@
 package main
 
 import (
-	"github.com/stretchr/testify/require"
-	"github.com/fabbricadigitale/scimd/schemas/core"
 	"testing"
-)
-// Note: testing phase 1 has static expected values.
-const (
-	//Number of JSON files within default/schemas directory
-	x = 3
-	//Number of JSON files within default/resources directory
-	y = 2
+
+	"github.com/fabbricadigitale/scimd/schemas/core"
+	"github.com/stretchr/testify/require"
 )
 
 func TestConfig(t *testing.T) {
@@ -18,11 +12,15 @@ func TestConfig(t *testing.T) {
 	spc := config()
 	require.IsType(t, spc, &core.ServiceProviderConfig{})
 
+	schemaList := filesFromDir("./default/schemas")
+
 	schemaRepo := core.GetSchemaRepository()
-	require.Equal(t, x, len(schemaRepo.List()))
+	require.Equal(t, len(schemaList), len(schemaRepo.List()))
+
+	resTypeList := filesFromDir("./default/resources")
 
 	resTypeRepo := core.GetResourceTypeRepository()
-	require.Equal(t, y, len(resTypeRepo.List()))
+	require.Equal(t, len(resTypeList), len(resTypeRepo.List()))
 
 	// (todo)
 	// phase 2 - requires parametrization (path of service provider config JSON) of config function
@@ -30,4 +28,3 @@ func TestConfig(t *testing.T) {
 	// - test panics with unmarshalling errors
 	// - test panics with validation errors
 }
-
