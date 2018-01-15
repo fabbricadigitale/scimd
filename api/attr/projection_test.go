@@ -88,6 +88,15 @@ var allUserAttrs = map[string]bool{
 	"urn:ietf:params:scim:schemas:core:2.0:User:x509Certificates.display": true,
 	"urn:ietf:params:scim:schemas:core:2.0:User:x509Certificates.type":    true,
 	"urn:ietf:params:scim:schemas:core:2.0:User:x509Certificates.primary": true,
+	"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:costCenter": true,
+	"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:department": true,
+	"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:division": true,
+	"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:employeeNumber": true,
+	"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:manager": true,
+	"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:manager.$ref": true,
+	"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:manager.displayName": true,
+	"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:manager.value": true,
+	"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:organization": true,
 }
 
 var minimalUserAttributes = map[string]bool{
