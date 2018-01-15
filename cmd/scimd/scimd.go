@@ -33,13 +33,20 @@ func setup() *gin.Engine {
 	if !spc.Patch.Supported {
 		unsupportedMethods = append(unsupportedMethods, http.MethodPatch)
 	}
-
 	v2.Use(server.MethodNotImplemented(unsupportedMethods))
+
+	for _, authScheme := range spc.AuthenticationSchemes {
+		v2.Use(server.Authentication(authScheme.Type))
+	}
 
 	v2.GET(svcpcfgEndpoint, getting)
 	v2.GET(restypeEndpoint, listing)
 	v2.GET(schemasEndpoint, listing)
-	v2.POST(bulkEndpoint, bulking)
+
+	if spc.Bulk.Supported {
+		v2.POST(bulkEndpoint, bulking)
+	}
+
 	v2.GET(selfEndpoint, selfing)
 	v2.POST(selfEndpoint, selfing)
 	v2.PUT(fmt.Sprintf("%s/:id", selfEndpoint), selfing)

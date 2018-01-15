@@ -5,30 +5,37 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/thoas/go-funk"
 )
 
-func insensitiveContains(s []string, e string) bool {
-	e = strings.ToLower(e)
-	for _, a := range s {
-		a = strings.ToLower(a)
-		if a == e {
-			return true
-		}
-	}
-	return false
-}
-
-// MethodNotImplemented ...
+// MethodNotImplemented is a gin middleware responsible to abort requests which method is not supported.
 func MethodNotImplemented(notSupportedMethods []string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		m := ctx.Request.Method
+		m := strings.ToLower(ctx.Request.Method)
+		var methods []string
+		funk.Map(notSupportedMethods, func(x string) string {
+			return strings.ToLower(x)
+		})
+
 		// Abort incoming request if its method is not supported
-		if insensitiveContains(notSupportedMethods, m) {
+		if funk.ContainsString(methods, m) {
 			ctx.AbortWithStatus(http.StatusNotImplemented)
 			return
 		}
 
 		// Otherwise go ahead
 		ctx.Next()
+	}
+}
+
+// Authentication is a gin middleware supporting multiple authentication schemes
+func Authentication(authenticationType string) gin.HandlerFunc {
+	switch authenticationType {
+	case strings.ToLower(HTTPBasic.String()):
+		return gin.BasicAuth(gin.Accounts{
+			"admin": "admin",
+		})
+	default:
+		panic("authentication scheme not available")
 	}
 }
