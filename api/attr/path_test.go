@@ -3,6 +3,8 @@ package attr
 import (
 	"testing"
 
+	"github.com/thoas/go-funk"
+
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -149,7 +151,7 @@ func TestPaths(t *testing.T) {
 
 	for _, tt := range attributesTest {
 		attr := Paths(rt, func(attribute *core.Attribute) bool {
-			return contains(tt.attribute, attribute.Name)
+			return funk.ContainsString(tt.attribute, attribute.Name)
 		})
 
 		results := make([]string, len(attr))

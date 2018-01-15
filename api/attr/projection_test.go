@@ -3,6 +3,8 @@ package attr
 import (
 	"testing"
 
+	"github.com/thoas/go-funk"
+
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/stretchr/testify/require"
 )
@@ -152,24 +154,15 @@ var projectionTestCases = []projectionTestCase{
 	},
 }
 
-func contains(s []string, e string) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
-}
-
 func TestProjection(t *testing.T) {
 	rt := resTypeRepo.Get("User")
 
 	for _, tt := range projectionTestCases {
 		included := Paths(rt, func(attribute *core.Attribute) bool {
-			return contains(tt.included, attribute.Name)
+			return funk.ContainsString(tt.included, attribute.Name)
 		})
 		excluded := Paths(rt, func(attribute *core.Attribute) bool {
-			return contains(tt.excluded, attribute.Name)
+			return funk.ContainsString(tt.excluded, attribute.Name)
 		})
 
 		result := Projection(rt, included, excluded)
