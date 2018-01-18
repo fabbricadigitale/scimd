@@ -106,6 +106,7 @@ func Resources(s storage.Storer, resTypes []*core.ResourceType, search *api.Sear
 	// Make query
 	var q storage.Querier
 	q, err = s.Find(resTypes, f)
+	defer q.Close()
 	if err != nil {
 		return
 	}

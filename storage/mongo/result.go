@@ -11,6 +11,7 @@ import (
 // Query is
 type Query struct {
 	q *mgo.Query
+	c func()
 }
 
 // Iter is
@@ -68,7 +69,12 @@ func (res *Query) Fields(fields map[attr.Path]bool) storage.Querier {
 	return res
 }
 
+func (res *Query) Close() {
+	res.c()
+}
+
 func (res *Query) one() (*resource.Resource, error) {
+	defer res.Close()
 	d := &document{}
 	err := res.q.One(d)
 	if err != nil {

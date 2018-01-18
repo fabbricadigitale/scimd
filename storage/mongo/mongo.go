@@ -75,8 +75,7 @@ func (d *Driver) Delete(query bson.M) error {
 // Find is the driver method for Find
 func (d *Driver) Find(q bson.M) (*mgo.Query, func(), error) {
 	c, close := d.getCollection()
-	//defer close()
-
+	
 	query := c.Find(q)
 	return query, close, nil
 }

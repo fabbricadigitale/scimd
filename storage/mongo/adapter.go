@@ -64,13 +64,13 @@ func (a *Adapter) Create(res *resource.Resource) error {
 // Get is ...
 func (a *Adapter) Get(resType *core.ResourceType, id, version string, fields map[attr.Path]bool) (*resource.Resource, error) {
 	q, close, err := (*a.adaptee).Find(makeQuery(resType.GetIdentifier(), id, version))
-	defer close()
 
 	if err != nil {
+		close()
 		return nil, err
 	}
 
-	query := Query{q}
+	query := Query{q, close}
 	query.Fields(fields)
 	return query.one()
 }
@@ -103,12 +103,13 @@ func (a *Adapter) Find(resTypes []*core.ResourceType, filter filter.Filter) (sto
 	}
 
 	query, close, err := (*a.adaptee).Find(_q)
-	defer close()
 	if err != nil {
+		close()
 		return nil, err
 	}
 	return &Query{
 		q: query,
+		c: close,
 	}, nil
 }
 

@@ -21,6 +21,8 @@ type Querier interface {
 
 	Count() (n int, err error)
 	Iter() Iter
+
+	Close()
 }
 
 // Storer is the target interface
