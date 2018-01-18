@@ -145,21 +145,6 @@ func TestMongoGet(t *testing.T) {
 
 }
 
-func TestMongoDelete(t *testing.T) {
-	require.NotNil(t, resTypeRepo)
-	require.NotNil(t, schemaRepo)
-	require.NotNil(t, adapter)
-
-	// Delete object with specified id
-	id := "2819c223-7f76-453a-919d-ab1234567891"
-	err := adapter.Delete(resTypeRepo.Get("User"), id, "")
-	require.NoError(t, err)
-
-	id = "2819c223-7f76-453a-919d-111111111111"
-	err = adapter.Delete(resTypeRepo.Get("User"), id, "")
-	require.Error(t, err)
-}
-
 func TestMongoUpdate(t *testing.T) {
 	require.NotNil(t, resTypeRepo)
 	require.NotNil(t, schemaRepo)
@@ -213,17 +198,40 @@ func TestMongoFind(t *testing.T) {
 			Sub:  "",
 		},
 		Op:    filter.OpEqual,
-		Value: "bjensen@example.com",
+		Value: "tfork@example.com",
 	}
 
 	q, err := adapter.Find(res, f)
-	require.NotNil(t, q)
-	require.NoError(t, err)
+	count, err := q.Count()
+	require.Nil(t, err)
+	require.Equal(t, 1, count)
+
+	if q != nil {
+		q.Close()
+	}
 
 	// Invalid schema urn
 
 	res[0].Schema = "invalid-urn"
 	q, err = adapter.Find(res, f)
 	require.Nil(t, q)
+
+	if q != nil {
+		q.Close()
+	}
+}
+
+func TestMongoDelete(t *testing.T) {
+	require.NotNil(t, resTypeRepo)
+	require.NotNil(t, schemaRepo)
+	require.NotNil(t, adapter)
+
+	// Delete object with specified id
+	id := "2819c223-7f76-453a-919d-ab1234567891"
+	err := adapter.Delete(resTypeRepo.Get("User"), id, "")
+	require.NoError(t, err)
+
+	id = "2819c223-7f76-453a-919d-111111111111"
+	err = adapter.Delete(resTypeRepo.Get("User"), id, "")
 	require.Error(t, err)
 }
