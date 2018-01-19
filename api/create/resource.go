@@ -2,17 +2,20 @@ package create
 
 import (
 	"time"
+
 	"github.com/fabbricadigitale/scimd/api/attr"
 	"github.com/fabbricadigitale/scimd/schemas"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/storage"
+	"github.com/fabbricadigitale/scimd/version"
 	"github.com/satori/go.uuid"
 )
+
 // Resource creates a new res of type resType and stores it into s.
 //
 // This func expects that res was populated according to the given resType.
-// Commons' attributes, if present, will be ignored and overwritten 
+// Commons' attributes, if present, will be ignored and overwritten
 // (with the only exception of ExternalID that if populated will be used).
 // Attributes whose mutability is "readOnly" will be ignored and removed.
 func Resource(s storage.Storer, resType *core.ResourceType, res *resource.Resource) (err error) {
@@ -26,8 +29,8 @@ func Resource(s storage.Storer, resType *core.ResourceType, res *resource.Resour
 	// Setup commons
 	res.ID = ID.String()
 
-	res.Schemas = make([]string, len(resType.SchemaExtensions) + 1)
-	res.Schemas[0]  = resType.Schema
+	res.Schemas = make([]string, len(resType.SchemaExtensions)+1)
+	res.Schemas[0] = resType.Schema
 	for i, ext := range resType.SchemaExtensions {
 		res.Schemas[i+1] = ext.Schema
 	}
@@ -35,9 +38,9 @@ func Resource(s storage.Storer, resType *core.ResourceType, res *resource.Resour
 	now := time.Now()
 	res.Meta = core.Meta{
 		ResourceType: resType.GetIdentifier(),
-		Created: &now,
+		Created:      &now,
 		LastModified: &now,
-		// (todo) Version: "",
+		Version:      version.GenerateVersion(true, ID.String(), now.String()),
 	}
 
 	// Attributes whose mutability is "readOnly" SHALL be ignored
@@ -46,7 +49,7 @@ func Resource(s storage.Storer, resType *core.ResourceType, res *resource.Resour
 	})
 	for _, p := range ro {
 		p.Context(resType).Delete(res)
-	}	
+	}
 
 	err = s.Create(res)
 	// (todo) Reload res?
