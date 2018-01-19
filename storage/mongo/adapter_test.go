@@ -1,8 +1,6 @@
 package mongo
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"strconv"
 	"testing"
 
@@ -212,12 +210,11 @@ func herror(index int, test mongoCase) string {
 }
 
 func TestConvertToMongoQuery(t *testing.T) {
-	dat, err := ioutil.ReadFile("../../internal/testdata/user.json")
-	require.NotNil(t, dat)
-	require.Nil(t, err)
 
-	res := core.ResourceType{}
-	json.Unmarshal(dat, &res)
+	// A fake "User" resource type which has no schema thus no attributes
+	res := core.ResourceType{
+		Name: "User",
+	}
 
 	for ii, tt := range mongoTests {
 		t.Run("AllAttributesUnknown", func(t *testing.T) {
@@ -229,9 +226,10 @@ func TestConvertToMongoQuery(t *testing.T) {
 		})
 	}
 
-	// Now we load within repositories the resource type and the schema
+	// Now we load within repositories the actual resource type and the schema
+	var err error
 	resTypeRepo := core.GetResourceTypeRepository()
-	_, err = resTypeRepo.Add("../../internal/testdata/user.json")
+	res, err = resTypeRepo.Add("../../internal/testdata/user.json")
 	require.NoError(t, err)
 
 	schemaRepo := core.GetSchemaRepository()
