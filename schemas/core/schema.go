@@ -83,7 +83,7 @@ type Schema struct {
 	CommonAttributes
 	Name        string     `json:"name,omitempty"`
 	Description string     `json:"description,omitempty"`
-	Attributes  Attributes `json:"attributes,omitempty"`
+	Attributes  Attributes `json:"attributes,omitempty" validate:"uniquefield=Name"`
 }
 
 // NewSchema returns a new Schema filled with defaults
