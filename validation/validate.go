@@ -16,5 +16,5 @@ func init() {
 	Validator.RegisterValidation("attrpath", attrPath)
 	Validator.RegisterValidation("isfield", isField)
 	Validator.RegisterValidation("isset", depsOn)
-	Validator.RegisterValidation("uniquefield", uniqueField)
+	Validator.RegisterValidation("uniqueattr", uniqueAttr)
 }

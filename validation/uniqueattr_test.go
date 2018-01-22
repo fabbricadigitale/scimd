@@ -14,18 +14,18 @@ type Test struct {
 }
 
 type Testy struct {
-	Tests Tests `validate:"uniquefield=Name"`
+	Tests Tests `validate:"uniqueattr=Name"`
 }
 
 type NonExistingFieldTest struct {
-	Tests Tests `validate:"uniquefield=Nonexisting"`
+	Tests Tests `validate:"uniqueattr=Nonexisting"`
 }
 
 type NonStringFieldTest struct {
-	Tests Tests `validate:"uniquefield=Age"`
+	Tests Tests `validate:"uniqueattr=Age"`
 }
 
-func TestUniqueName(t *testing.T) {
+func TestUniqueAttr(t *testing.T) {
 
 	// Valid test, fields values are unique
 	x := Testy{}
@@ -85,6 +85,6 @@ func TestUniqueName(t *testing.T) {
 	// Fail test, validator can't be used on types that are not Slices
 	xy := "Waldo"
 	require.PanicsWithValue(t, "Can't be used on string, only on a Slice", func() {
-		Validator.Var(xy, "uniquefield=Name")
+		Validator.Var(xy, "uniqueattr=Name")
 	})
 }

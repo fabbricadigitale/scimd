@@ -10,7 +10,7 @@ import (
 
 // The uniqueField validator checks if a field in a slice has unique values, in a case-insensitive way, and works with strings only.
 
-var uniqueField = func(fl validator.FieldLevel) bool {
+var uniqueAttr = func(fl validator.FieldLevel) bool {
 	field := fl.Field()
 	param := fl.Param()
 
@@ -23,7 +23,7 @@ var uniqueField = func(fl validator.FieldLevel) bool {
 		}
 		_, ok := innerType.FieldByName(param)
 		if !ok {
-			fmt.Printf("'%v' it's not an existing field in the struct.\n", param)
+			fmt.Printf("'%v' it's not an existing attribute in the struct.\n", param)
 			return false
 		}
 
@@ -36,7 +36,7 @@ var uniqueField = func(fl validator.FieldLevel) bool {
 			}
 
 			if iV.FieldByName(param).Kind() != reflect.String {
-				fmt.Printf("Field is %v, validator can be used on strings only fields.\n", iV.FieldByName(param).Kind())
+				fmt.Printf("Field is %v, validator can be used on strings only attributes.\n", iV.FieldByName(param).Kind())
 				return false
 			}
 
