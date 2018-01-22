@@ -8,6 +8,8 @@ import (
 	validator "gopkg.in/go-playground/validator.v9"
 )
 
+// The uniqueField validator checks if a field in a slice has unique values, in a case-insensitive way, and works with strings only.
+
 var uniqueField = func(fl validator.FieldLevel) bool {
 	field := fl.Field()
 	param := fl.Param()
