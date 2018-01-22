@@ -10,6 +10,7 @@ type Tests []*Test
 type Test struct {
 	Name 	string 
 	Surname string 
+	Age 	int
 }
 
 type Testy struct {
@@ -18,6 +19,10 @@ type Testy struct {
 
 type NonExistingFieldTest struct {
 	Tests Tests `validate:"uniquefield=Nonexisting"`
+}
+
+type NonStringFieldTest struct {
+	Tests Tests `validate:"uniquefield=Age"`
 }
 
 func TestUniqueName(t *testing.T) {
@@ -56,6 +61,20 @@ func TestUniqueName(t *testing.T) {
 	x.Tests = yz
 
 	err = Validator.Struct(x)
+	require.Error(t, err)
+
+	// Fail test, validator works on string fields only
+	xx := NonStringFieldTest{}
+
+	yy := Tests{
+		{
+			Age: 27,
+		},
+	}
+
+	xx.Tests = yy
+
+	err = Validator.Struct(xx)
 	require.Error(t, err)
 
 	// Fail test, field is not existing

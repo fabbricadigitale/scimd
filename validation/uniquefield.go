@@ -12,8 +12,6 @@ var uniqueField = func(fl validator.FieldLevel) bool {
 	field := fl.Field()
 	param := fl.Param()
 
-	fmt.Println(field.Kind())
-
 	switch field.Kind() {
 	case reflect.Slice, reflect.Array:
 
@@ -21,7 +19,6 @@ var uniqueField = func(fl validator.FieldLevel) bool {
 		if innerType.Kind() == reflect.Ptr {
 			innerType = innerType.Elem()
 		}
-
 		_, ok := innerType.FieldByName(param)
 		if !ok {
 			fmt.Printf("'%v' it's not an existing field in the struct.\n", param)
@@ -35,6 +32,12 @@ var uniqueField = func(fl validator.FieldLevel) bool {
 			if iV.Kind() == reflect.Ptr {
 				iV = iV.Elem()
 			}
+
+			if iV.FieldByName(param).Kind() != reflect.String {
+				fmt.Printf("Field is %v, validator can be used on strings only fields.\n", iV.FieldByName(param).Kind())
+				return false
+			}
+
 			m[strings.ToLower(iV.FieldByName(param).String())] = struct{}{}
 		}
 		return field.Len() == len(m)
