@@ -62,6 +62,20 @@ func Commons() Attributes {
 func init() {
 	comAttrs = Attributes{
 		&Attribute{
+			Name: "schemas",
+			Type: datatype.StringType,
+			// SubAttributes
+			MultiValued: true,
+			Description: "An array of Strings containing URIs that are used to indicate the namespaces of the SCIM schemas",
+			Required:    true,
+			// CanonicalValues
+			CaseExact:  true,
+			Mutability: schemas.MutabilityReadWrite,
+			Returned:   schemas.ReturnedAlways,
+			Uniqueness: schemas.UniquenessNone,
+			// ReferenceTypes
+		},
+		&Attribute{
 			Name: "id",
 			Type: datatype.StringType,
 			// SubAttributes
