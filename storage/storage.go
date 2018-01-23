@@ -3,16 +3,19 @@ package storage
 import (
 	"github.com/fabbricadigitale/scimd/api/attr"
 	"github.com/fabbricadigitale/scimd/api/filter"
+	"github.com/fabbricadigitale/scimd/dispatcher"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 )
 
+// Iter ...
 type Iter interface {
 	Next() *resource.Resource
 	Done() bool
 	Close()
 }
 
+// Querier ...
 type Querier interface {
 	Fields(map[attr.Path]bool) Querier
 	Skip(int) Querier
@@ -27,6 +30,8 @@ type Querier interface {
 
 // Storer is the target interface
 type Storer interface {
+	dispatcher.Emitter
+
 	Ping() error
 
 	Create(res *resource.Resource) error

@@ -5,6 +5,7 @@ import (
 
 	"github.com/fabbricadigitale/scimd/api/attr"
 	"github.com/fabbricadigitale/scimd/api/filter"
+	"github.com/fabbricadigitale/scimd/dispatcher"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/storage"
@@ -14,6 +15,7 @@ import (
 // Adapter is the repository Adapter
 type Adapter struct {
 	adaptee *Driver
+	*dispatcher.Dispatcher
 }
 
 var _ storage.Storer = (*Adapter)(nil)
@@ -46,6 +48,7 @@ func New(url, db, collection string) (storage.Storer, error) {
 		return nil, err
 	}
 	adapter.adaptee = driver
+	adapter.Dispatcher = dispatcher.New(0)
 
 	return adapter, nil
 }
@@ -57,12 +60,18 @@ func (a *Adapter) Ping() error {
 
 // Create is ...
 func (a *Adapter) Create(res *resource.Resource) error {
+	// Emit an event and wait it has been sent successfully
+	a.Emitter().Emit("create", res)
+
 	dataResource := a.toDoc(res)
 	return (*a.adaptee).Create(dataResource)
 }
 
 // Get is ...
 func (a *Adapter) Get(resType *core.ResourceType, id, version string, fields map[attr.Path]bool) (*resource.Resource, error) {
+	// Emit an event and wait it has been sent successfully
+	a.Emitter().Emit("get", resType, id, version, fields)
+
 	q, close, err := (*a.adaptee).Find(makeQuery(resType.GetIdentifier(), id, version))
 
 	if err != nil {
@@ -77,17 +86,26 @@ func (a *Adapter) Get(resType *core.ResourceType, id, version string, fields map
 
 // Update is ...
 func (a *Adapter) Update(resource *resource.Resource, id string, version string) error {
+	// Emit an event and wait it has been sent successfully
+	a.Emitter().Emit("update", resource, id, version)
+
 	dataResource := a.toDoc(resource)
 	return (*a.adaptee).Update(makeQuery(resource.ResourceType().GetIdentifier(), id, version), dataResource)
 }
 
 // Delete is ...
 func (a *Adapter) Delete(resType *core.ResourceType, id, version string) error {
+	// Emit an event and wait it has been sent successfully
+	a.Emitter().Emit("delete", resType, id, version)
+
 	return (*a.adaptee).Delete(makeQuery(resType.GetIdentifier(), id, version))
 }
 
 // Find is ...
 func (a *Adapter) Find(resTypes []*core.ResourceType, filter filter.Filter) (storage.Querier, error) {
+	// Emit an event and wait it has been sent successfully
+	a.Emitter().Emit("find", resTypes, filter)
+
 	or := make([]bson.M, len(resTypes))
 
 	for i, resType := range resTypes {

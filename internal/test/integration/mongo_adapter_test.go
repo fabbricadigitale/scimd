@@ -15,7 +15,9 @@ import (
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/storage"
 	"github.com/fabbricadigitale/scimd/storage/mongo"
+	"github.com/olebedev/emitter"
 	"github.com/ory/dockertest"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -95,7 +97,18 @@ func TestMongoCreate(t *testing.T) {
 	err = json.Unmarshal(dat, res)
 	require.NoError(t, err)
 
+	var called bool
+	em := adapter.Emitter()
+	em.On("create", func(evt *emitter.Event) {
+		called = true
+		assert.Equal(t, len(evt.Args), 1)
+		assert.IsType(t, (*resource.Resource)(nil), evt.Args[0])
+	})
+
 	err = adapter.Create(res)
+
+	assert.True(t, called)
+
 	require.NoError(t, err)
 }
 
