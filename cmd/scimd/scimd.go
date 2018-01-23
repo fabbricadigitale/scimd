@@ -2,8 +2,11 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
+	"github.com/fabbricadigitale/scimd/api"
+	"github.com/fabbricadigitale/scimd/api/messages"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/server"
 	"github.com/gin-gonic/gin"
@@ -60,7 +63,7 @@ func setup() *gin.Engine {
 	v2.DELETE(fmt.Sprintf("%s/:id", selfEndpoint), selfing)
 
 	// Search from system root for one or more resource types using POST
-	v2.POST(fmt.Sprintf("/%s", searchAction), getting)
+	v2.POST(fmt.Sprintf("/%s", searchAction), searching)
 
 	for _, rt := range core.GetResourceTypeRepository().List() {
 		// (todo) > verify whether RFC specifies endpoint to retrieve resource type by identifier, or not
@@ -73,7 +76,7 @@ func setup() *gin.Engine {
 		v2.POST(rt.Endpoint, posting)
 
 		// Search within a resource endpoint for one or more resource types using POST
-		v2.POST(fmt.Sprintf("%s/%s", rt.Endpoint, searchAction), getting)
+		v2.POST(fmt.Sprintf("%s/%s", rt.Endpoint, searchAction), searching)
 
 		// Retrieve, add, modify, or delete resource
 		v2.GET(fmt.Sprintf("%s/:id", rt.Endpoint), getting)
@@ -85,17 +88,45 @@ func setup() *gin.Engine {
 	return router
 }
 
-// query string via decorators?
-
 func listing(c *gin.Context) {
+	params := &api.Search{}
+	// Using the form binding engine (query)
+	if err := c.ShouldBindQuery(params); err == nil {
+		params.Attributes.Explode()
 
+		log.Println(params.Attributes)
+		log.Println(params.Pagination)
+	} else {
+		// (todo)> throw 4XX
+		panic(err)
+	}
 }
 
-func posting(c *gin.Context) {
+func searching(c *gin.Context) {
+	contents := &messages.SearchRequest{}
+	if err := c.ShouldBindJSON(contents); err == nil {
 
+		log.Printf("%+v\n", contents)
+	} else {
+		// (todo)> throw 4XX
+		panic(err)
+	}
 }
 
 func getting(c *gin.Context) {
+	var attrs api.Attributes
+	// Using the form binding engine (query)
+	if err := c.ShouldBindQuery(&attrs); err == nil {
+		attrs.Explode()
+
+		log.Println(attrs.Attributes)
+	} else {
+		// (todo)> throw 4XX
+		panic(err)
+	}
+}
+
+func posting(c *gin.Context) {
 
 }
 
