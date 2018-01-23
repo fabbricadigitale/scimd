@@ -89,13 +89,12 @@ func setup() *gin.Engine {
 }
 
 func listing(c *gin.Context) {
-	params := &api.Search{}
+	params := api.NewSearch()
 	// Using the form binding engine (query)
 	if err := c.ShouldBindQuery(params); err == nil {
 		params.Attributes.Explode()
 
-		log.Println(params.Attributes)
-		log.Println(params.Pagination)
+		log.Printf("%+v\n", params)
 	} else {
 		// (todo)> throw 4XX
 		panic(err)
@@ -119,7 +118,7 @@ func getting(c *gin.Context) {
 	if err := c.ShouldBindQuery(&attrs); err == nil {
 		attrs.Explode()
 
-		log.Println(attrs.Attributes)
+		log.Printf("%+v\n", attrs)
 	} else {
 		// (todo)> throw 4XX
 		panic(err)

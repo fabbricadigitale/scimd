@@ -1,6 +1,11 @@
 package api
 
-import "strings"
+import (
+	"encoding/json"
+	"strings"
+
+	defaults "github.com/mcuadros/go-defaults"
+)
 
 // Attributes represents ...
 type Attributes struct {
@@ -44,9 +49,29 @@ type Pagination struct {
 	Count      int `form:"count" json:"count,omitempty" mold:"min=0"`
 }
 
+// Search represents the set of parameters of a search query
 type Search struct {
 	Attributes
 	Filter `form:"filter" json:"filter,omitempty"`
 	Sorting
 	Pagination
+}
+
+// NewSearch instantiates a Search instance with defaults
+func NewSearch() *Search {
+	s := &Search{}
+	defaults.SetDefaults(s)
+	return s
+}
+
+// UnmarshalJSON unmarshals an Attribute taking into account defaults
+func (s *Search) UnmarshalJSON(data []byte) error {
+	defaults.SetDefaults(s)
+
+	type aliasType Search
+	alias := aliasType(*s)
+	err := json.Unmarshal(data, &alias)
+
+	*s = Search(alias)
+	return err
 }
