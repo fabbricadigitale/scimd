@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/cenk/backoff"
 	"github.com/fabbricadigitale/scimd/storage"
@@ -39,6 +40,7 @@ func Storage(endpoint, db, collection string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
 		b := backoff.NewExponentialBackOff()
+		b.MaxElapsedTime = 1 * time.Millisecond
 
 		err := backoff.Retry(func() error {
 			var err error
@@ -51,7 +53,8 @@ func Storage(endpoint, db, collection string) gin.HandlerFunc {
 		}, b)
 
 		if err != nil {
-			log.Fatalf("error after retrying: %v", err)
+			log.Printf("error after retrying: %v", err)
+			ctx.Abort()
 		}
 
 		ctx.Set("storage", adapter)
