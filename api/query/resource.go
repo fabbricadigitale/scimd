@@ -120,14 +120,14 @@ func Resources(s storage.Storer, resTypes []*core.ResourceType, search *api.Sear
 		q.Fields(fields)
 	}
 
+	// Make list
+	list = messages.NewListResponse()
+
 	// Count
 	list.TotalResults, err = q.Count()
 	if err != nil {
 		return
 	}
-
-	// Make list
-	list = messages.NewListResponse()
 
 	// Pagination
 	q.Skip(search.StartIndex).Limit(search.Count)
