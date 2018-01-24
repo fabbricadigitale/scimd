@@ -91,38 +91,39 @@ func setup() *gin.Engine {
 func listing(c *gin.Context) {
 	params := api.NewSearch()
 	// Using the form binding engine (query)
-	if err := c.ShouldBindQuery(params); err == nil {
-		params.Attributes.Explode()
-
-		log.Printf("%+v\n", params)
-	} else {
+	if err := c.ShouldBindQuery(params); err != nil {
 		// (todo)> throw 4XX
 		panic(err)
 	}
+
+	// Go ahead ...
+	params.Attributes.Explode()
+	log.Printf("%+v\n", params)
 }
 
 func searching(c *gin.Context) {
 	contents := &messages.SearchRequest{}
-	if err := c.ShouldBindJSON(contents); err == nil {
-
-		log.Printf("%+v\n", contents)
-	} else {
+	if err := c.ShouldBindJSON(contents); err != nil {
 		// (todo)> throw 4XX
 		panic(err)
 	}
+
+	// Go ahead ...
+	log.Printf("%+v\n", contents)
 }
 
 func getting(c *gin.Context) {
 	var attrs api.Attributes
 	// Using the form binding engine (query)
-	if err := c.ShouldBindQuery(&attrs); err == nil {
-		attrs.Explode()
-
-		log.Printf("%+v\n", attrs)
-	} else {
+	if err := c.ShouldBindQuery(&attrs); err != nil {
 		// (todo)> throw 4XX
 		panic(err)
+
 	}
+
+	// Go ahead ...
+	attrs.Explode()
+	log.Printf("%+v\n", attrs)
 }
 
 func posting(c *gin.Context) {

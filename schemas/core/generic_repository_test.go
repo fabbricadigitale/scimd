@@ -50,8 +50,6 @@ func TestSchemaRepository(t *testing.T) {
 }
 
 func TestResourceTypeRepository(t *testing.T) {
-	// (todo)
-
 	rType := GetResourceTypeRepository()
 
 	// Malformed JSON
@@ -81,8 +79,6 @@ func TestResourceTypeRepository(t *testing.T) {
 
 	// (todo): test lock
 }
-
-// (todo): test list
 
 func TestResourceTypeRepositoryList(t *testing.T) {
 	repos := GetResourceTypeRepository()
