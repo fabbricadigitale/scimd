@@ -3,7 +3,7 @@ package storage
 import (
 	"github.com/fabbricadigitale/scimd/api/attr"
 	"github.com/fabbricadigitale/scimd/api/filter"
-	"github.com/fabbricadigitale/scimd/dispatcher"
+	"github.com/fabbricadigitale/scimd/event"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 )
@@ -30,7 +30,7 @@ type Querier interface {
 
 // Storer is the target interface
 type Storer interface {
-	dispatcher.Emitter
+	event.Dispatcher
 
 	Ping() error
 

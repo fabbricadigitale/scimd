@@ -5,18 +5,18 @@ import (
 
 	"github.com/fabbricadigitale/scimd/api/attr"
 	"github.com/fabbricadigitale/scimd/api/filter"
-	"github.com/fabbricadigitale/scimd/dispatcher"
+	"github.com/fabbricadigitale/scimd/event"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/storage"
-	"gopkg.in/mgo.v2/bson"
 	"github.com/olebedev/emitter"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // Adapter is the repository Adapter
 type Adapter struct {
 	adaptee *Driver
-	*dispatcher.Dispatcher
+	event.Dispatcher
 }
 
 var _ storage.Storer = (*Adapter)(nil)
@@ -49,7 +49,7 @@ func New(url, db, collection string) (storage.Storer, error) {
 		return nil, err
 	}
 	adapter.adaptee = driver
-	adapter.Dispatcher = dispatcher.New(0)
+	adapter.Dispatcher = event.NewDispatcher(0)
 	adapter.Emitter().Use("*", emitter.Void)
 
 	return adapter, nil
