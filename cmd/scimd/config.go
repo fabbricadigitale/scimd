@@ -13,9 +13,9 @@ import (
 )
 
 const defaultConfigPath = "default"
-const endpoint = "0.0.0.0:32770"
-const db = "scimd"
-const collection = "resources"
+const dbURL = "0.0.0.0:32770"
+const dbName = "scimd"
+const dbCollection = "resources"
 
 var (
 	defaultResourcesPath string

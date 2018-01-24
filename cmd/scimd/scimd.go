@@ -9,6 +9,7 @@ import (
 	"github.com/fabbricadigitale/scimd/api/messages"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/server"
+	"github.com/fabbricadigitale/scimd/server/decorator"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,7 +32,7 @@ func main() {
 
 func setup() *gin.Engine {
 	const (
-		svcpcfgEndpoint = "/ServiceProviderConfig"
+		svcpcfgEndpoint = "/ServiceProviderConfigs"
 		restypeEndpoint = "/ResourceTypes"
 		schemasEndpoint = "/Schemas"
 		bulkEndpoint    = "/Bulk"
@@ -45,6 +46,10 @@ func setup() *gin.Engine {
 	// Setup endpoint as dictated by https://tools.ietf.org/html/rfc7644#section-3.2
 	v2 := router.Group("/v2")
 
+	v2.Use(server.Set("ResourceTypeRepository", rTypeRepo))
+	v2.Use(server.Set("SchemaRepository", schemaRepo))
+	v2.Use(server.Storage(dbURL, dbName, dbCollection))
+
 	unsupportedMethods := []string{}
 	if !spc.Patch.Supported {
 		unsupportedMethods = append(unsupportedMethods, http.MethodPatch)
@@ -54,10 +59,6 @@ func setup() *gin.Engine {
 	for _, authScheme := range spc.AuthenticationSchemes {
 		v2.Use(server.Authentication(authScheme.Type))
 	}
-
-	v2.Use(server.Set("ResourceTypeRepository", rTypeRepo))
-	v2.Use(server.Set("SchemaRepository", schemaRepo))
-	v2.Use(server.Storage(endpoint, db, collection))
 
 	// Retrieve service provider config
 	v2.GET(svcpcfgEndpoint, getting)
@@ -83,23 +84,7 @@ func setup() *gin.Engine {
 	v2.POST(fmt.Sprintf("/%s", searchAction), searching)
 
 	for _, rt := range core.GetResourceTypeRepository().List() {
-		// (todo) > verify whether RFC specifies endpoint to retrieve resource type by identifier, or not
-		// v2.GET(fmt.Sprintf("%s/%s", restypeEndpoint, rt.GetIdentifier()), getting)
-
-		// List all resources
-		v2.GET(rt.Endpoint, listing)
-
-		// Create new resource
-		v2.POST(rt.Endpoint, posting)
-
-		// Search within a resource endpoint for one or more resource types using POST
-		v2.POST(fmt.Sprintf("%s/%s", rt.Endpoint, searchAction), searching)
-
-		// Retrieve, add, modify, or delete resource
-		v2.GET(fmt.Sprintf("%s/:id", rt.Endpoint), getting)
-		v2.PUT(fmt.Sprintf("%s/:id", rt.Endpoint), putting)
-		v2.PATCH(fmt.Sprintf("%s/:id", rt.Endpoint), patching)
-		v2.DELETE(fmt.Sprintf("%s/:id", rt.Endpoint), deleting)
+		decorator.Scim2(v2, server.NewResourceService(&rt))
 	}
 
 	return router

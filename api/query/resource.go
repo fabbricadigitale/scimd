@@ -77,7 +77,6 @@ func Attributes(resTypes []*core.ResourceType, attrs *api.Attributes) (fields ma
 }
 
 func Resource(s storage.Storer, resType *core.ResourceType, id string, attrs *api.Attributes) (res core.ResourceTyper, err error) {
-
 	fields, err := Attributes([]*core.ResourceType{resType}, attrs)
 	if err != nil {
 		return
