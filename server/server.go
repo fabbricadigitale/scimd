@@ -1,12 +1,19 @@
 package server
 
 import (
+	"log"
 	"net/http"
 	"strings"
+	"time"
 
+	"github.com/cenk/backoff"
+	"github.com/fabbricadigitale/scimd/storage"
+	"github.com/fabbricadigitale/scimd/storage/mongo"
 	"github.com/gin-gonic/gin"
 	"github.com/thoas/go-funk"
 )
+
+var adapter storage.Storer
 
 // MethodNotImplemented is a gin middleware responsible to abort requests which method is not supported.
 func MethodNotImplemented(notSupportedMethods []string) gin.HandlerFunc {
@@ -24,6 +31,32 @@ func MethodNotImplemented(notSupportedMethods []string) gin.HandlerFunc {
 		}
 
 		// Otherwise go ahead
+		ctx.Next()
+	}
+}
+
+// Storage is a middleware to
+func Storage(endpoint, db, collection string) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		b := backoff.NewExponentialBackOff()
+		b.MaxElapsedTime = 3 * time.Minute
+
+		err := backoff.Retry(func() error {
+			var err error
+			adapter, err = mongo.New(endpoint, db, collection)
+			if err != nil {
+				return err
+			}
+
+			return adapter.Ping()
+		}, b)
+		if err != nil {
+			log.Fatalf("error after retrying: %v", err)
+		}
+
+		ctx.Set("storage", adapter)
+
 		ctx.Next()
 	}
 }

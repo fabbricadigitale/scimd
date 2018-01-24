@@ -12,6 +12,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var resTypeRepo core.ResourceTypeRepository
+var schemaRepo core.SchemaRepository
+
+func init() {
+	// Repositories are prerequisites
+	resTypeRepo = core.GetResourceTypeRepository()
+	resTypeRepo.Add("./default/resources/user.json")
+
+	schemaRepo = core.GetSchemaRepository()
+	schemaRepo.Add("./default/schemas/user.json")
+	schemaRepo.Add("./default/schemas/enterprise_user.json")
+}
+
 func main() {
 	setup().Run(":8787")
 }
@@ -41,6 +54,8 @@ func setup() *gin.Engine {
 	for _, authScheme := range spc.AuthenticationSchemes {
 		v2.Use(server.Authentication(authScheme.Type))
 	}
+
+	v2.Use(server.Storage(endpoint, db, collection))
 
 	// Retrieve service provider config
 	v2.GET(svcpcfgEndpoint, getting)
@@ -124,6 +139,7 @@ func getting(c *gin.Context) {
 	// Go ahead ...
 	attrs.Explode()
 	log.Printf("%+v\n", attrs)
+
 }
 
 func posting(c *gin.Context) {
