@@ -61,6 +61,14 @@ func Storage(endpoint, db, collection string) gin.HandlerFunc {
 	}
 }
 
+// Set is a middleware to store a value by key within the context
+func Set(key string, val interface{}) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		ctx.Set(key, val)
+		ctx.Next()
+	}
+}
+
 // Authentication is a gin middleware supporting multiple authentication schemes
 func Authentication(authenticationType string) gin.HandlerFunc {
 	switch authenticationType {

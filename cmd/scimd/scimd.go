@@ -39,7 +39,7 @@ func setup() *gin.Engine {
 		searchAction    = ".search"
 	)
 
-	spc := config()
+	spc, rTypeRepo, schemaRepo := config()
 	router := gin.Default()
 
 	// Setup endpoint as dictated by https://tools.ietf.org/html/rfc7644#section-3.2
@@ -55,6 +55,8 @@ func setup() *gin.Engine {
 		v2.Use(server.Authentication(authScheme.Type))
 	}
 
+	v2.Use(server.Set("ResourceTypeRepository", rTypeRepo))
+	v2.Use(server.Set("SchemaRepository", schemaRepo))
 	v2.Use(server.Storage(endpoint, db, collection))
 
 	// Retrieve service provider config
