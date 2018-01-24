@@ -13,19 +13,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var resTypeRepo core.ResourceTypeRepository
-var schemaRepo core.SchemaRepository
-
-func init() {
-	// Repositories are prerequisites
-	resTypeRepo = core.GetResourceTypeRepository()
-	resTypeRepo.Add("./default/resources/user.json")
-
-	schemaRepo = core.GetSchemaRepository()
-	schemaRepo.Add("./default/schemas/user.json")
-	schemaRepo.Add("./default/schemas/enterprise_user.json")
-}
-
 func main() {
 	setup().Run(":8787")
 }
@@ -40,15 +27,19 @@ func setup() *gin.Engine {
 		searchAction    = ".search"
 	)
 
-	spc, rTypeRepo, schemaRepo := config()
+	spc := config()
 	router := gin.Default()
+
+	resTypeRepo := core.GetResourceTypeRepository()
+	schemasRepo := core.GetSchemaRepository()
 
 	// Setup endpoint as dictated by https://tools.ietf.org/html/rfc7644#section-3.2
 	v2 := router.Group("/v2")
 
-	v2.Use(server.Set("ResourceTypeRepository", rTypeRepo))
-	v2.Use(server.Set("SchemaRepository", schemaRepo))
-	v2.Use(server.Storage(dbURL, dbName, dbCollection))
+	//v2.Use(server.Storage(dbURL, dbName, dbCollection))
+
+	resourceTypes := resTypeRepo.List()
+	schemas := schemasRepo.List()
 
 	unsupportedMethods := []string{}
 	if !spc.Patch.Supported {
@@ -62,11 +53,12 @@ func setup() *gin.Engine {
 
 	// Retrieve service provider config
 	v2.GET(svcpcfgEndpoint, getting)
+
 	// Retrieve supported resource types
-	v2.GET(restypeEndpoint, listing)
+	decorator.Scim2(v2, server.NewStaticResourceService(restypeEndpoint, resourceTypes))
+
 	// Retrieve one or more supported schemas
-	v2.GET(schemasEndpoint, listing)
-	v2.GET(fmt.Sprintf("%s/:id", schemasEndpoint), getting)
+	decorator.Scim2(v2, server.NewStaticResourceService(schemasEndpoint, schemas))
 
 	// Bulk updates to one or more supported schemas
 	if spc.Bulk.Supported {
@@ -83,7 +75,7 @@ func setup() *gin.Engine {
 	// Search from system root for one or more resource types using POST
 	v2.POST(fmt.Sprintf("/%s", searchAction), searching)
 
-	for _, rt := range core.GetResourceTypeRepository().List() {
+	for _, rt := range resourceTypes {
 		decorator.Scim2(v2, server.NewResourceService(&rt))
 	}
 

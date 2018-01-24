@@ -43,7 +43,7 @@ func filesFromDir(dir string) (res []string) {
 	return
 }
 
-func config() (*core.ServiceProviderConfig, *core.ResourceTypeRepository, *core.SchemaRepository) {
+func config() *core.ServiceProviderConfig {
 	// Schemas
 	schemas := core.GetSchemaRepository()
 	for _, p := range filesFromDir(defaultSchemasPath) {
@@ -75,5 +75,5 @@ func config() (*core.ServiceProviderConfig, *core.ResourceTypeRepository, *core.
 		panic(fmt.Sprintf("validation errors\n%s", errs))
 	}
 
-	return spc, rtypes, schemas
+	return spc
 }
