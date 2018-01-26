@@ -10,6 +10,7 @@ import (
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/storage"
 	"gopkg.in/mgo.v2/bson"
+	"github.com/olebedev/emitter"
 )
 
 // Adapter is the repository Adapter
@@ -49,6 +50,7 @@ func New(url, db, collection string) (storage.Storer, error) {
 	}
 	adapter.adaptee = driver
 	adapter.Dispatcher = dispatcher.New(0)
+	adapter.Emitter().Use("*", emitter.Void)
 
 	return adapter, nil
 }
