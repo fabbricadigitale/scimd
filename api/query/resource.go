@@ -157,7 +157,8 @@ func Resources(s storage.Storer, resTypes []*core.ResourceType, search *api.Sear
 
 	// Finally, fetch resources
 	var r *resource.Resource
-	for iter := q.Iter(); !iter.Done(); r = iter.Next() {
+	for iter := q.Iter(); !iter.Done(); {
+		r = iter.Next()
 		list.Resources = append(list.Resources, r)
 	}
 
