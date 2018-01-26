@@ -67,8 +67,6 @@ func TestResource(t *testing.T) {
 		require.Nil(t, (*e)["value"])
 	}
 
-	return
-
 	// Fail test, non existing id
 	id = "wrong-id"
 	r, err = query.Resource(adapter, res, id, attrs)
