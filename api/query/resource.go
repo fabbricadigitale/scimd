@@ -6,6 +6,7 @@ import (
 	"github.com/fabbricadigitale/scimd/api/filter"
 	"github.com/fabbricadigitale/scimd/api/messages"
 	"github.com/fabbricadigitale/scimd/schemas/core"
+	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/storage"
 )
 
@@ -129,6 +130,10 @@ func Resources(s storage.Storer, resTypes []*core.ResourceType, search *api.Sear
 		return
 	}
 
+	if search.Count == 0 {
+		search.Count = list.TotalResults
+	}
+
 	// Pagination
 	q.Skip(search.StartIndex).Limit(search.Count)
 	list.StartIndex = search.StartIndex
@@ -145,8 +150,8 @@ func Resources(s storage.Storer, resTypes []*core.ResourceType, search *api.Sear
 	}
 
 	// Finally, fetch resources
-	iter := q.Iter()
-	for r := iter.Next(); r != nil; {
+	var r *resource.Resource
+	for iter := q.Iter(); !iter.Done(); r = iter.Next() {
 		list.Resources = append(list.Resources, r)
 	}
 
