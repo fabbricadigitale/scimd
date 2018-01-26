@@ -39,12 +39,16 @@ func (res *Query) Sort(by attr.Path, asc bool) storage.Querier {
 
 // Skip is
 func (res *Query) Skip(index int) storage.Querier {
+	if index < 0 {
+		index = 0
+	}
 	res.q = res.q.Skip(index)
 	return res
 }
 
 // Limit is
 func (res *Query) Limit(n int) storage.Querier {
+	// (note) > negative n affects batch size (https://docs.mongodb.com/manual/reference/method/cursor.limit/#negative-values)
 	res.q = res.q.Limit(n)
 	return res
 }

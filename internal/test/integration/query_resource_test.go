@@ -1,20 +1,20 @@
 package integration
 
 import (
+	"encoding/json"
+	"io/ioutil"
+	"testing"
+
+	"github.com/fabbricadigitale/scimd/api"
+	"github.com/fabbricadigitale/scimd/api/query"
+	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/datatype"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
-	"github.com/fabbricadigitale/scimd/api/query"
-	"github.com/fabbricadigitale/scimd/api"
-	"encoding/json"
-	"github.com/fabbricadigitale/scimd/schemas/core"
-	"io/ioutil"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestResource(t *testing.T) {
 
-	
 	require.NotNil(t, resTypeRepo)
 	require.NotNil(t, schemaRepo)
 	require.NotNil(t, adapter)
@@ -41,6 +41,7 @@ func TestResource(t *testing.T) {
 
 	require.NotNil(t, userName)
 
+	// (todo) > reenable/review when excluding subattributes will work corrcetly (issue #51, #53)
 	// Excluding attribute
 	// attrs.ExcludedAttributes = []string{"urn:ietf:params:scim:schemas:core:2.0:User:name"}
 	// r2, err2 := query.Resource(adapter, res, id, attrs)
@@ -66,8 +67,6 @@ func TestResource(t *testing.T) {
 		e := email.(*datatype.Complex)
 		require.Nil(t, (*e)["value"])
 	}
-	
-
 
 	return
 
@@ -93,7 +92,7 @@ func TestResources(t *testing.T) {
 
 	resTypes := []*core.ResourceType{resType}
 	require.NotNil(t, resTypes)
-	
+
 	// Filtering by attribute
 	search := &api.Search{}
 	search.Filter = `userName eq "tfork@example.com"`
@@ -101,7 +100,7 @@ func TestResources(t *testing.T) {
 	r, err := query.Resources(adapter, resTypes, search)
 	require.NoError(t, err)
 	require.NotEmpty(t, r.TotalResults)
- 
+
 	// Filtering by attribute's subattribute
 	search.Filter = `name.middleName eq "Geraldine"`
 	r, err = query.Resources(adapter, resTypes, search)

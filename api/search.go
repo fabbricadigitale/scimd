@@ -19,7 +19,7 @@ type Sorting struct {
 
 type Pagination struct {
 	StartIndex int `json:"startIndex,omitempty" default:"1" validate:"gt=0"`
-	Count      int  `json:"count,omitempty" mold:"min=0"`
+	Count      int `json:"count,omitempty" mold:"min=0"`
 }
 
 type Search struct {

@@ -8,6 +8,7 @@ import (
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/storage"
+	"github.com/fabbricadigitale/scimd/validation"
 )
 
 func makeAttrs(list []string) ([]*attr.Path, error) {
@@ -94,6 +95,9 @@ func Resource(s storage.Storer, resType *core.ResourceType, id string, attrs *ap
 }
 
 func Resources(s storage.Storer, resTypes []*core.ResourceType, search *api.Search) (list *messages.ListResponse, err error) {
+	if err = validation.Validator.Struct(search); err != nil {
+		return
+	}
 
 	// Make filter
 	var f filter.Filter
@@ -130,12 +134,14 @@ func Resources(s storage.Storer, resTypes []*core.ResourceType, search *api.Sear
 		return
 	}
 
+	// Unlimited
 	if search.Count == 0 {
 		search.Count = list.TotalResults
+		// (todo) > We need a way to LIMIT this to a MAX value (from config) - issue https://github.com/fabbricadigitale/scimd/issues/55
 	}
 
 	// Pagination
-	q.Skip(search.StartIndex).Limit(search.Count)
+	q.Skip(search.StartIndex - 1).Limit(search.Count)
 	list.StartIndex = search.StartIndex
 	list.ItemsPerPage = search.Count
 
