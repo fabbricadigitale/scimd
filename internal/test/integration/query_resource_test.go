@@ -2,31 +2,28 @@ package integration
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"testing"
+
+	"github.com/fabbricadigitale/scimd/api"
+	"github.com/fabbricadigitale/scimd/api/query"
+	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/datatype"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
-	"github.com/fabbricadigitale/scimd/api/query"
-	"github.com/fabbricadigitale/scimd/api"
-	"github.com/fabbricadigitale/scimd/schemas/core"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestResource(t *testing.T) {
-
 	require.NotNil(t, resTypeRepo)
 	require.NotNil(t, schemaRepo)
 	require.NotNil(t, adapter)
 
 	id := "2819c223-7f76-453a-919d-ab1234567891"
 
-	dat, err := ioutil.ReadFile("../../testdata/user.json")
-	require.NoError(t, err)
-	require.NotNil(t, dat)
-
-	res := &core.ResourceType{}
-	err = json.Unmarshal(dat, res)
-	require.NoError(t, err)
+	res := core.GetResourceTypeRepository().Get("User")
+	require.NotNil(t, res)
 
 	attrs := &api.Attributes{}
 
@@ -62,15 +59,17 @@ func TestResource(t *testing.T) {
 
 	values = r.(*resource.Resource).Values("urn:ietf:params:scim:schemas:core:2.0:User")
 	emails := (*values)["emails"]
+
 	for _, email := range emails.([]datatype.DataTyper) {
 		e := email.(*datatype.Complex)
-		require.Nil(t, (*e)["value"])
+		fmt.Printf("%+v\n", e)
+		assert.Nil(t, (*e)["value"])
 	}
 
 	// Fail test, non existing id
 	id = "wrong-id"
-	r, err = query.Resource(adapter, res, id, attrs)
-	require.Nil(t, r)
+	r2, err := query.Resource(adapter, res, id, attrs)
+	require.Nil(t, r2)
 	require.Error(t, err)
 }
 
@@ -119,5 +118,5 @@ func TestResources(t *testing.T) {
 	require.NoError(t, err)
 	require.Empty(t, r.TotalResults)
 
-	// 
+	//
 }

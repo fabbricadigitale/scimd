@@ -84,6 +84,7 @@ func (res *Query) one() (*resource.Resource, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return toResource(d), nil
 }
 

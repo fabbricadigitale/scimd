@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"testing"
+
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/storage"
 	"github.com/fabbricadigitale/scimd/storage/mongo"
@@ -15,6 +16,7 @@ import (
 var resTypeRepo core.ResourceTypeRepository
 var schemaRepo core.SchemaRepository
 var adapter storage.Storer
+var adapter2 storage.Storer
 
 func TestMain(m *testing.M) {
 	// It uses sensible defaults for windows (tcp/http) and linux/osx (socket)

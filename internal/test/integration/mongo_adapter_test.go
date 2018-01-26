@@ -16,7 +16,6 @@ import (
 )
 
 func TestMongoCreate(t *testing.T) {
-	log.Println("TestMongoCreate")
 	require.NotNil(t, resTypeRepo)
 	require.NotNil(t, schemaRepo)
 	require.NotNil(t, adapter)
@@ -46,7 +45,6 @@ func TestMongoCreate(t *testing.T) {
 }
 
 func TestMongoGet(t *testing.T) {
-	log.Println("TestMongoGet")
 	require.NotNil(t, resTypeRepo)
 	require.NotNil(t, schemaRepo)
 	require.NotNil(t, adapter)
