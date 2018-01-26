@@ -4,12 +4,11 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"testing"
-
-	"github.com/fabbricadigitale/scimd/api"
-	"github.com/fabbricadigitale/scimd/api/query"
-	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/datatype"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
+	"github.com/fabbricadigitale/scimd/api/query"
+	"github.com/fabbricadigitale/scimd/api"
+	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/stretchr/testify/require"
 )
 
@@ -95,8 +94,11 @@ func TestResources(t *testing.T) {
 
 	// Filtering by attribute
 	search := &api.Search{}
-	search.Filter = `userName eq "tfork@example.com"`
+	search.SortOrder = api.AscendingOrder
+	search.StartIndex = 1
 
+	// search.Filter = `userName eq "tfork@example.com"`
+	search.Filter = `addresses.country eq "USA"`
 	r, err := query.Resources(adapter, resTypes, search)
 	require.NoError(t, err)
 	require.NotEmpty(t, r.TotalResults)
@@ -118,4 +120,6 @@ func TestResources(t *testing.T) {
 	r, err = query.Resources(adapter, resTypes, search)
 	require.NoError(t, err)
 	require.Empty(t, r.TotalResults)
+
+	// 
 }
