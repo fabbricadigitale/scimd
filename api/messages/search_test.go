@@ -20,6 +20,7 @@ func TestSearchRequestResource(t *testing.T) {
 	s := SearchRequest{}
 	json.Unmarshal(dat, &s)
 
+	// (todo) > assert s.Schemas exists first of all ...
 	require.Equal(t, "urn:ietf:params:scim:api:messages:2.0:SearchRequest", s.Schemas[0])
 
 	// Marshal
@@ -38,6 +39,8 @@ func TestSearchRequestResource(t *testing.T) {
 
 func TestSearchRequestValid(t *testing.T) {
 	var err error
+
+	// (todo) > test minimum length = 1 // not empty
 
 	// Wrong SearchRequest validation tag
 

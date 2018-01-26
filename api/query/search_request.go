@@ -1,6 +1,5 @@
 package query
 
-
 import (
 	"github.com/fabbricadigitale/scimd/api/messages"
 	"github.com/fabbricadigitale/scimd/schemas/core"
