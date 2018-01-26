@@ -39,7 +39,7 @@ func (res *Query) Sort(by attr.Path, asc bool) storage.Querier {
 
 // Skip is
 func (res *Query) Skip(index int) storage.Querier {
-	res.q = res.q.Skip(index - 1)
+	res.q = res.q.Skip(index)
 	return res
 }
 
