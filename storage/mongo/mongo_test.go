@@ -13,9 +13,9 @@ import (
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/storage"
+	"github.com/globalsign/mgo/bson"
 	"github.com/ory/dockertest"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/mgo.v2/bson"
 )
 
 var resTypeRepo core.ResourceTypeRepository

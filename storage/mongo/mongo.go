@@ -3,8 +3,8 @@ package mongo
 import (
 	"fmt"
 
-	mgo "gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	mgo "github.com/globalsign/mgo"
+	"github.com/globalsign/mgo/bson"
 )
 
 //Driver repository adaptee
@@ -75,7 +75,7 @@ func (d *Driver) Delete(query bson.M) error {
 // Find is the driver method for Find
 func (d *Driver) Find(q bson.M) (*mgo.Query, func(), error) {
 	c, close := d.getCollection()
-	
+
 	query := c.Find(q)
 	return query, close, nil
 }

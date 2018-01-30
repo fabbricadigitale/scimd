@@ -6,8 +6,8 @@ import (
 
 	"github.com/fabbricadigitale/scimd/api/filter"
 	"github.com/fabbricadigitale/scimd/schemas/core"
+	"github.com/globalsign/mgo/bson"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/mgo.v2/bson"
 )
 
 type mongoCase struct {

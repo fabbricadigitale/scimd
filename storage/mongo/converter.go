@@ -7,7 +7,7 @@ import (
 	"github.com/fabbricadigitale/scimd/api/filter"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/datatype"
-	"gopkg.in/mgo.v2/bson"
+	"github.com/globalsign/mgo/bson"
 )
 
 func convertToMongoQuery(resType *core.ResourceType, ft filter.Filter) (m bson.M, err error) {

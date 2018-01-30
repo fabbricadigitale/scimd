@@ -9,8 +9,8 @@ import (
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/storage"
+	"github.com/globalsign/mgo/bson"
 	"github.com/olebedev/emitter"
-	"gopkg.in/mgo.v2/bson"
 )
 
 // Adapter is the repository Adapter
