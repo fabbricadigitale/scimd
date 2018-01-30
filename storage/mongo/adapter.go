@@ -74,16 +74,27 @@ func (a *Adapter) Get(resType *core.ResourceType, id, version string, fields map
 	// Emit an event and wait it has been sent successfully
 	a.Emitter().Emit("get", resType, id, version, fields)
 
+	// Setup query
 	q, close, err := (*a.adaptee).Find(makeQuery(resType.GetIdentifier(), id, version))
-
+	defer close()
 	if err != nil {
-		close()
 		return nil, err
 	}
 
-	query := Query{q, close}
+	// Set projection
+	query := Query{q: q}
 	query.Fields(fields)
-	return query.one()
+
+	// Make new document
+	d := document{}
+
+	// Query
+	err = q.One(&d)
+	if err != nil {
+		return nil, err
+	}
+
+	return toResource(&d), nil
 }
 
 // Update is ...

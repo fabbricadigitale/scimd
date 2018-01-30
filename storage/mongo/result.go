@@ -77,17 +77,6 @@ func (res *Query) Close() {
 	res.c()
 }
 
-func (res *Query) one() (*resource.Resource, error) {
-	defer res.Close()
-	d := &document{}
-	err := res.q.One(d)
-	if err != nil {
-		return nil, err
-	}
-
-	return toResource(d), nil
-}
-
 // Iter executes the query and returns an iterator capable of going over all
 // the results.
 func (res *Query) Iter() storage.Iter {

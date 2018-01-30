@@ -37,7 +37,7 @@ func CreateDriver(url, db, collection string) (*Driver, error) {
 // This pattern allows to take a full advantage of concurrency.
 func (d *Driver) getCollection() (*mgo.Collection, func()) {
 	s := d.session.Copy()
-	return s.DB(d.db).C(d.collection), func() { s.Close() }
+	return s.DB(d.db).C(d.collection), s.Close
 }
 
 // Create is the driver method for Create
