@@ -29,8 +29,8 @@ import (
 // D: I if I != ∅ || { d | d.Returned == "default" }
 //
 // Furthermore, attributes with Mutability == "writeOnly" cannot be returned too.
-// So, pragmatically, they are treated as Returned == "never", as per: 
-// - https://tools.ietf.org/html/rfc7643#section-7 
+// So, pragmatically, they are treated as Returned == "never", as per:
+// - https://tools.ietf.org/html/rfc7643#section-7
 //
 func Projection(ctx *core.ResourceType, included []*Path, excluded []*Path) []*Path {
 	always := set.New()
@@ -78,7 +78,7 @@ func getPathSlice(ret set.Interface) []*Path {
 }
 
 func cannotBeReturned(attribute *core.Attribute) bool {
-	return attribute.Returned == schemas.ReturnedNever || attribute.Mutability == schemas.MutabilityWriteOnly
+	return attribute.Returned == schemas.ReturnedNever || attribute.Mutability == schemas.MutabilityWriteOnly || len(attribute.SubAttributes) > 0
 }
 
 func withReturned(equalTo string) func(attribute *core.Attribute) bool {
