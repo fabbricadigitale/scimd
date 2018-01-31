@@ -1,6 +1,7 @@
 package messages
 
 import (
+	"github.com/stretchr/testify/assert"
 	"encoding/json"
 	"io/ioutil"
 	"testing"
@@ -20,8 +21,9 @@ func TestSearchRequestResource(t *testing.T) {
 	s := SearchRequest{}
 	json.Unmarshal(dat, &s)
 
-	// (todo) > assert s.Schemas exists first of all ...
-	require.Equal(t, "urn:ietf:params:scim:api:messages:2.0:SearchRequest", s.Schemas[0])
+	// s.Schemas exists
+	assert.NotEmpty(t, s.Schemas)
+	require.Contains(t, s.Schemas[0], "urn:ietf:params:scim:api:messages:2.0:SearchRequest")
 
 	// Marshal
 	r := SearchRequest{}
@@ -40,17 +42,25 @@ func TestSearchRequestResource(t *testing.T) {
 func TestSearchRequestValid(t *testing.T) {
 	var err error
 
-	// (todo) > test minimum length = 1 // not empty
+	// Right SearchRequest validation tag, Schemas not empty, there's only one URI inside of Schemas
+	rightURI := []string{"urn:ietf:params:scim:api:messages:2.0:SearchRequest"}
+	err = validation.Validator.Var(rightURI, "eq=1,dive,eq=urn:ietf:params:scim:api:messages:2.0:SearchRequest")
+	require.NoError(t, err)
+	require.NotEmpty(t, rightURI)
+	require.Len(t, rightURI, 1)
+
+	// SearchRequest's Schemas cannot be empty
+	noURI := []string{}
+	err = validation.Validator.Var(noURI, "eq=1,dive,eq=urn:ietf:params:scim:api:messages:2.0:SearchRequest")
+	require.Error(t, err)
 
 	// Wrong SearchRequest validation tag
-
 	wrongURI := []string{"urn:ietf:params:scim:api:messages:2.0"}
 	err = validation.Validator.Var(wrongURI, "eq=1,dive,eq=urn:ietf:params:scim:api:messages:2.0:SearchRequest")
 	require.Error(t, err)
 
-	// Right SearchRequest validation tag
-
-	rightURI := []string{"urn:ietf:params:scim:api:messages:2.0:SearchRequest"}
-	err = validation.Validator.Var(rightURI, "eq=1,dive,eq=urn:ietf:params:scim:api:messages:2.0:SearchRequest")
-	require.NoError(t, err)
+	// Can't be two URIs inside SearchRequest's Schemas
+	twoURIs := []string{"urn:ietf:params:scim:api:messages:2.0:SearchRequest", "urn:ietf:params:scim:api:messages:2.0:SearchRequest"}
+	err = validation.Validator.Var(twoURIs, "eq=1,dive,eq=urn:ietf:params:scim:api:messages:2.0:SearchRequest")
+	require.Error(t, err)
 }
