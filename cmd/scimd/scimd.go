@@ -17,6 +17,7 @@ func main() {
 	setup().Run(":8787")
 }
 
+// Setup endpoints as dictated by https://tools.ietf.org/html/rfc7644#section-3.2
 func setup() *gin.Engine {
 	const (
 		svcpcfgEndpoint = "/ServiceProviderConfigs"
@@ -27,19 +28,24 @@ func setup() *gin.Engine {
 		searchAction    = ".search"
 	)
 
+	// Initialize configurations
 	spc := config()
+
+	// Obtain an engine
 	router := gin.Default()
 
 	resTypeRepo := core.GetResourceTypeRepository()
 	schemasRepo := core.GetSchemaRepository()
 
-	// Setup endpoint as dictated by https://tools.ietf.org/html/rfc7644#section-3.2
+	// Root group
 	v2 := router.Group("/v2")
 
-	//v2.Use(server.Storage(dbURL, dbName, dbCollection))
-
+	// Retrieve list of resource types
 	resourceTypes := resTypeRepo.List()
+	// Retrieve list of schemas
 	schemas := schemasRepo.List()
+
+	//v2.Use(server.Storage(dbURL, dbName, dbCollection))
 
 	unsupportedMethods := []string{}
 	if !spc.Patch.Supported {
@@ -65,18 +71,24 @@ func setup() *gin.Engine {
 		v2.POST(bulkEndpoint, bulking)
 	}
 
-	// Alias for operations against a resource mapped to an authenticated subject
-	v2.GET(selfEndpoint, selfing)
-	v2.POST(selfEndpoint, selfing)
-	v2.PUT(fmt.Sprintf("%s/:id", selfEndpoint), selfing)
-	v2.PATCH(fmt.Sprintf("%s/:id", selfEndpoint), selfing)
-	v2.DELETE(fmt.Sprintf("%s/:id", selfEndpoint), selfing)
-
 	// Search from system root for one or more resource types using POST
 	v2.POST(fmt.Sprintf("/%s", searchAction), searching)
 
+	// Create endpoints for all resource types
 	for _, rt := range resourceTypes {
 		decorator.Scim2(v2, server.NewResourceService(&rt))
+	}
+
+	// Alias for operations against a resource mapped to an authenticated subject
+	const mountSelf = false
+	me := v2.Group(selfEndpoint)
+	if !mountSelf {
+		// RFC 7644 - Section 3.11 - 1st bullet
+		me.Use(server.Status(http.StatusNotImplemented))
+	}
+	if self := resTypeRepo.Get("User"); self != nil {
+		self.Endpoint = ""
+		decorator.Scim2(me, server.NewResourceService(self))
 	}
 
 	return router

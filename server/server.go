@@ -35,6 +35,14 @@ func MethodNotImplemented(notSupportedMethods []string) gin.HandlerFunc {
 	}
 }
 
+// Status is a gin middleware forcing the abortion of a request with the given code
+func Status(code int) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		ctx.AbortWithStatus(code)
+		return
+	}
+}
+
 // Storage is a middleware to
 func Storage(endpoint, db, collection string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -67,6 +75,7 @@ func Storage(endpoint, db, collection string) gin.HandlerFunc {
 func Set(key string, val interface{}) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ctx.Set(key, val)
+
 		ctx.Next()
 	}
 }
