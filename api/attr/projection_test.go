@@ -205,6 +205,14 @@ var c = map[string]bool{
 	"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:organization":  true,
 }
 
+var d = map[string]bool{
+	"id":                                                         true,
+	"schemas":                                                    true,
+	"meta.resourceType":                                          true,
+	"urn:ietf:params:scim:schemas:core:2.0:User:name.familyName": true,
+	"urn:ietf:params:scim:schemas:core:2.0:User:emails.type":     true,
+}
+
 var projectionTestCases = []projectionTestCase{
 
 	{
@@ -259,6 +267,14 @@ var projectionTestCases = []projectionTestCase{
 		},
 		[]string{},
 		a,
+	},
+	{
+		[]string{
+			"name.familyName",
+			"emails.type",
+		},
+		[]string{},
+		d,
 	},
 	{
 		[]string{

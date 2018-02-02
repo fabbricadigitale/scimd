@@ -66,7 +66,7 @@ func Projection(ctx *core.ResourceType, included []*Path, excluded []*Path) []*P
 	for _, e := range excluded {
 		ectx := e.Context(ctx)
 		if ectx == nil {
-			panic("Can notobtain a context for the excluded attribute")
+			panic("Can not obtain a context for the excluded attribute")
 		}
 		epath := *ectx.Path()
 		if epath.Undefined() {
