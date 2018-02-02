@@ -114,10 +114,10 @@ var a = map[string]bool{
 }
 
 var b = map[string]bool{
-	"id":                                                     true,
-	"schemas":                                                true,
-	"meta.resourceType":                                      true,
-	"urn:ietf:params:scim:schemas:core:2.0:User:displayName": true,
+	"id":                                                                             true,
+	"schemas":                                                                        true,
+	"meta.resourceType":                                                              true,
+	"urn:ietf:params:scim:schemas:core:2.0:User:displayName":                         true,
 	"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:manager.displayName": true,
 }
 
@@ -200,9 +200,9 @@ var c = map[string]bool{
 	"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:division":       true,
 	"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:employeeNumber": true,
 	// "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:manager":             true,
-	"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:manager.$ref":        true,
-	"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:manager.value":       true,
-	"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:organization":        true,
+	"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:manager.$ref":  true,
+	"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:manager.value": true,
+	"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:organization":  true,
 }
 
 var projectionTestCases = []projectionTestCase{
@@ -279,6 +279,17 @@ var projectionTestCases = []projectionTestCase{
 		},
 		c,
 	},
+	// Mixing included and excluded attributes
+	{
+		[]string{
+			"displayName",
+		},
+		[]string{
+			"meta.resourceType",
+			"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:manager.displayName",
+		},
+		a,
+	},
 	// Excluded attributes override included attributes
 	{
 		[]string{
@@ -290,16 +301,6 @@ var projectionTestCases = []projectionTestCase{
 			"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:manager.displayName",
 		},
 		minimalUserAttributes,
-	},
-	{
-		[]string{
-			"displayName",
-		},
-		[]string{
-			"meta.resourceType",
-			"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:manager.displayName",
-		},
-		a,
 	},
 }
 
@@ -337,3 +338,13 @@ func TestProjection(t *testing.T) {
 		require.Equal(t, tt.expected, results)
 	}
 }
+
+// (todo) > test what happens using unknown attributes
+// Eg.,
+// {
+// 	[]string{
+// 		"phantom",
+// 	},
+// 	[]string{},
+// 	minimalUserAttributes,
+// },
