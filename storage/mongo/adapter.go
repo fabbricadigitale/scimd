@@ -254,18 +254,27 @@ func fromMeta(meta *core.Meta) map[string]interface{} {
 }
 
 func toMeta(m map[string]interface{}) core.Meta {
-	created := m["created"].(time.Time)
-	lastMod := m["lastModified"].(time.Time)
 	meta := core.Meta{
-		Created:      &created,
-		LastModified: &lastMod,
-		Location:     m["location"].(string),
 		ResourceType: m["resourceType"].(string),
 	}
 
 	// version is not a required field, it is omitted if empty
 	if m["version"] != nil {
 		meta.Version = m["version"].(string)
+	}
+
+	if m["created"] != nil {
+		created := m["created"].(time.Time)
+		meta.Created = &created
+	}
+
+	if m["lastMod"] != nil {
+		lastMod := m["lastMod"].(time.Time)
+		meta.LastModified = &lastMod
+	}
+
+	if m["location"] != nil {
+		meta.Location = m["location"].(string)
 	}
 
 	return meta
