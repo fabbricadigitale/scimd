@@ -3,9 +3,6 @@ package attr
 import (
 	"testing"
 
-	"github.com/thoas/go-funk"
-
-	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/stretchr/testify/require"
 )
 
@@ -109,6 +106,13 @@ var minimalUserAttributes = map[string]bool{
 	"meta.resourceType": true,
 }
 
+var a = map[string]bool{
+	"id":                                                     true,
+	"schemas":                                                true,
+	"meta.resourceType":                                      true,
+	"urn:ietf:params:scim:schemas:core:2.0:User:displayName": true,
+}
+
 var projectionTestCases = []projectionTestCase{
 
 	{
@@ -156,18 +160,42 @@ var projectionTestCases = []projectionTestCase{
 		},
 		minimalUserAttributes,
 	},
+	// Including attributes
+	{
+		[]string{
+			"displayName",
+		},
+		[]string{},
+		a,
+	},
+	// Excluding attributes
 }
 
 func TestProjection(t *testing.T) {
 	rt := resTypeRepo.Get("User")
 
 	for _, tt := range projectionTestCases {
-		included := Paths(rt, func(attribute *core.Attribute) bool {
-			return funk.ContainsString(tt.included, attribute.Name)
-		})
-		excluded := Paths(rt, func(attribute *core.Attribute) bool {
-			return funk.ContainsString(tt.excluded, attribute.Name)
-		})
+		// Make included attributes
+		included := make([]*Path, len(tt.included))
+		for idx, i := range tt.included {
+			p := Parse(i)
+			if !p.Undefined() {
+				included[idx] = p
+			} else {
+				t.Fatalf("Wrong included attribute: %s", i)
+			}
+		}
+
+		// Make excluded attributes
+		excluded := make([]*Path, len(tt.excluded))
+		for idx, e := range tt.excluded {
+			p := Parse(e)
+			if !p.Undefined() {
+				excluded[idx] = p
+			} else {
+				t.Fatalf("Wrong excluded attribute: %s", e)
+			}
+		}
 
 		result := Projection(rt, included, excluded)
 		results := make(map[string]bool)

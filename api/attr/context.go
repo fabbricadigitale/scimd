@@ -82,7 +82,7 @@ func (p Path) Context(rt *core.ResourceType) (ctx *Context) {
 // Contexts returns a slice of Context given a resource type rt.
 //
 // It flattens the attributes of rt's schemas returning their Context representations.
-// When a fx is provided it returns only the attribute statisfying fx(attribute).
+// When a fx is provided it returns all the attributes statisfying fx(attribute).
 func Contexts(rt *core.ResourceType, fx func(attribute *core.Attribute) bool) []Context {
 	// Tautology
 	if fx == nil {
