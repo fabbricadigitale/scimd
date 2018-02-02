@@ -98,6 +98,13 @@ func (p Path) String() string {
 	return s
 }
 
+// IsSubAttribute returns true if the path refers to an attribute with a parent
+//
+// While p.Name refers to the name of the parent, p.Sub refers to the name of its children.
+func (p Path) IsSubAttribute() bool {
+	return !p.Undefined() && len(p.Sub) > 0
+}
+
 // Transform applies f(facet) to p's facets (URN, attribute, and sub-attribute name) and returns a new transformed Path
 func (p Path) Transform(f func(facet string) string) *Path {
 	return &Path{
