@@ -40,7 +40,12 @@ func (r *Resource) Values(ns string) *datatype.Complex {
 	if r.data == nil {
 		return nil
 	}
-	return r.data[ns]
+
+	if nsdata, ok := r.data[ns]; ok {
+		return nsdata
+	}
+
+	return nil
 }
 
 // UnmarshalJSON is the Resource Marshal implementation
@@ -53,13 +58,13 @@ func (r *Resource) UnmarshalJSON(b []byte) error {
 	// Validate and get ResourceType
 	resourceType := r.ResourceType()
 	if resourceType == nil {
-		return &core.ScimError{"Unsupported Resource Type"}
+		return &core.ScimError{Msg: "Unsupported Resource Type"}
 	}
 
 	// Validate and get schema
 	schema := resourceType.GetSchema()
 	if schema == nil {
-		return &core.ScimError{"Unsupported Schema"}
+		return &core.ScimError{Msg: "Unsupported Schema"}
 	}
 
 	// Unmarshal other parts
@@ -119,12 +124,12 @@ func (r *Resource) MarshalJSON() ([]byte, error) {
 	// Validate and get ResourceType
 	resourceType := r.ResourceType()
 	if resourceType == nil {
-		return nil, &core.ScimError{"Unsupported Resource Type"}
+		return nil, &core.ScimError{Msg: "Unsupported Resource Type"}
 	}
 	// Validate and get schema
 	schema := resourceType.GetSchema()
 	if schema == nil {
-		return nil, &core.ScimError{"Unsupported Schema"}
+		return nil, &core.ScimError{Msg: "Unsupported Schema"}
 	}
 	// ****
 
@@ -140,11 +145,12 @@ func (r *Resource) MarshalJSON() ([]byte, error) {
 	for _, extSch := range resourceType.GetSchemaExtensions() {
 		if extSch != nil {
 			ns := extSch.GetIdentifier()
-			values := *r.Values(ns)
-			if msg, err = json.Marshal(values); err != nil {
-				return nil, err
+			if values := r.Values(ns); values != nil {
+				if msg, err = json.Marshal(&values); err != nil {
+					return nil, err
+				}
+				out[ns] = msg
 			}
-			out[ns] = msg
 		}
 
 	}

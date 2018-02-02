@@ -132,3 +132,5 @@ func TestMarshalResource(t *testing.T) {
 	t.Logf("%s", string(b[:]))
 
 }
+
+// (todo) > test resource.Resource
