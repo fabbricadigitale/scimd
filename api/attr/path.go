@@ -133,7 +133,6 @@ func (p Path) matchSchema(rt *core.ResourceType) *core.Schema {
 // It flattens the attributes of rt's schemas returning their contextualized Path representations.
 // When a fx is provided it returns only the attribute paths statisfying fx(attribute).
 func Paths(rt *core.ResourceType, fx func(attribute *core.Attribute) bool) []*Path {
-
 	ctxs := Contexts(rt, fx)
 	acc := make([]*Path, len(ctxs))
 

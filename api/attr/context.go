@@ -2,8 +2,8 @@ package attr
 
 import (
 	"github.com/fabbricadigitale/scimd/schemas/core"
-	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/schemas/datatype"
+	"github.com/fabbricadigitale/scimd/schemas/resource"
 )
 
 // A Context represents a set of definitions related to a Path
@@ -79,7 +79,6 @@ func (p Path) Context(rt *core.ResourceType) (ctx *Context) {
 	return
 }
 
-
 // Contexts returns a slice of Context given a resource type rt.
 //
 // It flattens the attributes of rt's schemas returning their Context representations.
@@ -96,13 +95,17 @@ func Contexts(rt *core.ResourceType, fx func(attribute *core.Attribute) bool) []
 	acc := []Context{}
 
 	commonCtx := Context{} // Common attributes have no schema
-	for _, c1 := range core.Commons().Some(fx) {
+	for _, c1 := range core.Commons() {
 		commonCtx.Attribute = c1
 		commonCtx.SubAttribute = nil
-		acc = append(acc, commonCtx)
-		for _, c2 := range c1.SubAttributes.Some(fx) {
-			commonCtx.SubAttribute = c2
+		if fx(c1) {
 			acc = append(acc, commonCtx)
+		}
+		for _, c2 := range c1.SubAttributes {
+			commonCtx.SubAttribute = c2
+			if fx(c2) {
+				acc = append(acc, commonCtx)
+			}
 		}
 	}
 
@@ -111,13 +114,17 @@ func Contexts(rt *core.ResourceType, fx func(attribute *core.Attribute) bool) []
 			ctx := Context{
 				Schema: sc,
 			}
-			for _, a1 := range sc.Attributes.Some(fx) {
+			for _, a1 := range sc.Attributes {
 				ctx.Attribute = a1
 				ctx.SubAttribute = nil
-				acc = append(acc, ctx)
-				for _, a2 := range a1.SubAttributes.Some(fx) {
-					ctx.SubAttribute = a2
+				if fx(a1) {
 					acc = append(acc, ctx)
+				}
+				for _, a2 := range a1.SubAttributes {
+					ctx.SubAttribute = a2
+					if fx(a2) {
+						acc = append(acc, ctx)
+					}
 				}
 			}
 		}
@@ -139,7 +146,7 @@ func (ctx *Context) getValuerValues(valuer resource.Valuer) *datatype.Complex {
 }
 
 // Set value to valuer at destination path of this context
-// 
+//
 // Value should be datatype.DataTyper or []datatype.DataTyper or nil.
 // Furthermore attribute's characteristics are not enforced nor checked
 // according to DataTypes rules when used within maps.
@@ -153,10 +160,10 @@ func (ctx *Context) getValuerValues(valuer resource.Valuer) *datatype.Complex {
 //
 // Usage example:
 // Parse("emails.type").Context(res.ResourceType()).Set(datatype.String("home"), res)
-// for each complex value within "emails" (it's a multi value), the value of "type" sub-attribute will be set to "home". 
+// for each complex value within "emails" (it's a multi value), the value of "type" sub-attribute will be set to "home".
 func (ctx *Context) Set(value interface{}, valuer resource.Valuer) {
 	values := ctx.getValuerValues(valuer)
-	if  values == nil || ctx.Attribute == nil {
+	if values == nil || ctx.Attribute == nil {
 		return
 	}
 
@@ -181,7 +188,7 @@ func (ctx *Context) Set(value interface{}, valuer resource.Valuer) {
 					elem[ctx.SubAttribute.Name] = value
 				}
 			}
-		}	
+		}
 	} else {
 		if parent, ok := (*values)[ctx.Attribute.Name].(datatype.Complex); ok {
 			parent[ctx.SubAttribute.Name] = value
@@ -192,7 +199,7 @@ func (ctx *Context) Set(value interface{}, valuer resource.Valuer) {
 // Get a value from valuer at destination path of this context and return it
 func (ctx *Context) Get(valuer resource.Valuer) interface{} {
 	values := ctx.getValuerValues(valuer)
-	if  values == nil || ctx.Attribute == nil {
+	if values == nil || ctx.Attribute == nil {
 		return nil
 	}
 
@@ -209,7 +216,7 @@ func (ctx *Context) Get(valuer resource.Valuer) interface{} {
 				}
 			}
 			return ret
-		}	
+		}
 	} else {
 		if parent, ok := (*values)[ctx.Attribute.Name].(datatype.Complex); ok {
 			return parent[ctx.SubAttribute.Name]
@@ -222,7 +229,7 @@ func (ctx *Context) Get(valuer resource.Valuer) interface{} {
 // Delete a value from valuer at destination path of this context
 func (ctx *Context) Delete(valuer resource.Valuer) {
 	values := ctx.getValuerValues(valuer)
-	if  values == nil || ctx.Attribute == nil {
+	if values == nil || ctx.Attribute == nil {
 		return
 	}
 
@@ -238,7 +245,7 @@ func (ctx *Context) Delete(valuer resource.Valuer) {
 					delete(elem, ctx.SubAttribute.Name)
 				}
 			}
-		}	
+		}
 	} else {
 		if parent, ok := (*values)[ctx.Attribute.Name].(datatype.Complex); ok {
 			delete(parent, ctx.SubAttribute.Name)

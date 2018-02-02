@@ -117,7 +117,8 @@ func init() {
 					// CanonicalValues
 					CaseExact:  true,
 					Mutability: schemas.MutabilityReadOnly,
-					Returned:   schemas.ReturnedDefault,
+					// NOTE > We need to enforce at least this (sub)attribute to be present in projections - See #55
+					Returned:   schemas.ReturnedAlways,
 					Uniqueness: schemas.UniquenessNone,
 					// ReferenceTypes
 				},

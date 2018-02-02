@@ -197,9 +197,9 @@ func (a *Adapter) toDoc(r *resource.Resource) *document {
 }
 
 func toResource(d *document) *resource.Resource {
-
 	dd := (*d)
 
+	// We are assuming here schemas, id, and meta will always be present here
 	r := &resource.Resource{
 		CommonAttributes: core.CommonAttributes{
 			Schemas: toStringSlice(dd["schemas"].([]interface{})),

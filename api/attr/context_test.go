@@ -259,3 +259,5 @@ func TestContextDelete(t *testing.T) {
 	displayName := (*values)["manager"].(datatype.Complex)["displayName"]
 	assert.Nil(t, displayName)
 }
+
+// (todo) > Test contexts() with filter about attributes sub attributes characteristic
