@@ -13,7 +13,7 @@ import (
 )
 
 const defaultConfigPath = "default"
-const dbURL = "0.0.0.0:32770"
+const dbURL = "0.0.0.0:27018"
 const dbName = "scimd"
 const dbCollection = "resources"
 

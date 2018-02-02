@@ -45,7 +45,7 @@ func setup() *gin.Engine {
 	// Retrieve list of schemas
 	schemas := schemasRepo.List()
 
-	//v2.Use(server.Storage(dbURL, dbName, dbCollection))
+	v2.Use(server.Storage(dbURL, dbName, dbCollection))
 
 	unsupportedMethods := []string{}
 	if !spc.Patch.Supported {
@@ -133,30 +133,6 @@ func getting(c *gin.Context) {
 
 }
 
-func posting(c *gin.Context) {
-
-}
-
-func putting(c *gin.Context) {
-
-}
-
-func deleting(c *gin.Context) {
-
-}
-
-func selfing(c *gin.Context) {
-
-}
-
-func patching(c *gin.Context) {
-
-}
-
 func bulking(c *gin.Context) {
-
-}
-
-func resourcing(c *gin.Context) {
 
 }

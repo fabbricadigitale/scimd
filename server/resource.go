@@ -2,10 +2,14 @@ package server
 
 import (
 	"log"
+	"net/http"
 
 	"github.com/fabbricadigitale/scimd/api"
 	"github.com/fabbricadigitale/scimd/api/messages"
+	"github.com/fabbricadigitale/scimd/api/query"
 	"github.com/fabbricadigitale/scimd/schemas/core"
+	"github.com/fabbricadigitale/scimd/schemas/resource"
+	"github.com/fabbricadigitale/scimd/storage"
 	"github.com/gin-gonic/gin"
 )
 
@@ -69,9 +73,23 @@ func (rs *ResourceService) Get(c *gin.Context) {
 
 	}
 
-	// Go ahead ...
+	// Explode the attributes
 	attrs.Explode()
-	log.Printf("%+v\n", attrs)
+
+	// Retrieve the storage adapter
+	store, ok := c.Get("storage")
+	if !ok {
+		panic("Missing storage setup ...")
+	}
+	// Retrieve the id segment
+	id := c.Param("id")
+
+	res, err := query.Resource(store.(storage.Storer), rs.rt, id, &attrs)
+	if err != nil {
+		log.Println("(todo) > handle error")
+	}
+
+	c.JSON(http.StatusOK, res.(*resource.Resource))
 }
 
 // Post ...

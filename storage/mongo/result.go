@@ -55,7 +55,6 @@ func (res *Query) Limit(n int) storage.Querier {
 
 // Fields is
 func (res *Query) Fields(fields map[attr.Path]bool) storage.Querier {
-
 	var selector bson.M
 	selector = make(bson.M)
 
