@@ -19,7 +19,6 @@ import (
 // (with the only exception of ExternalID that if populated will be used).
 // Attributes whose mutability is "readOnly" will be ignored and removed.
 func Resource(s storage.Storer, resType *core.ResourceType, res *resource.Resource) (err error) {
-
 	// Make a new UUID
 	ID, err := uuid.NewV4()
 	if err != nil {

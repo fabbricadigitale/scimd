@@ -15,7 +15,7 @@ const (
 	attrName = `(?P<ATTRNAME>` + schemas.AttrNameExpr + `)`
 
 	// subAttr   = "." ATTRNAME ; a sub-attribute of a complex attribute
-	subAttr = `(?:\.(?P<SUBATTRNAME>` + schemas.AttrNameExpr + `))?`
+	subAttr = `(?:\.(?P<SUBATTRNAME>\` + schemas.ReferenceAttrName + `|` + schemas.AttrNameExpr + `))?`
 )
 
 // A Path represents a parsed SCIM attribute path as per https://tools.ietf.org/html/rfc7644#section-3.10

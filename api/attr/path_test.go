@@ -90,7 +90,11 @@ const (
 	path5      = `userName`
 	path6      = `name.givenName`
 	path7      = `urn:ietf:params:scim:schemas:core:2.0`
+	path8      = `urn:ietf:params:scim:schemas:core:2.0:User:groups`
+	path9      = `urn:ietf:params:scim:schemas:core:2.0:User:groups.display`
+	path10     = `urn:ietf:params:scim:schemas:core:2.0:User:groups.$ref`
 	invalidUrn = `urn:urn:params:scim:schemas:core:2.0:User:name`
+	invalidRef = `urn:urn:params:scim:schemas:core:2.0:User:$ref`
 )
 
 func TestPath(t *testing.T) {
@@ -142,8 +146,22 @@ func TestPath(t *testing.T) {
 	g := Parse(path7)
 	assert.True(t, g.Undefined())
 
-	ko := Parse(invalidUrn)
-	assert.True(t, ko.Undefined())
+	h := Parse(path8)
+	assert.Equal(t, "groups", h.Name)
+
+	i := Parse(path9)
+	assert.Equal(t, "groups", i.Name)
+	assert.Equal(t, "display", i.Sub)
+
+	l := Parse(path10)
+	assert.Equal(t, "groups", l.Name)
+	assert.Equal(t, "$ref", l.Sub)
+
+	ko1 := Parse(invalidUrn)
+	assert.True(t, ko1.Undefined())
+
+	ko2 := Parse(invalidRef)
+	assert.True(t, ko2.Undefined())
 }
 
 func TestPaths(t *testing.T) {
