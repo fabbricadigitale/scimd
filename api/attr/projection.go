@@ -47,16 +47,14 @@ func Projection(ctx *core.ResourceType, included []*Path, excluded []*Path) []*P
 	if len(included) > 0 {
 		for _, i := range included {
 			ictx := i.Context(ctx)
-			if ictx == nil {
-				panic("Can not obtain a context for the included attribute")
+			if ictx != nil {
+				defaults.Add(*ictx.Path())
 			}
-			ipath := *ictx.Path()
-			if ipath.Undefined() {
-				panic("Can not contextualize included attribute")
-			}
-			defaults.Add(ipath)
 		}
-	} else {
+	}
+	// When no attribute inclusion or all inclusion was unknown (and thus ignored) attributes ...
+	// Switch to defaults
+	if defaults.Size() == 0 || len(included) == 0 {
 		for _, d := range Paths(ctx, withReturned(schemas.ReturnedDefault)) {
 			defaults.Add(*d)
 		}
@@ -65,14 +63,9 @@ func Projection(ctx *core.ResourceType, included []*Path, excluded []*Path) []*P
 	exclusions := set.New()
 	for _, e := range excluded {
 		ectx := e.Context(ctx)
-		if ectx == nil {
-			panic("Can not obtain a context for the excluded attribute")
+		if ectx != nil {
+			exclusions.Add(*ectx.Path())
 		}
-		epath := *ectx.Path()
-		if epath.Undefined() {
-			panic("Can not contextualize excluded attribute")
-		}
-		exclusions.Add(epath)
 	}
 
 	ret := set.Union(set.Difference(defaults, exclusions, never), always)
