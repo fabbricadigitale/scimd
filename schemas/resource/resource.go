@@ -134,11 +134,12 @@ func (r *Resource) MarshalJSON() ([]byte, error) {
 	// ****
 
 	// Marshal schema attrs to the top level
-	for key, values := range *r.Values(schema.GetIdentifier()) {
-		if msg, err = json.Marshal(values); err != nil {
+	ns := schema.GetIdentifier()
+	if values := r.Values(ns); values != nil {
+		if msg, err = json.Marshal(&values); err != nil {
 			return nil, err
 		}
-		out[key] = msg
+		out[ns] = msg
 	}
 
 	// Marshal extensions to proper namespace key
