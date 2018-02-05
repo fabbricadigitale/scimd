@@ -318,6 +318,40 @@ var projectionTestCases = []projectionTestCase{
 		},
 		minimalUserAttributes,
 	},
+	// Unknown attributes gets ignored
+	{
+		[]string{
+			"phantom",
+		},
+		[]string{},
+		allUserAttrs,
+	},
+	{
+		[]string{},
+		[]string{
+			"phantom",
+		},
+		allUserAttrs,
+	},
+	// Unknown attributes listed with included/excluded attributes gets ignored
+	{
+		[]string{
+			"phantom",
+			"displayName",
+		},
+		[]string{},
+		a,
+	},
+	{
+		[]string{},
+		[]string{
+			"phantom",
+			"displayName",
+			"urn:ietf:params:scim:schemas:core:2.0:User:emails.value",
+			"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:manager.displayName",
+		},
+		c,
+	},
 }
 
 func TestProjection(t *testing.T) {
@@ -354,13 +388,3 @@ func TestProjection(t *testing.T) {
 		require.Equal(t, tt.expected, results)
 	}
 }
-
-// (todo) > test what happens using unknown attributes
-// Eg.,
-// {
-// 	[]string{
-// 		"phantom",
-// 	},
-// 	[]string{},
-// 	minimalUserAttributes,
-// },
