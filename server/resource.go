@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/fabbricadigitale/scimd/api"
+	"github.com/fabbricadigitale/scimd/api/create"
 	"github.com/fabbricadigitale/scimd/api/messages"
 	"github.com/fabbricadigitale/scimd/api/query"
 	"github.com/fabbricadigitale/scimd/schemas/core"
@@ -93,7 +94,22 @@ func (rs *ResourceService) Get(c *gin.Context) {
 }
 
 // Post ...
-func (rs *ResourceService) Post(*gin.Context) {
+func (rs *ResourceService) Post(c *gin.Context) {
+	contents := &resource.Resource{}
+	if err := c.ShouldBindJSON(contents); err != nil {
+		// (todo)> throw 4XX
+		panic(err)
+	}
+
+	// Retrieve the storage adapter
+	store, ok := c.Get("storage")
+	if !ok {
+		panic("Missing storage setup ...")
+	}
+
+	create.Resource(store.(storage.Storer), rs.rt, contents)
+
+	c.JSON(http.StatusOK, nil)
 
 }
 
