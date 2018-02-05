@@ -16,10 +16,10 @@ func (e *ScimError) Error() string { return e.Msg }
 
 // Meta ...
 type Meta struct {
-	Location     string     `json:"location" validate:"uri,required"`
+	Location     string     `json:"location,omitempty" validate:"uri"`
 	ResourceType string     `json:"resourceType" validate:"required"`
-	Created      *time.Time `json:"created" validate:"required"`
-	LastModified *time.Time `json:"lastModified" validate:"required"`
+	Created      *time.Time `json:"created,omitempty"`
+	LastModified *time.Time `json:"lastModified,omitempty"`
 	Version      string     `json:"version,omitempty"`
 }
 

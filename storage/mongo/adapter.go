@@ -268,8 +268,8 @@ func toMeta(m map[string]interface{}) core.Meta {
 		meta.Created = &created
 	}
 
-	if m["lastMod"] != nil {
-		lastMod := m["lastMod"].(time.Time)
+	if m["lastModified"] != nil {
+		lastMod := m["lastModified"].(time.Time)
 		meta.LastModified = &lastMod
 	}
 
