@@ -8,6 +8,7 @@ import (
 	"github.com/fabbricadigitale/scimd/api/create"
 	"github.com/fabbricadigitale/scimd/api/messages"
 	"github.com/fabbricadigitale/scimd/api/query"
+	"github.com/fabbricadigitale/scimd/api/update"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/storage"
@@ -50,6 +51,22 @@ func (rs *ResourceService) List(c *gin.Context) {
 	// Go ahead ...
 	params.Attributes.Explode()
 	log.Printf("%+v\n", params)
+
+	// Retrieve the storage adapter
+	store, ok := c.Get("storage")
+	if !ok {
+		panic("Missing storage setup ...")
+	}
+
+	resArr := make([]*core.ResourceType, 0)
+	resArr[0] = rs.rt
+
+	list, err := query.Resources(store.(storage.Storer), resArr, params)
+	if err != nil {
+		panic(err)
+	}
+
+	c.JSON(http.StatusOK, list)
 }
 
 // Search ...
@@ -114,7 +131,34 @@ func (rs *ResourceService) Post(c *gin.Context) {
 }
 
 // Put ...
-func (rs *ResourceService) Put(*gin.Context) {
+func (rs *ResourceService) Put(c *gin.Context) {
+	var attrs api.Attributes
+	// Using the form binding engine (query)
+	if err := c.ShouldBindQuery(&attrs); err != nil {
+		// (todo)> throw 4XX
+		panic(err)
+
+	}
+
+	// Explode the attributes
+	attrs.Explode()
+	// Retrieve the id segment
+	id := c.Param("id")
+
+	contents := &resource.Resource{}
+	if err := c.ShouldBindJSON(contents); err != nil {
+		// (todo)> throw 4XX
+		panic(err)
+	}
+
+	// Retrieve the storage adapter
+	store, ok := c.Get("storage")
+	if !ok {
+		panic("Missing storage setup ...")
+	}
+	update.Resource(store.(storage.Storer), id, contents)
+
+	c.JSON(http.StatusOK, nil)
 
 }
 
