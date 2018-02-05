@@ -11,13 +11,27 @@ import (
 func TestContext(t *testing.T) {
 	rt := resTypeRepo.Get("User")
 
-	// FQN path / case insesitive
+	// Unknown attribute
+	s := Parse("unknown")
+	ctx := s.Context(rt)
+	assert.Nil(t, ctx)
+
+	// Name and Sub without URI
+	// Unknown since not present on base schema
 	p := Path{
+		Name: "MANAGER",
+		Sub:  "value",
+	}
+	ctx = p.Context(rt)
+	assert.Nil(t, ctx)
+
+	// FQN path / case insensitive
+	p = Path{
 		URI:  "urn:ietf:params:scim:schemas:core:2.0:User",
 		Name: "NAME",
 		Sub:  "gIvEnNaMe",
 	}
-	ctx := p.Context(rt)
+	ctx = p.Context(rt)
 	assert.Equal(t, rt.GetSchema(), ctx.Schema)
 	assert.Equal(t, rt.GetSchema().Attributes.WithName("name"), ctx.Attribute)
 	assert.Equal(t, rt.GetSchema().Attributes.WithName("name").SubAttributes.WithName("givenName"), ctx.SubAttribute)
@@ -73,16 +87,6 @@ func TestContext(t *testing.T) {
 	ctx = p.Context(rt)
 	assert.Equal(t, rt.GetSchemaExtensions()["urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"], ctx.Schema)
 	assert.Equal(t, rt.GetSchemaExtensions()["urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"].Attributes.WithName("employeeNumber"), ctx.Attribute)
-
-	// Name and Sub without URI
-	p = Path{
-		Name: "MANAGER",
-		Sub:  "value",
-	}
-	ctx = p.Context(rt)
-	assert.Equal(t, rt.GetSchema(), ctx.Schema)
-	assert.Nil(t, ctx.Attribute)
-	assert.Nil(t, ctx.SubAttribute)
 }
 
 func TestContextSet(t *testing.T) {

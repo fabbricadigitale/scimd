@@ -33,6 +33,8 @@ func (ctx *Context) Path() *Path {
 }
 
 // Context fetches from rt a suitable Context for p, if any.
+//
+// Nil when p is an unknown path attribute.
 func (p Path) Context(rt *core.ResourceType) (ctx *Context) {
 
 	// (todo) implement caching
@@ -74,6 +76,8 @@ func (p Path) Context(rt *core.ResourceType) (ctx *Context) {
 				return nil
 			}
 		}
+	} else {
+		return nil
 	}
 
 	return
