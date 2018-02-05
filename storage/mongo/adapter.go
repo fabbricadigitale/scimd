@@ -182,10 +182,12 @@ func (a *Adapter) toDoc(r *resource.Resource) *document {
 	rt := r.ResourceType()
 
 	d := document{
-		"schemas":    r.Schemas,
-		"id":         r.ID,
-		"externalId": r.ExternalID,
-		"meta":       fromMeta(&r.Meta),
+		"schemas": r.Schemas,
+		"id":      r.ID,
+		"meta":    fromMeta(&r.Meta),
+	}
+	if r.ExternalID != "" {
+		d["externalId"] = r.ExternalID
 	}
 
 	for ns := range rt.GetSchemas() {
@@ -206,6 +208,9 @@ func toResource(d *document) *resource.Resource {
 			ID:      dd["id"].(string),
 			Meta:    toMeta(dd["meta"].(bson.M)),
 		},
+	}
+	if dd["externalId"] != nil {
+		r.CommonAttributes.ExternalID = dd["externalId"].(string)
 	}
 
 	rt := r.ResourceType()

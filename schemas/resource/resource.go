@@ -48,7 +48,7 @@ func (r *Resource) Values(ns string) *datatype.Complex {
 	return nil
 }
 
-// UnmarshalJSON is the Resource Marshal implementation
+// UnmarshalJSON is the Resource unmarshal implementation
 func (r *Resource) UnmarshalJSON(b []byte) error {
 	// Unmarshal common parts
 	if err := json.Unmarshal(b, &r.CommonAttributes); err != nil {
@@ -102,36 +102,29 @@ func (r *Resource) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// MarshalJSON is the Resource Marshal implementation
+// MarshalJSON is the Resource marshal implementation
 func (r *Resource) MarshalJSON() ([]byte, error) {
-
 	var msg json.RawMessage
 	var err error
 
 	// Attach Common attribute to the map before marshal operation
-	// TODO: implement "omitempty" check
 	out := map[string]interface{}{
-		"id":         r.ID,
-		"externalId": r.ExternalID,
-		"schemas":    r.Schemas,
-		"meta":       r.Meta,
+		"id":      r.ID,
+		"schemas": r.Schemas,
+		"meta":    r.Meta,
+	}
+	if r.ExternalID != "" {
+		out["externalId"] = r.ExternalID
 	}
 
-	// Get BaseSchema to encode core attributes
-	// TODO: Generalize this code block
-	// ****
-
-	// Validate and get ResourceType
 	resourceType := r.ResourceType()
 	if resourceType == nil {
 		return nil, &core.ScimError{Msg: "Unsupported Resource Type"}
 	}
-	// Validate and get schema
 	schema := resourceType.GetSchema()
 	if schema == nil {
 		return nil, &core.ScimError{Msg: "Unsupported Schema"}
 	}
-	// ****
 
 	// Marshal schema attrs to the top level
 	ns := schema.GetIdentifier()

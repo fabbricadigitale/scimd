@@ -69,18 +69,6 @@ func (rs *ResourceService) List(c *gin.Context) {
 	c.JSON(http.StatusOK, list)
 }
 
-// Search ...
-func (rs *ResourceService) Search(c *gin.Context) {
-	contents := &messages.SearchRequest{}
-	if err := c.ShouldBindJSON(contents); err != nil {
-		// (todo)> throw 4XX
-		panic(err)
-	}
-
-	// Go ahead ...
-	log.Printf("%+v\n", contents)
-}
-
 // Get ...
 func (rs *ResourceService) Get(c *gin.Context) {
 	var attrs api.Attributes
@@ -97,7 +85,7 @@ func (rs *ResourceService) Get(c *gin.Context) {
 	// Retrieve the storage adapter
 	store, ok := c.Get("storage")
 	if !ok {
-		panic("Missing storage setup ...")
+		panic("Missing storage setup ...") // (fixme)>
 	}
 	// Retrieve the id segment
 	id := c.Param("id")
@@ -127,7 +115,18 @@ func (rs *ResourceService) Post(c *gin.Context) {
 	create.Resource(store.(storage.Storer), rs.rt, contents)
 
 	c.JSON(http.StatusOK, nil)
+}
 
+// Search ...
+func (rs *ResourceService) Search(c *gin.Context) {
+	contents := &messages.SearchRequest{}
+	if err := c.ShouldBindJSON(contents); err != nil {
+		// (todo)> throw 4XX
+		panic(err)
+	}
+
+	// Go ahead ...
+	log.Printf("%+v\n", contents)
 }
 
 // Put ...

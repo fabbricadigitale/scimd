@@ -52,7 +52,7 @@ type Pagination struct {
 // Search represents the set of parameters of a search query
 type Search struct {
 	Attributes
-	Filter `form:"filter" json:"filter,omitempty"`
+	Filter `form:"filter" json:"filter,omitempty"` // (todo)> add validator
 	Sorting
 	Pagination
 }
