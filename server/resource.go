@@ -100,21 +100,20 @@ func (rs *ResourceService) Get(c *gin.Context) {
 
 // Post ...
 func (rs *ResourceService) Post(c *gin.Context) {
-	contents := &resource.Resource{}
-	if err := c.ShouldBindJSON(contents); err != nil {
-		// (todo)> throw 4XX
-		panic(err)
+	var contents resource.Resource
+	if err := c.ShouldBindJSON(&contents); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	} else {
+		// Retrieve the storage adapter
+		store, ok := c.Get("storage")
+		if !ok {
+			panic("Missing storage setup ...")
+		}
+
+		create.Resource(store.(storage.Storer), rs.rt, &contents)
+
+		c.JSON(http.StatusOK, nil)
 	}
-
-	// Retrieve the storage adapter
-	store, ok := c.Get("storage")
-	if !ok {
-		panic("Missing storage setup ...")
-	}
-
-	create.Resource(store.(storage.Storer), rs.rt, contents)
-
-	c.JSON(http.StatusOK, nil)
 }
 
 // Search ...

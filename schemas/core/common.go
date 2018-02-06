@@ -17,7 +17,7 @@ func (e *ScimError) Error() string { return e.Msg }
 // Meta ...
 type Meta struct {
 	Location     string     `json:"location,omitempty" validate:"uri"`
-	ResourceType string     `json:"resourceType" validate:"required"`
+	ResourceType string     `form:"resourceType" json:"resourceType" validate:"required" binding:"required"`
 	Created      *time.Time `json:"created,omitempty"`
 	LastModified *time.Time `json:"lastModified,omitempty"`
 	Version      string     `json:"version,omitempty"`
@@ -25,12 +25,12 @@ type Meta struct {
 
 // CommonAttributes represents SCIM Common Attributes as per https://tools.ietf.org/html/rfc7643#section-3.1
 type CommonAttributes struct {
-	Schemas []string `json:"schemas" validate:"gt=0,dive,urn,required" mold:"dive,normurn"`
+	Schemas []string `form:"schemas" json:"schemas" validate:"gt=0,dive,urn,required" mold:"dive,normurn" binding:"required"`
 
 	// Common attributes
-	ID         string `json:"id" validate:"excludes=bulkId,required"`
+	ID         string `form:"id" json:"id" validate:"excludes=bulkId,required" binding:"required"`
 	ExternalID string `json:"externaId,omitempty"`
-	Meta       Meta   `json:"meta" validate:"required"`
+	Meta       Meta   `form:"meta" json:"meta" validate:"required" binding:"required"`
 }
 
 // NewCommon returns a Common filled with schema, resourceType, and ID
