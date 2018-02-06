@@ -4,6 +4,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/fabbricadigitale/scimd/api/delete"
+
 	"github.com/fabbricadigitale/scimd/api"
 	"github.com/fabbricadigitale/scimd/api/create"
 	"github.com/fabbricadigitale/scimd/api/messages"
@@ -166,6 +168,20 @@ func (rs *ResourceService) Patch(*gin.Context) {
 }
 
 // Delete ...
-func (rs *ResourceService) Delete(*gin.Context) {
+func (rs *ResourceService) Delete(c *gin.Context) {
+
+	id := c.Param("id")
+	// Retrieve the storage adapter
+	store, ok := c.Get("storage")
+	if !ok {
+		panic("Missing storage setup ...")
+	}
+
+	err := delete.Resource(store.(storage.Storer), rs.rt, id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+	} else {
+		c.JSON(http.StatusOK, nil)
+	}
 
 }
