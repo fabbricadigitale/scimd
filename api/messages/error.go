@@ -40,6 +40,8 @@ func NewError(e error) Error {
 	case *api.InvalidFilterError:
 		scimError.Status = string(http.StatusBadRequest)
 		scimError.ScimType = "invalidFilter"
+	case *api.ResourceNotFoundError:
+		scimError.Status = "404"
 	default:
 		scimError.Status = string(http.StatusInternalServerError)
 	}
@@ -48,4 +50,12 @@ func NewError(e error) Error {
 	scimError.Detail = e.Error()
 
 	return scimError
+}
+
+func (e Error) Error() string {
+	b, err := json.Marshal(e)
+	if err != nil {
+		panic(err)
+	}
+	return string(b)
 }

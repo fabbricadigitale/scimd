@@ -4,10 +4,12 @@ import (
 	"time"
 
 	"github.com/fabbricadigitale/scimd/api"
+	"github.com/fabbricadigitale/scimd/api/messages"
 	"github.com/fabbricadigitale/scimd/api/query"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/storage"
+	"github.com/fabbricadigitale/scimd/storage/mongo"
 	"github.com/fabbricadigitale/scimd/version"
 )
 
@@ -20,6 +22,12 @@ func Resource(s storage.Storer, resType *core.ResourceType, id string, res *reso
 
 	err = s.Update(res, id, "")
 	if err != nil {
+		switch err.(type) {
+		case mongo.ResourceNotFoundError:
+			err = messages.NewError(&api.ResourceNotFoundError{
+				Detail: id,
+			})
+		}
 		ret = nil
 	} else {
 		ret, err = query.Resource(s.(storage.Storer), resType, res.ID, &api.Attributes{})

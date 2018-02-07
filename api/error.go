@@ -47,3 +47,12 @@ type InternalServerError struct {
 func (e *InternalServerError) Error() string {
 	return fmt.Sprintf("Ops! Internal server error: %s", e.Detail)
 }
+
+// ResourceNotFoundError is a wrapper of a mongo.ResourceNotFoundError
+type ResourceNotFoundError struct {
+	Detail string
+}
+
+func (e *ResourceNotFoundError) Error() string {
+	return fmt.Sprintf("Resource %s not found", e.Detail)
+}

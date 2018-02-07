@@ -162,7 +162,7 @@ func (rs *ResourceService) Put(c *gin.Context) {
 	res, err := update.Resource(store.(storage.Storer), rs.rt, id, contents)
 	if err != nil {
 		log.Println("(todo) > handle error")
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.String(http.StatusNotFound, err.Error())
 	} else {
 		c.JSON(http.StatusOK, res.(*resource.Resource))
 	}
