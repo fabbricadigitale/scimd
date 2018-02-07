@@ -58,13 +58,21 @@ func (res *Query) Fields(fields map[attr.Path]bool) storage.Querier {
 	var selector bson.M
 	selector = make(bson.M)
 
+	inclusionMode := false
+
 	if fields != nil {
 		for p, on := range fields {
 			var s int
 			if on {
 				s = 1
+				inclusionMode = true
 			}
 			selector[pathToKey(p)] = s
+		}
+		if inclusionMode {
+			selector["id"] = 1
+			selector["schemas"] = 1
+			selector["meta.resourceType"] = 1
 		}
 	} // else an empty selector is set
 
