@@ -32,11 +32,16 @@ func TestCreate(t *testing.T) {
 		"employeeNumber": "701984",
 	})
 
-	create.Resource(adapter, resTypeRepo.Get("User"), res)
+	retRes, err := create.Resource(adapter, resTypeRepo.Get("User"), res)
 
-	retRes, err := adapter.Get(resTypeRepo.Get("User"), res.ID, res.Meta.Version, nil)
 	require.Nil(t, err)
 	require.NotNil(t, retRes)
-	require.Equal(t, res.Meta.Version, retRes.Meta.Version)
-
+	r := retRes.(*resource.Resource)
+	values := r.Values("urn:ietf:params:scim:schemas:core:2.0:User")
+	userName := (*values)["userName"]
+	extensionValues := r.Values("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User")
+	employeeNumber := (*extensionValues)["employeeNumber"]
+	require.Equal(t, res.Meta.Version, r.Meta.Version)
+	require.Equal(t, datatype.String("alelb"), userName)
+	require.Equal(t, datatype.String("701984"), employeeNumber)
 }

@@ -12,6 +12,8 @@ import (
 
 func TestUpdate(t *testing.T) {
 
+	notExistingID := "abcdefgh-xxxx-yyyy-zzzz-jkilmnopqrst"
+
 	id := "2819c223-7f76-453a-919d-ab1234567891"
 	dat, err := ioutil.ReadFile("../../testdata/enterprise_user_resource_1.json")
 	require.NoError(t, err)
@@ -21,11 +23,17 @@ func TestUpdate(t *testing.T) {
 	err = json.Unmarshal(dat, res)
 	require.NoError(t, err)
 
-	err = update.Resource(adapter, id, res)
+	retRes, err := update.Resource(adapter, resTypeRepo.Get("User"), notExistingID, res)
+	require.Error(t, err)
 
-	retRes, err := adapter.Get(resTypeRepo.Get("User"), res.ID, res.Meta.Version, nil)
+	res = &resource.Resource{}
+	err = json.Unmarshal(dat, res)
+	require.NoError(t, err)
+
+	retRes, err = update.Resource(adapter, resTypeRepo.Get("User"), id, res)
 	require.Nil(t, err)
-	require.NotNil(t, retRes)
-	require.Equal(t, res.Meta.Version, retRes.Meta.Version)
+	r := retRes.(*resource.Resource)
+	require.NotNil(t, r)
+	require.Equal(t, res.Meta.Version, r.Meta.Version)
 
 }

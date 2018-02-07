@@ -112,9 +112,12 @@ func (rs *ResourceService) Post(c *gin.Context) {
 			panic("Missing storage setup ...")
 		}
 
-		create.Resource(store.(storage.Storer), rs.rt, &contents)
+		res, err := create.Resource(store.(storage.Storer), rs.rt, &contents)
+		if err != nil {
+			log.Println("(todo) > handle error")
+		}
 
-		c.JSON(http.StatusOK, nil)
+		c.JSON(http.StatusOK, res.(*resource.Resource))
 	}
 }
 
@@ -156,10 +159,13 @@ func (rs *ResourceService) Put(c *gin.Context) {
 	if !ok {
 		panic("Missing storage setup ...")
 	}
-	update.Resource(store.(storage.Storer), id, contents)
-
-	c.JSON(http.StatusOK, nil)
-
+	res, err := update.Resource(store.(storage.Storer), rs.rt, id, contents)
+	if err != nil {
+		log.Println("(todo) > handle error")
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+	} else {
+		c.JSON(http.StatusOK, res.(*resource.Resource))
+	}
 }
 
 // Patch ...

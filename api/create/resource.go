@@ -3,7 +3,9 @@ package create
 import (
 	"time"
 
+	"github.com/fabbricadigitale/scimd/api"
 	"github.com/fabbricadigitale/scimd/api/attr"
+	"github.com/fabbricadigitale/scimd/api/query"
 	"github.com/fabbricadigitale/scimd/schemas"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
@@ -18,7 +20,7 @@ import (
 // Commons' attributes, if present, will be ignored and overwritten
 // (with the only exception of ExternalID that if populated will be used).
 // Attributes whose mutability is "readOnly" will be ignored and removed.
-func Resource(s storage.Storer, resType *core.ResourceType, res *resource.Resource) (err error) {
+func Resource(s storage.Storer, resType *core.ResourceType, res *resource.Resource) (ret core.ResourceTyper, err error) {
 	// Make a new UUID
 	ID, err := uuid.NewV4()
 	if err != nil {
@@ -51,6 +53,11 @@ func Resource(s storage.Storer, resType *core.ResourceType, res *resource.Resour
 	}
 
 	err = s.Create(res)
-	// (todo) Reload res?
+	if err != nil {
+		ret = nil
+	} else {
+		ret, err = query.Resource(s.(storage.Storer), resType, res.ID, &api.Attributes{})
+	}
+
 	return
 }

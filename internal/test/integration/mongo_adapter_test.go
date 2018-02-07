@@ -96,6 +96,8 @@ func TestMongoUpdate(t *testing.T) {
 	require.NotNil(t, schemaRepo)
 	require.NotNil(t, adapter)
 
+	notExistingID := "zzzzzzzzzzzzzzzzzzzzzz"
+
 	id := "2819c223-7f76-453a-919d-ab1234567891"
 	dat, err := ioutil.ReadFile("../../testdata/user_to_update.json")
 	require.NoError(t, err)
@@ -105,8 +107,12 @@ func TestMongoUpdate(t *testing.T) {
 	err = json.Unmarshal(dat, res)
 	require.NoError(t, err)
 
+	err = adapter.Update(res, notExistingID, "")
+	require.Error(t, err)
+
 	err = adapter.Update(res, id, "")
 	require.NoError(t, err)
+
 }
 
 func TestMongoFind(t *testing.T) {

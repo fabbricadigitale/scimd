@@ -28,7 +28,7 @@ type CommonAttributes struct {
 	Schemas []string `form:"schemas" json:"schemas" validate:"gt=0,dive,urn,required" mold:"dive,normurn" binding:"required"`
 
 	// Common attributes
-	ID         string `form:"id" json:"id" validate:"excludes=bulkId,required" binding:"required"`
+	ID         string `json:"id" validate:"excludes=bulkId,required"`
 	ExternalID string `json:"externaId,omitempty"`
 	Meta       Meta   `form:"meta" json:"meta" validate:"required" binding:"required"`
 }
