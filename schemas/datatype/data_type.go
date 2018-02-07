@@ -161,7 +161,7 @@ func Cast(v interface{}, t string) (DataTyper, error) {
 	if rt := rTypes[t]; rt != nil {
 		rv := reflect.ValueOf(v)
 		rv = reflect.Indirect(rv)
-		if rv.Type().ConvertibleTo(rt) {
+		if rv.IsValid() && rv.Type().ConvertibleTo(rt) {
 			return rv.Convert(rt).Interface().(DataTyper), nil
 		}
 		// Those values are not within Data Types must be considered to be Null
