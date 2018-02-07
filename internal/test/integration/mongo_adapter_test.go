@@ -9,6 +9,7 @@ import (
 	"github.com/fabbricadigitale/scimd/api/attr"
 	"github.com/fabbricadigitale/scimd/api/filter"
 	"github.com/fabbricadigitale/scimd/schemas/core"
+	"github.com/fabbricadigitale/scimd/schemas/datatype"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/olebedev/emitter"
 	"github.com/stretchr/testify/assert"
@@ -88,6 +89,34 @@ func TestMongoGet(t *testing.T) {
 	require.Nil(t, resource)
 	require.EqualError(t, err, "not found")
 
+}
+
+func TestMongoGetOmitEmpty(t *testing.T) {
+	require.NotNil(t, resTypeRepo)
+	require.NotNil(t, schemaRepo)
+	require.NotNil(t, adapter)
+
+	// Excluding externalId
+	id := "2819c223-7f76-453a-919d-ab1234567891"
+	m := make(map[attr.Path]bool)
+	m[attr.Path{
+		URI:  "urn:ietf:params:scim:schemas:core:2.0:User",
+		Name: "emails",
+		Sub:  "primary",
+	}] = true
+
+	resource, err := adapter.Get(resTypeRepo.Get("User"), id, "", m)
+
+	require.NoError(t, err)
+	require.NotNil(t, resource)
+
+	values := *resource.Values("urn:ietf:params:scim:schemas:core:2.0:User")
+
+	emails := values["emails"].([]datatype.DataTyper)
+	require.NotEmpty(t, values)
+	for _, value := range emails {
+		assert.NotEmpty(t, value)
+	}
 }
 
 func TestMongoUpdate(t *testing.T) {
