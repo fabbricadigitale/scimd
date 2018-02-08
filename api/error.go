@@ -56,3 +56,12 @@ type ResourceNotFoundError struct {
 func (e *ResourceNotFoundError) Error() string {
 	return fmt.Sprintf("Resource %s not found", e.Detail)
 }
+
+// MissingRequiredPropertyError is ...
+type MissingRequiredPropertyError struct {
+	Path string
+}
+
+func (e *MissingRequiredPropertyError) Error() string {
+	return fmt.Sprintf("No attribute defined for '%s'", e.Path)
+}

@@ -42,6 +42,9 @@ func NewError(e error) Error {
 		scimError.ScimType = "invalidFilter"
 	case *api.ResourceNotFoundError:
 		scimError.Status = "404"
+	case *api.MissingRequiredPropertyError:
+		scimError.Status = string(http.StatusBadRequest)
+		scimError.ScimType = "invalidValue"
 	default:
 		scimError.Status = string(http.StatusInternalServerError)
 	}

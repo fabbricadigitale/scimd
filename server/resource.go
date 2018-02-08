@@ -104,7 +104,7 @@ func (rs *ResourceService) Get(c *gin.Context) {
 func (rs *ResourceService) Post(c *gin.Context) {
 	var contents resource.Resource
 	if err := c.ShouldBindJSON(&contents); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, messages.NewError(err))
 	} else {
 		// Retrieve the storage adapter
 		store, ok := c.Get("storage")
