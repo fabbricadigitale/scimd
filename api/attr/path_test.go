@@ -179,5 +179,11 @@ func TestPaths(t *testing.T) {
 		require.Equal(t, tt.expected, results)
 	}
 
-	// (todo)> test that Paths(rt, nil) returns all attributes (ignoring their returned characteristic)
+	// Paths(rt, nil) with fx = nil returns all attributes (ignoring their returned characteristic)
+	var attrs = make(map[string]bool)
+	p := Paths(rt, nil)
+	for _, at := range p {
+		attrs[at.String()] = true
+	}
+	require.Equal(t, withFxNil, attrs)
 }
