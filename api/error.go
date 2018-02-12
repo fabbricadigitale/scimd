@@ -59,9 +59,13 @@ func (e *ResourceNotFoundError) Error() string {
 
 // MissingRequiredPropertyError is ...
 type MissingRequiredPropertyError struct {
-	Path string
+	Path   string
+	Detail string
 }
 
 func (e *MissingRequiredPropertyError) Error() string {
-	return fmt.Sprintf("No attribute defined for '%s'", e.Path)
+	if e.Path != "" {
+		return fmt.Sprintf("No attribute defined for '%s'", e.Path)
+	}
+	return fmt.Sprintf("%s", e.Detail)
 }

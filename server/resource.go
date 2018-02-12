@@ -114,7 +114,7 @@ func (rs *ResourceService) Post(c *gin.Context) {
 
 		res, err := create.Resource(store.(storage.Storer), rs.rt, &contents)
 		if err != nil {
-			log.Println("(todo) > handle error")
+			c.JSON(http.StatusBadRequest, err)
 		}
 
 		c.JSON(http.StatusOK, res.(*resource.Resource))
