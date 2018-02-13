@@ -7,12 +7,11 @@ import (
 	"github.com/fabbricadigitale/scimd/api/filter"
 	"github.com/fabbricadigitale/scimd/event"
 	"github.com/fabbricadigitale/scimd/schemas/core"
-	"github.com/fabbricadigitale/scimd/schemas/datatype"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/storage"
+	"github.com/fabbricadigitale/scimd/storage/listeners"
 	"github.com/globalsign/mgo/bson"
 	"github.com/olebedev/emitter"
-	"golang.org/x/crypto/bcrypt"
 )
 
 // Adapter is the repository Adapter
@@ -53,7 +52,7 @@ func New(url, db, collection string) (storage.Storer, error) {
 	adapter.adaptee = driver
 	adapter.Dispatcher = event.NewDispatcher(0)
 	adapter.Emitter().Use("*", emitter.Void)
-	adapter.addListeners()
+	listeners.AddListeners(adapter.Emitter())
 
 	return adapter, nil
 }
@@ -286,53 +285,4 @@ func toMeta(m map[string]interface{}) core.Meta {
 	}
 
 	return meta
-}
-
-func (a *Adapter) addListeners() {
-	a.Emitter().On("create", func(event *emitter.Event) {
-		res, ok := event.Args[0].(*resource.Resource)
-
-		if ok != true {
-			return
-		}
-
-		hashPassword(res)
-
-	})
-	a.Emitter().On("update", func(event *emitter.Event) {
-		res, ok := event.Args[0].(*resource.Resource)
-
-		if ok != true {
-			return
-		}
-
-		hashPassword(res)
-
-	})
-}
-
-// hash the password value if there is the password attribute
-func hashPassword(res *resource.Resource) {
-	values := res.Values("urn:ietf:params:scim:schemas:core:2.0:User")
-	if values == nil {
-		return
-	}
-
-	passwordValue, ok := (*values)["password"]
-	if ok != true {
-		return
-	}
-
-	password := []byte(passwordValue.(datatype.String))
-
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 10)
-
-	if err != nil {
-		panic(err)
-	}
-
-	res.SetValues("urn:ietf:params:scim:schemas:core:2.0:User", &datatype.Complex{
-		"password": datatype.String(hashedPassword),
-	})
-
 }
