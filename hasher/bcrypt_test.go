@@ -6,11 +6,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestBCryptHasher_Hash(t *testing.T) {
-
+func TestBCrypt_Hash(t *testing.T) {
 	password := []byte("password")
 	expected := []byte("$2a$10$nnKMazO/AsNRayhioXqb1.WNNcEkDPjj3/ownOU3jIil7aXZRnXNC")
-	hasher := NewBCryptHasher()
+	hasher := NewBCrypt()
 	hashedPassword, err := hasher.Hash(password)
 
 	assert.Nil(t, err)
@@ -18,9 +17,8 @@ func TestBCryptHasher_Hash(t *testing.T) {
 }
 
 func TestBCryptHasher_Compare(t *testing.T) {
-
 	password := []byte("password")
-	hasher := NewBCryptHasher()
+	hasher := NewBCrypt()
 	hashedPassword, err := hasher.Hash(password)
 	assert.Nil(t, err)
 	assert.True(t, hasher.Compare(hashedPassword, password))

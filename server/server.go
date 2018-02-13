@@ -8,6 +8,7 @@ import (
 
 	"github.com/cenk/backoff"
 	"github.com/fabbricadigitale/scimd/storage"
+	"github.com/fabbricadigitale/scimd/storage/listeners"
 	"github.com/fabbricadigitale/scimd/storage/mongo"
 	"github.com/gin-gonic/gin"
 	"github.com/thoas/go-funk"
@@ -53,6 +54,7 @@ func Storage(endpoint, db, collection string) gin.HandlerFunc {
 		err := backoff.Retry(func() error {
 			var err error
 			adapter, err = mongo.New(endpoint, db, collection)
+			listeners.AddListeners(adapter.Emitter())
 			if err != nil {
 				return err
 			}

@@ -2,25 +2,27 @@ package hasher
 
 import "golang.org/x/crypto/bcrypt"
 
-const cost int = 10
+const defaultCost int = 10
 
-// BCryptHasher is a Hasher that use bcrypt algorithm
-type BCryptHasher struct {
+// BCrypt is a Hasher that use the bcrypt algorithm
+type BCrypt struct {
 	cost int
 }
 
-// NewBCryptHasher allocates new NewBCryptHasher
-func NewBCryptHasher() Hasher {
-	return &BCryptHasher{}
+// NewBCrypt allocates a new BCrypt instance
+func NewBCrypt() Hasher {
+	return &BCrypt{
+		cost: defaultCost,
+	}
 }
 
-// Hash implements Hasher interface
-func (b BCryptHasher) Hash(password []byte) ([]byte, error) {
-	return bcrypt.GenerateFromPassword(password, cost)
+// Hash implements the Hasher interface
+func (bc BCrypt) Hash(password []byte) ([]byte, error) {
+	return bcrypt.GenerateFromPassword(password, bc.cost)
 }
 
-// Compare implements Hasher interface
-func (b BCryptHasher) Compare(hashedPassword, password []byte) bool {
+// Compare implements the Hasher interface
+func (bc BCrypt) Compare(hashedPassword, password []byte) bool {
 	err := bcrypt.CompareHashAndPassword(hashedPassword, password)
 	return err == nil
 }

@@ -9,7 +9,6 @@ import (
 
 // AddListeners for the emitted events
 func AddListeners(e *emitter.Emitter) {
-
 	// Create event handler
 	e.On("create", func(event *emitter.Event) {
 		res, ok := event.Args[0].(*resource.Resource)
@@ -19,7 +18,6 @@ func AddListeners(e *emitter.Emitter) {
 		}
 
 		hashPassword(res)
-
 	})
 
 	// Update event handler
@@ -31,7 +29,6 @@ func AddListeners(e *emitter.Emitter) {
 		}
 
 		hashPassword(res)
-
 	})
 }
 
@@ -49,7 +46,7 @@ func hashPassword(res *resource.Resource) {
 
 	password := []byte(passwordValue.(datatype.String))
 
-	hashedPassword, err := hasher.NewBCryptHasher().Hash(password)
+	hashedPassword, err := hasher.NewBCrypt().Hash(password)
 
 	if err != nil {
 		panic(err)
@@ -58,5 +55,4 @@ func hashPassword(res *resource.Resource) {
 	res.SetValues("urn:ietf:params:scim:schemas:core:2.0:User", &datatype.Complex{
 		"password": datatype.String(hashedPassword),
 	})
-
 }

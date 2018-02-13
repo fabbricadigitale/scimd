@@ -9,7 +9,6 @@ import (
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/storage"
-	"github.com/fabbricadigitale/scimd/storage/listeners"
 	"github.com/globalsign/mgo/bson"
 	"github.com/olebedev/emitter"
 )
@@ -52,7 +51,6 @@ func New(url, db, collection string) (storage.Storer, error) {
 	adapter.adaptee = driver
 	adapter.Dispatcher = event.NewDispatcher(0)
 	adapter.Emitter().Use("*", emitter.Void)
-	listeners.AddListeners(adapter.Emitter())
 
 	return adapter, nil
 }
