@@ -3,6 +3,7 @@ package server
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/fabbricadigitale/scimd/api/delete"
 
@@ -46,8 +47,9 @@ func (rs *ResourceService) List(c *gin.Context) {
 	params := api.NewSearch()
 	// Using the form binding engine (query)
 	if err := c.ShouldBindQuery(params); err != nil {
-		// (todo) > throw 4XX
-		panic(err)
+		err := messages.NewError(err)
+		status, _ := strconv.Atoi(err.Status)
+		c.JSON(status, err)
 	}
 
 	// Go ahead ...
@@ -57,15 +59,21 @@ func (rs *ResourceService) List(c *gin.Context) {
 	// Retrieve the storage adapter
 	store, ok := c.Get("storage")
 	if !ok {
-		panic("Missing storage setup ...")
+		err := messages.NewError(&api.InternalServerError{
+			Detail: "Missing storage setup ...",
+		})
+		status, _ := strconv.Atoi(err.Status)
+		c.JSON(status, err)
 	}
 
-	resArr := make([]*core.ResourceType, 0)
-	resArr[0] = rs.rt
+	rtArr := make([]*core.ResourceType, 0)
+	rtArr = append(rtArr, rs.rt)
 
-	list, err := query.Resources(store.(storage.Storer), resArr, params)
+	list, err := query.Resources(store.(storage.Storer), rtArr, params)
 	if err != nil {
-		panic(err)
+		err := messages.NewError(err)
+		status, _ := strconv.Atoi(err.Status)
+		c.JSON(status, err)
 	}
 
 	c.JSON(http.StatusOK, list)
@@ -76,9 +84,9 @@ func (rs *ResourceService) Get(c *gin.Context) {
 	var attrs api.Attributes
 	// Using the form binding engine (query)
 	if err := c.ShouldBindQuery(&attrs); err != nil {
-		// (todo)> throw 4XX
-		panic(err)
-
+		err := messages.NewError(err)
+		status, _ := strconv.Atoi(err.Status)
+		c.JSON(status, err)
 	}
 
 	// Explode the attributes
@@ -87,14 +95,20 @@ func (rs *ResourceService) Get(c *gin.Context) {
 	// Retrieve the storage adapter
 	store, ok := c.Get("storage")
 	if !ok {
-		panic("Missing storage setup ...") // (fixme)>
+		err := messages.NewError(&api.InternalServerError{
+			Detail: "Missing storage setup ...",
+		})
+		status, _ := strconv.Atoi(err.Status)
+		c.JSON(status, err)
 	}
 	// Retrieve the id segment
 	id := c.Param("id")
 
 	res, err := query.Resource(store.(storage.Storer), rs.rt, id, &attrs)
 	if err != nil {
-		log.Println("(todo) > handle error")
+		err := messages.NewError(err)
+		status, _ := strconv.Atoi(err.Status)
+		c.JSON(status, err)
 	}
 
 	c.JSON(http.StatusOK, res.(*resource.Resource))
@@ -104,17 +118,25 @@ func (rs *ResourceService) Get(c *gin.Context) {
 func (rs *ResourceService) Post(c *gin.Context) {
 	var contents resource.Resource
 	if err := c.ShouldBindJSON(&contents); err != nil {
-		c.JSON(http.StatusBadRequest, messages.NewError(err))
+		err := messages.NewError(err)
+		status, _ := strconv.Atoi(err.Status)
+		c.JSON(status, err)
 	} else {
 		// Retrieve the storage adapter
 		store, ok := c.Get("storage")
 		if !ok {
-			panic("Missing storage setup ...")
+			err := messages.NewError(&api.InternalServerError{
+				Detail: "Missing storage setup ...",
+			})
+			status, _ := strconv.Atoi(err.Status)
+			c.JSON(status, err)
 		}
 
 		res, err := create.Resource(store.(storage.Storer), rs.rt, &contents)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, err)
+			err := messages.NewError(err)
+			status, _ := strconv.Atoi(err.Status)
+			c.JSON(status, err)
 		}
 
 		c.JSON(http.StatusOK, res.(*resource.Resource))
@@ -125,12 +147,32 @@ func (rs *ResourceService) Post(c *gin.Context) {
 func (rs *ResourceService) Search(c *gin.Context) {
 	contents := &messages.SearchRequest{}
 	if err := c.ShouldBindJSON(contents); err != nil {
-		// (todo)> throw 4XX
-		panic(err)
+		err := messages.NewError(err)
+		status, _ := strconv.Atoi(err.Status)
+		c.JSON(status, err)
 	}
 
-	// Go ahead ...
-	log.Printf("%+v\n", contents)
+	// Retrieve the storage adapter
+	store, ok := c.Get("storage")
+	if !ok {
+		err := messages.NewError(&api.InternalServerError{
+			Detail: "Missing storage setup ...",
+		})
+		status, _ := strconv.Atoi(err.Status)
+		c.JSON(status, err)
+	}
+
+	rtArr := make([]*core.ResourceType, 0)
+	rtArr = append(rtArr, rs.rt)
+
+	list, err := query.SearchRequest(store.(storage.Storer), rtArr, contents)
+	if err != nil {
+		err := messages.NewError(err)
+		status, _ := strconv.Atoi(err.Status)
+		c.JSON(status, err)
+	}
+	c.JSON(http.StatusOK, list)
+
 }
 
 // Put ...
@@ -138,9 +180,9 @@ func (rs *ResourceService) Put(c *gin.Context) {
 	var attrs api.Attributes
 	// Using the form binding engine (query)
 	if err := c.ShouldBindQuery(&attrs); err != nil {
-		// (todo)> throw 4XX
-		panic(err)
-
+		err := messages.NewError(err)
+		status, _ := strconv.Atoi(err.Status)
+		c.JSON(status, err)
 	}
 
 	// Explode the attributes
@@ -150,19 +192,25 @@ func (rs *ResourceService) Put(c *gin.Context) {
 
 	contents := &resource.Resource{}
 	if err := c.ShouldBindJSON(contents); err != nil {
-		// (todo)> throw 4XX
-		panic(err)
+		err := messages.NewError(err)
+		status, _ := strconv.Atoi(err.Status)
+		c.JSON(status, err)
 	}
 
 	// Retrieve the storage adapter
 	store, ok := c.Get("storage")
 	if !ok {
-		panic("Missing storage setup ...")
+		err := messages.NewError(&api.InternalServerError{
+			Detail: "Missing storage setup ...",
+		})
+		status, _ := strconv.Atoi(err.Status)
+		c.JSON(status, err)
 	}
 	res, err := update.Resource(store.(storage.Storer), rs.rt, id, contents)
 	if err != nil {
-		log.Println("(todo) > handle error")
-		c.String(http.StatusNotFound, err.Error())
+		err := messages.NewError(err)
+		status, _ := strconv.Atoi(err.Status)
+		c.JSON(status, err)
 	} else {
 		c.JSON(http.StatusOK, res.(*resource.Resource))
 	}
@@ -180,12 +228,18 @@ func (rs *ResourceService) Delete(c *gin.Context) {
 	// Retrieve the storage adapter
 	store, ok := c.Get("storage")
 	if !ok {
-		panic("Missing storage setup ...")
+		err := messages.NewError(&api.InternalServerError{
+			Detail: "Missing storage setup ...",
+		})
+		status, _ := strconv.Atoi(err.Status)
+		c.JSON(status, err)
 	}
 
 	err := delete.Resource(store.(storage.Storer), rs.rt, id)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		err := messages.NewError(err)
+		status, _ := strconv.Atoi(err.Status)
+		c.JSON(status, err)
 	} else {
 		c.JSON(http.StatusOK, nil)
 	}
