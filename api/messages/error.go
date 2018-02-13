@@ -2,7 +2,6 @@ package messages
 
 import (
 	"encoding/json"
-	"net/http"
 
 	"github.com/fabbricadigitale/scimd/api"
 	"github.com/fabbricadigitale/scimd/schemas/datatype"
@@ -14,7 +13,7 @@ const ErrorURI = "urn:ietf:params:scim:api:messages:2.0:Error"
 //Error is a struct for wrapping scim error
 type Error struct {
 	Schemas  []string `json:"schemas"`
-	Status   string   `json:"status,required"`
+	Status   int      `json:"status,required"`
 	ScimType string   `json:"scimType,omitempty"`
 	Detail   string   `json:"detail,omitempty"`
 }
@@ -23,30 +22,31 @@ type Error struct {
 func NewError(e error) Error {
 
 	var scimError Error
-
+	// NOTE: Here the int codes substitute http status codes
+	// to avoid a weird effect when unmarshal is performed.
 	switch e.(type) {
 	case *json.SyntaxError:
-		scimError.Status = string(http.StatusBadRequest)
+		scimError.Status = 400
 		scimError.ScimType = "invalidSyntax"
 	case *datatype.InvalidDataTypeError:
-		scimError.Status = string(http.StatusBadRequest)
+		scimError.Status = 400
 		scimError.ScimType = "invalidValue"
 	case *json.UnmarshalTypeError:
-		scimError.Status = string(http.StatusBadRequest)
+		scimError.Status = 400
 		scimError.ScimType = "invalidValue"
 	case *api.InvalidPathError:
-		scimError.Status = string(http.StatusBadRequest)
+		scimError.Status = 400
 		scimError.ScimType = "invalidPath"
 	case *api.InvalidFilterError:
-		scimError.Status = string(http.StatusBadRequest)
+		scimError.Status = 400
 		scimError.ScimType = "invalidFilter"
 	case *api.ResourceNotFoundError:
-		scimError.Status = "404"
+		scimError.Status = 404
 	case *api.MissingRequiredPropertyError:
-		scimError.Status = string(http.StatusBadRequest)
+		scimError.Status = 400
 		scimError.ScimType = "invalidValue"
 	default:
-		scimError.Status = string(http.StatusInternalServerError)
+		scimError.Status = 500
 	}
 
 	scimError.Schemas = append(scimError.Schemas, ErrorURI)

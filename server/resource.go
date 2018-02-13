@@ -3,7 +3,6 @@ package server
 import (
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/fabbricadigitale/scimd/api/delete"
 
@@ -48,8 +47,7 @@ func (rs *ResourceService) List(c *gin.Context) {
 	// Using the form binding engine (query)
 	if err := c.ShouldBindQuery(params); err != nil {
 		err := messages.NewError(err)
-		status, _ := strconv.Atoi(err.Status)
-		c.JSON(status, err)
+		c.JSON(err.Status, err)
 	}
 
 	// Go ahead ...
@@ -62,8 +60,7 @@ func (rs *ResourceService) List(c *gin.Context) {
 		err := messages.NewError(&api.InternalServerError{
 			Detail: "Missing storage setup ...",
 		})
-		status, _ := strconv.Atoi(err.Status)
-		c.JSON(status, err)
+		c.JSON(err.Status, err)
 	}
 
 	rtArr := make([]*core.ResourceType, 0)
@@ -72,8 +69,7 @@ func (rs *ResourceService) List(c *gin.Context) {
 	list, err := query.Resources(store.(storage.Storer), rtArr, params)
 	if err != nil {
 		err := messages.NewError(err)
-		status, _ := strconv.Atoi(err.Status)
-		c.JSON(status, err)
+		c.JSON(err.Status, err)
 	}
 
 	c.JSON(http.StatusOK, list)
@@ -85,8 +81,7 @@ func (rs *ResourceService) Get(c *gin.Context) {
 	// Using the form binding engine (query)
 	if err := c.ShouldBindQuery(&attrs); err != nil {
 		err := messages.NewError(err)
-		status, _ := strconv.Atoi(err.Status)
-		c.JSON(status, err)
+		c.JSON(err.Status, err)
 	}
 
 	// Explode the attributes
@@ -98,8 +93,7 @@ func (rs *ResourceService) Get(c *gin.Context) {
 		err := messages.NewError(&api.InternalServerError{
 			Detail: "Missing storage setup ...",
 		})
-		status, _ := strconv.Atoi(err.Status)
-		c.JSON(status, err)
+		c.JSON(err.Status, err)
 	}
 	// Retrieve the id segment
 	id := c.Param("id")
@@ -107,8 +101,7 @@ func (rs *ResourceService) Get(c *gin.Context) {
 	res, err := query.Resource(store.(storage.Storer), rs.rt, id, &attrs)
 	if err != nil {
 		err := messages.NewError(err)
-		status, _ := strconv.Atoi(err.Status)
-		c.JSON(status, err)
+		c.JSON(err.Status, err)
 	}
 
 	c.JSON(http.StatusOK, res.(*resource.Resource))
@@ -119,8 +112,7 @@ func (rs *ResourceService) Post(c *gin.Context) {
 	var contents resource.Resource
 	if err := c.ShouldBindJSON(&contents); err != nil {
 		err := messages.NewError(err)
-		status, _ := strconv.Atoi(err.Status)
-		c.JSON(status, err)
+		c.JSON(err.Status, err)
 	} else {
 		// Retrieve the storage adapter
 		store, ok := c.Get("storage")
@@ -128,15 +120,13 @@ func (rs *ResourceService) Post(c *gin.Context) {
 			err := messages.NewError(&api.InternalServerError{
 				Detail: "Missing storage setup ...",
 			})
-			status, _ := strconv.Atoi(err.Status)
-			c.JSON(status, err)
+			c.JSON(err.Status, err)
 		}
 
 		res, err := create.Resource(store.(storage.Storer), rs.rt, &contents)
 		if err != nil {
 			err := messages.NewError(err)
-			status, _ := strconv.Atoi(err.Status)
-			c.JSON(status, err)
+			c.JSON(err.Status, err)
 		}
 
 		c.JSON(http.StatusOK, res.(*resource.Resource))
@@ -148,8 +138,7 @@ func (rs *ResourceService) Search(c *gin.Context) {
 	contents := &messages.SearchRequest{}
 	if err := c.ShouldBindJSON(contents); err != nil {
 		err := messages.NewError(err)
-		status, _ := strconv.Atoi(err.Status)
-		c.JSON(status, err)
+		c.JSON(err.Status, err)
 	}
 
 	// Retrieve the storage adapter
@@ -158,8 +147,7 @@ func (rs *ResourceService) Search(c *gin.Context) {
 		err := messages.NewError(&api.InternalServerError{
 			Detail: "Missing storage setup ...",
 		})
-		status, _ := strconv.Atoi(err.Status)
-		c.JSON(status, err)
+		c.JSON(err.Status, err)
 	}
 
 	rtArr := make([]*core.ResourceType, 0)
@@ -168,8 +156,7 @@ func (rs *ResourceService) Search(c *gin.Context) {
 	list, err := query.SearchRequest(store.(storage.Storer), rtArr, contents)
 	if err != nil {
 		err := messages.NewError(err)
-		status, _ := strconv.Atoi(err.Status)
-		c.JSON(status, err)
+		c.JSON(err.Status, err)
 	}
 	c.JSON(http.StatusOK, list)
 
@@ -181,8 +168,7 @@ func (rs *ResourceService) Put(c *gin.Context) {
 	// Using the form binding engine (query)
 	if err := c.ShouldBindQuery(&attrs); err != nil {
 		err := messages.NewError(err)
-		status, _ := strconv.Atoi(err.Status)
-		c.JSON(status, err)
+		c.JSON(err.Status, err)
 	}
 
 	// Explode the attributes
@@ -193,8 +179,7 @@ func (rs *ResourceService) Put(c *gin.Context) {
 	contents := &resource.Resource{}
 	if err := c.ShouldBindJSON(contents); err != nil {
 		err := messages.NewError(err)
-		status, _ := strconv.Atoi(err.Status)
-		c.JSON(status, err)
+		c.JSON(err.Status, err)
 	}
 
 	// Retrieve the storage adapter
@@ -203,14 +188,12 @@ func (rs *ResourceService) Put(c *gin.Context) {
 		err := messages.NewError(&api.InternalServerError{
 			Detail: "Missing storage setup ...",
 		})
-		status, _ := strconv.Atoi(err.Status)
-		c.JSON(status, err)
+		c.JSON(err.Status, err)
 	}
 	res, err := update.Resource(store.(storage.Storer), rs.rt, id, contents)
 	if err != nil {
 		err := messages.NewError(err)
-		status, _ := strconv.Atoi(err.Status)
-		c.JSON(status, err)
+		c.JSON(err.Status, err)
 	} else {
 		c.JSON(http.StatusOK, res.(*resource.Resource))
 	}
@@ -231,15 +214,13 @@ func (rs *ResourceService) Delete(c *gin.Context) {
 		err := messages.NewError(&api.InternalServerError{
 			Detail: "Missing storage setup ...",
 		})
-		status, _ := strconv.Atoi(err.Status)
-		c.JSON(status, err)
+		c.JSON(err.Status, err)
 	}
 
 	err := delete.Resource(store.(storage.Storer), rs.rt, id)
 	if err != nil {
 		err := messages.NewError(err)
-		status, _ := strconv.Atoi(err.Status)
-		c.JSON(status, err)
+		c.JSON(err.Status, err)
 	} else {
 		c.JSON(http.StatusOK, nil)
 	}
