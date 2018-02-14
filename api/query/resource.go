@@ -65,11 +65,9 @@ func Attributes(resTypes []*core.ResourceType, attrs *api.Attributes) (fields ma
 	}
 
 	// Fields projection
-	if in != nil || ex != nil {
-		for _, rt := range resTypes {
-			for _, p := range attr.Projection(rt, in, ex) {
-				fields[*p] = true
-			}
+	for _, rt := range resTypes {
+		for _, p := range attr.Projection(rt, in, ex) {
+			fields[*p] = true
 		}
 	}
 
