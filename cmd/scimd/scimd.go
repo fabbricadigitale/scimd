@@ -14,11 +14,13 @@ import (
 )
 
 func main() {
-	setup().Run(":8787")
+	GetEngine().Run(":8787")
 }
 
-// Setup endpoints as dictated by https://tools.ietf.org/html/rfc7644#section-3.2
-func setup() *gin.Engine {
+// GetEngine setups endpoints as dictated by RFC 7644
+//
+// Details at https://tools.ietf.org/html/rfc7644#section-3.2
+func GetEngine() *gin.Engine {
 	const (
 		svcpcfgEndpoint = "/ServiceProviderConfigs"
 		restypeEndpoint = "/ResourceTypes"
