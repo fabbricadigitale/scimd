@@ -216,6 +216,11 @@ var d = map[string]bool{
 var projectionTestCases = []projectionTestCase{
 
 	{
+		nil,
+		nil,
+		allUserAttrs,
+	},
+	{
 		[]string{},
 		[]string{},
 		allUserAttrs,
