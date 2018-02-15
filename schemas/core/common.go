@@ -29,7 +29,7 @@ type CommonAttributes struct {
 
 	// Common attributes
 	ID         string `json:"id" validate:"excludes=bulkId,required"`
-	ExternalID string `json:"externaId,omitempty"`
+	ExternalID string `json:"externalId,omitempty"`
 	Meta       Meta   `json:"meta" validate:"required"`
 }
 

@@ -54,6 +54,7 @@ func TestUnmarshalResource(t *testing.T) {
 	}{
 		{"2819c223-7f76-453a-919d-413861904646", res.ID},
 		{"2819c223-7f76-453a-919d-413861904646", res.CommonAttributes.ID},
+		{"701984", res.ExternalID},
 		{[]string{"urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"}, res.Schemas},
 		{[]string{"urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"}, res.CommonAttributes.Schemas},
 		{"https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646", res.Meta.Location},
