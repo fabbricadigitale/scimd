@@ -1,15 +1,16 @@
 package harness
 
 import (
-	"fmt"
+	"net/http/httptest"
 	"testing"
-	"time"
+
+	scim "github.com/fabbricadigitale/scimd/cmd/scimd"
 )
 
 func TestSimpleGet(t *testing.T) {
 	setup()
 	defer teardown()
 
-	fmt.Println("DOCKERUP")
-	time.Sleep(1 * time.Second)
+	eng := scim.GetEngine()
+	rec := httptest.NewRecorder()
 }
