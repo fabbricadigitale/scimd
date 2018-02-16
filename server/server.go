@@ -1,96 +1,93 @@
 package server
 
 import (
-	"log"
+	"fmt"
 	"net/http"
-	"strings"
-	"time"
 
-	"github.com/cenk/backoff"
-	"github.com/fabbricadigitale/scimd/storage"
-	"github.com/fabbricadigitale/scimd/storage/listeners"
-	"github.com/fabbricadigitale/scimd/storage/mongo"
+	"github.com/fabbricadigitale/scimd/config"
+	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/gin-gonic/gin"
-	"github.com/thoas/go-funk"
 )
 
-var adapter storage.Storer
+// Get setups endpoints as dictated by RFC 7644
+//
+// Details at https://tools.ietf.org/html/rfc7644#section-3.2
+func Get(spc *core.ServiceProviderConfig) *gin.Engine {
+	const (
+		svcpcfgEndpoint = "/ServiceProviderConfigs"
+		restypeEndpoint = "/ResourceTypes"
+		schemasEndpoint = "/Schemas"
+		bulkEndpoint    = "/Bulk"
+		selfEndpoint    = "/Me"
+		searchAction    = ".search"
+	)
 
-// MethodNotImplemented is a gin middleware responsible to abort requests which method is not supported.
-func MethodNotImplemented(notSupportedMethods []string) gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		m := strings.ToLower(ctx.Request.Method)
-		var methods []string
-		funk.Map(notSupportedMethods, func(x string) string {
-			return strings.ToLower(x)
-		})
+	// Obtain an engine
+	router := gin.Default()
 
-		// Abort incoming request if its method is not supported
-		if funk.ContainsString(methods, m) {
-			ctx.AbortWithStatus(http.StatusNotImplemented)
-			return
-		}
+	resTypeRepo := core.GetResourceTypeRepository()
+	schemasRepo := core.GetSchemaRepository()
 
-		// Otherwise go ahead
-		ctx.Next()
+	// Root group
+	v2 := router.Group("/v2")
+
+	// Retrieve list of resource types
+	resourceTypes := resTypeRepo.List()
+	// Retrieve list of schemas
+	schemas := schemasRepo.List()
+
+	// (todo) > Switch endpoint by config.Values.Storage.Type
+	endpoint := fmt.Sprintf("%s:%s", config.Values.Storage.Host, config.Values.Storage.Port)
+	v2.Use(Storage(endpoint, config.Values.Storage.Name, config.Values.Storage.Coll))
+
+	unsupportedMethods := []string{}
+	if !spc.Patch.Supported {
+		unsupportedMethods = append(unsupportedMethods, http.MethodPatch)
 	}
+	v2.Use(MethodNotImplemented(unsupportedMethods))
+
+	for _, authScheme := range spc.AuthenticationSchemes {
+		v2.Use(Authentication(authScheme.Type))
+	}
+
+	// (todo) > Retrieve service provider config
+	// v2.GET(svcpcfgEndpoint, getting)
+
+	// Retrieve supported resource types
+	Scim2(v2, NewStaticResourceService(restypeEndpoint, resourceTypes))
+
+	// Retrieve one or more supported schemas
+	Scim2(v2, NewStaticResourceService(schemasEndpoint, schemas))
+
+	// Bulk updates to one or more supported schemas
+	if spc.Bulk.Supported {
+		v2.POST(bulkEndpoint, bulking)
+	}
+
+	// (todo) > Search from system root for one or more resource types using POST
+	// v2.POST(fmt.Sprintf("/%s", searchAction), searching)
+
+	// Create endpoints for all resource types
+	for _, rt := range resourceTypes {
+		Scim2(v2, NewResourceService(&rt))
+	}
+
+	// Alias for operations against a resource mapped to an authenticated subject
+	const mountSelf = false
+	me := v2.Group(selfEndpoint)
+	if !mountSelf {
+		// RFC 7644 - Section 3.11 - 1st bullet
+		me.Use(Status(http.StatusNotImplemented))
+	}
+	if self := resTypeRepo.Pull("User"); self != nil {
+		self.Endpoint = ""
+		Scim2(me, NewResourceService(self))
+	}
+
+	return router
 }
 
-// Status is a gin middleware forcing the abortion of a request with the given code
-func Status(code int) gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		ctx.AbortWithStatus(code)
-		return
-	}
-}
+// (fixme)
+func bulking(c *gin.Context) {
 
-// Storage is a middleware to
-func Storage(endpoint, db, collection string) gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-
-		b := backoff.NewExponentialBackOff()
-		b.MaxElapsedTime = 1 * time.Millisecond
-
-		err := backoff.Retry(func() error {
-			var err error
-			adapter, err = mongo.New(endpoint, db, collection)
-			listeners.AddListeners(adapter.Emitter())
-			if err != nil {
-				return err
-			}
-
-			return adapter.Ping()
-		}, b)
-
-		if err != nil {
-			log.Printf("error after retrying: %v", err)
-			ctx.Abort()
-		}
-
-		ctx.Set("storage", adapter)
-
-		ctx.Next()
-	}
-}
-
-// Set is a middleware to store a value by key within the context
-func Set(key string, val interface{}) gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		ctx.Set(key, val)
-
-		ctx.Next()
-	}
-}
-
-// Authentication is a gin middleware supporting multiple authentication schemes
-func Authentication(authenticationType string) gin.HandlerFunc {
-	switch authenticationType {
-	case strings.ToLower(HTTPBasic.String()):
-		// (todo) > fetch http basic auth credentials from config
-		return gin.BasicAuth(gin.Accounts{
-			"admin": "admin",
-		})
-	default:
-		panic("authentication scheme not available")
-	}
 }
