@@ -165,7 +165,7 @@ func TestPath(t *testing.T) {
 }
 
 func TestPaths(t *testing.T) {
-	rt := resTypeRepo.Get("User")
+	rt := resTypeRepo.Pull("User")
 
 	for _, tt := range attributesTest {
 		attr := Paths(rt, func(attribute *core.Attribute) bool {

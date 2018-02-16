@@ -360,7 +360,7 @@ var projectionTestCases = []projectionTestCase{
 }
 
 func TestProjection(t *testing.T) {
-	rt := resTypeRepo.Get("User")
+	rt := resTypeRepo.Pull("User")
 
 	for _, tt := range projectionTestCases {
 		// Make included attributes

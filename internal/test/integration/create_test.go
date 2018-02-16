@@ -32,7 +32,7 @@ func TestCreate(t *testing.T) {
 		"employeeNumber": "701984",
 	})
 
-	retRes, err := create.Resource(adapter, resTypeRepo.Get("User"), res)
+	retRes, err := create.Resource(adapter, resTypeRepo.Pull("User"), res)
 
 	require.Nil(t, err)
 	require.NotNil(t, retRes)

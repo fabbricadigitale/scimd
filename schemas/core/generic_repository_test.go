@@ -22,73 +22,77 @@ func TestSchemaRepository(t *testing.T) {
 	schemas := GetSchemaRepository()
 
 	// Malformed JSON
-	_, err0 := schemas.Add("../../internal/testdata/malformed.json")
+	x0, err0 := schemas.PushFromFile("../../internal/testdata/malformed.json")
 	require.Error(t, err0)
-	// require.Empty(t, data0)
+	require.Zero(t, x0)
 
 	// Wrong path
-	_, err1 := schemas.Add("WRONG/uschema.json")
+	x1, err1 := schemas.PushFromFile("WRONG/uschema.json")
 	require.Error(t, err1)
-	// require.Empty(t, data1)
+	require.Zero(t, x1)
 
-	// Wrong structure
-	_, err2 := schemas.Add("../../internal/testdata/service_provider_config.json")
+	// Wrong structure (ie., missing ID) - Returns it but do not stores it
+	_, err2 := schemas.PushFromFile("../../internal/testdata/service_provider_config.json")
 	require.EqualError(t, err2, "missing identifier")
-	// require.Empty(t, data2)
+	require.Equal(t, 0, len(schemas.List()))
 
-	data3, err3 := schemas.Add("../../internal/testdata/user_schema.json")
+	data3, err3 := schemas.PushFromFile("../../internal/testdata/user_schema.json")
 	require.NoError(t, err3)
 	require.Implements(t, (*Identifiable)(nil), data3)
 	require.IsType(t, Schema{}, data3)
 
 	key := "urn:ietf:params:scim:schemas:core:2.0:User"
-	schema := schemas.Get(key)
+	schema := schemas.Pull(key)
 
 	require.Equal(t, schema.GetIdentifier(), key)
 
-	// (todo): test lock
+	// (todo) > test PushFromData
+
+	// (todo) > test lock
 }
 
 func TestResourceTypeRepository(t *testing.T) {
 	rType := GetResourceTypeRepository()
 
 	// Malformed JSON
-	_, err0 := rType.Add("../../internal/testdata/malformed.json")
+	_, err0 := rType.PushFromFile("../../internal/testdata/malformed.json")
 	require.Error(t, err0)
 	// require.Empty(t, data0)
 
 	// Wrong path
-	_, err1 := rType.Add("WRONG/urt.json")
+	_, err1 := rType.PushFromFile("WRONG/urt.json")
 	require.Error(t, err1)
 	// require.Empty(t, data1)
 
 	// Wrong structure
-	_, err2 := rType.Add("../../internal/testdata/service_provider_config.json")
+	_, err2 := rType.PushFromFile("../../internal/testdata/service_provider_config.json")
 	require.EqualError(t, err2, "missing identifier")
 	// require.Empty(t, data2)
 
-	data3, err3 := rType.Add("../../internal/testdata/user.json")
+	data3, err3 := rType.PushFromFile("../../internal/testdata/user.json")
 	require.NoError(t, err3)
 	require.Implements(t, (*Identifiable)(nil), data3)
 	require.IsType(t, ResourceType{}, data3)
 
 	key := "User"
-	rT := rType.Get(key)
+	rT := rType.Pull(key)
 
 	require.Equal(t, rT.GetIdentifier(), key)
 
-	// (todo): test lock
+	// (todo) > test PushFromData
+
+	// (todo) > test lock
 }
 
 func TestResourceTypeRepositoryList(t *testing.T) {
 	repos := GetResourceTypeRepository()
 
-	data, err := repos.Add("../../internal/testdata/user.json")
+	data, err := repos.PushFromFile("../../internal/testdata/user.json")
 	require.NoError(t, err)
 	require.Implements(t, (*Identifiable)(nil), data)
 	require.IsType(t, ResourceType{}, data)
 
-	data2, err2 := repos.Add("../../internal/testdata/user_resource.json")
+	data2, err2 := repos.PushFromFile("../../internal/testdata/user_resource.json")
 	require.NoError(t, err2)
 	require.Implements(t, (*Identifiable)(nil), data2)
 	require.IsType(t, ResourceType{}, data2)
@@ -102,12 +106,12 @@ func TestResourceTypeRepositoryList(t *testing.T) {
 func TestSchemaRepositoryList(t *testing.T) {
 	repos := GetSchemaRepository()
 
-	data, err := repos.Add("../../internal/testdata/user_schema.json")
+	data, err := repos.PushFromFile("../../internal/testdata/user_schema.json")
 	require.NoError(t, err)
 	require.Implements(t, (*Identifiable)(nil), data)
 	require.IsType(t, Schema{}, data)
 
-	data2, err2 := repos.Add("../../internal/testdata/enterprise_user_schema.json")
+	data2, err2 := repos.PushFromFile("../../internal/testdata/enterprise_user_schema.json")
 	require.NoError(t, err2)
 	require.Implements(t, (*Identifiable)(nil), data2)
 	require.IsType(t, Schema{}, data2)

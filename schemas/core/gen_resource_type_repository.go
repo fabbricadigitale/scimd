@@ -18,8 +18,9 @@ type repositoryResourceType struct {
 
 // ResourceTypeRepository is the ...
 type ResourceTypeRepository interface {
-	Get(key string) *ResourceType // (fixme) > evaluate whether make senses to do not return a pointer ...
-	Add(filename string) (ResourceType, error)
+	Pull(key string) *ResourceType // (fixme) > evaluate whether make senses to do not return a pointer ...
+	PushFromFile(filename string) (ResourceType, error)
+	PushFromData(data []byte) (ResourceType, error)
 	List() []ResourceType
 }
 
@@ -37,8 +38,8 @@ func (repo *repositoryResourceType) List() []ResourceType {
 	return res
 }
 
-// Get provides the element for a given key, or nil if it does not exist within the repository.
-func (repo *repositoryResourceType) Get(key string) *ResourceType {
+// Pull provides the element for a given key, or nil if it does not exist within the repository.
+func (repo *repositoryResourceType) Pull(key string) *ResourceType {
 	repo.mu.RLock()
 	defer repo.mu.RUnlock()
 	if item, ok := repo.items[key]; ok {
@@ -47,30 +48,37 @@ func (repo *repositoryResourceType) Get(key string) *ResourceType {
 	return nil
 }
 
-// Add allows to load an element and to store it within this repository
-func (repo *repositoryResourceType) Add(filename string) (ResourceType, error) {
-	var data ResourceType
+// PushFromData allows to load an element from bytes and to store it within this repository
+func (repo *repositoryResourceType) PushFromData(data []byte) (ResourceType, error) {
+	var elem ResourceType
 
-	bytes, err := ioutil.ReadFile(filename)
+	err := json.Unmarshal(data, &elem)
 	if err != nil {
-		return data, err
-	}
-	err = json.Unmarshal(bytes, &data)
-	if err != nil {
-		return data, err
+		return elem, err
 	}
 
 	repo.mu.Lock()
 	defer repo.mu.Unlock()
 
 	var id string
-	if id = interface{}(data).(Identifiable).GetIdentifier(); id == "" {
-		return data, errors.New("missing identifier")
+	if id = interface{}(elem).(Identifiable).GetIdentifier(); id == "" {
+		return elem, errors.New("missing identifier")
 	}
 
-	repo.items[id] = data
+	repo.items[id] = elem
 
-	return data, nil
+	return elem, nil
+}
+
+// PushFromFile allows to load an element from file system and to store it within this repository
+func (repo *repositoryResourceType) PushFromFile(filename string) (ResourceType, error) {
+	var elem ResourceType
+
+	bytes, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return elem, err
+	}
+	return repo.PushFromData(bytes)
 }
 
 var (

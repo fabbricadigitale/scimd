@@ -64,11 +64,11 @@ func TestMain(m *testing.M) {
 
 	// Repositories are prerequisites
 	resTypeRepo = core.GetResourceTypeRepository()
-	resTypeRepo.Add("../../internal/testdata/user.json")
+	resTypeRepo.PushFromFile("../../internal/testdata/user.json")
 
 	schemaRepo = core.GetSchemaRepository()
-	schemaRepo.Add("../../internal/testdata/user_schema.json")
-	schemaRepo.Add("../../internal/testdata/enterprise_user_schema.json")
+	schemaRepo.PushFromFile("../../internal/testdata/user_schema.json")
+	schemaRepo.PushFromFile("../../internal/testdata/enterprise_user_schema.json")
 
 	// Run our tests
 	code := m.Run()

@@ -23,14 +23,14 @@ func TestUpdate(t *testing.T) {
 	err = json.Unmarshal(dat, res)
 	require.NoError(t, err)
 
-	retRes, err := update.Resource(adapter, resTypeRepo.Get("User"), notExistingID, res)
+	retRes, err := update.Resource(adapter, resTypeRepo.Pull("User"), notExistingID, res)
 	require.Error(t, err)
 
 	res = &resource.Resource{}
 	err = json.Unmarshal(dat, res)
 	require.NoError(t, err)
 
-	retRes, err = update.Resource(adapter, resTypeRepo.Get("User"), id, res)
+	retRes, err = update.Resource(adapter, resTypeRepo.Pull("User"), id, res)
 	require.Nil(t, err)
 	r := retRes.(*resource.Resource)
 	require.NotNil(t, r)

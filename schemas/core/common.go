@@ -49,7 +49,7 @@ func (c *CommonAttributes) Common() *CommonAttributes {
 
 // ResourceType returns the ResourceType of a SCIM resource
 func (c *CommonAttributes) ResourceType() *ResourceType {
-	return GetResourceTypeRepository().Get(c.Meta.ResourceType)
+	return GetResourceTypeRepository().Pull(c.Meta.ResourceType)
 }
 
 var comAttrs Attributes

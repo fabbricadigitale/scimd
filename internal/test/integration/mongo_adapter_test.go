@@ -51,7 +51,7 @@ func TestMongoGet(t *testing.T) {
 	require.NotNil(t, adapter)
 
 	id := "2819c223-7f76-453a-919d-ab1234567891"
-	resource, err := adapter.Get(resTypeRepo.Get("User"), id, "", nil)
+	resource, err := adapter.Get(resTypeRepo.Pull("User"), id, "", nil)
 	require.NoError(t, err)
 
 	require.NotNil(t, resource)
@@ -72,7 +72,7 @@ func TestMongoGet(t *testing.T) {
 	m[attr.Path{
 		Name: "meta",
 	}] = true
-	resource, err = adapter.Get(resTypeRepo.Get("User"), id, "", m)
+	resource, err = adapter.Get(resTypeRepo.Pull("User"), id, "", m)
 	require.NoError(t, err)
 
 	require.NotNil(t, resource)
@@ -80,12 +80,12 @@ func TestMongoGet(t *testing.T) {
 
 	// Non-existing ID
 	id = "2819c223-7f76-453a-919d-ab1234567898"
-	resource, err = adapter.Get(resTypeRepo.Get("User"), id, "", nil)
+	resource, err = adapter.Get(resTypeRepo.Pull("User"), id, "", nil)
 	require.Nil(t, resource)
 	require.EqualError(t, err, "not found")
 
 	// Empty ID
-	resource, err = adapter.Get(resTypeRepo.Get("User"), "", "", nil)
+	resource, err = adapter.Get(resTypeRepo.Pull("User"), "", "", nil)
 	require.Nil(t, resource)
 	require.EqualError(t, err, "not found")
 
@@ -105,7 +105,7 @@ func TestMongoGetOmitEmpty(t *testing.T) {
 		Sub:  "primary",
 	}] = true
 
-	resource, err := adapter.Get(resTypeRepo.Get("User"), id, "", m)
+	resource, err := adapter.Get(resTypeRepo.Pull("User"), id, "", m)
 
 	require.NoError(t, err)
 	require.NotNil(t, resource)
@@ -211,10 +211,10 @@ func TestMongoDelete(t *testing.T) {
 
 	// Delete object with specified id
 	id := "2819c223-7f76-453a-919d-ab1234567891"
-	err := adapter.Delete(resTypeRepo.Get("User"), id, "")
+	err := adapter.Delete(resTypeRepo.Pull("User"), id, "")
 	require.NoError(t, err)
 
 	id = "2819c223-7f76-453a-919d-111111111111"
-	err = adapter.Delete(resTypeRepo.Get("User"), id, "")
+	err = adapter.Delete(resTypeRepo.Pull("User"), id, "")
 	require.Error(t, err)
 }

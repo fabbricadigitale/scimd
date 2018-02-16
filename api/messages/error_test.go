@@ -2,7 +2,6 @@ package messages
 
 import (
 	"encoding/json"
-	"net/http"
 	"testing"
 
 	"github.com/fabbricadigitale/scimd/schemas/datatype"
@@ -17,7 +16,7 @@ func TestNewError(t *testing.T) {
 
 	require.Equal(t, Error{
 		Schemas:  append([]string{}, ErrorURI),
-		Status:   string(http.StatusBadRequest),
+		Status:   400, /* (fixme) why http.StatusBadRequest gives weird chars */
 		ScimType: "invalidValue",
 		Detail:   err.Error(),
 	}, NewError(err))
@@ -33,7 +32,7 @@ func TestNewError(t *testing.T) {
 
 	require.Equal(t, Error{
 		Schemas:  append([]string{}, ErrorURI),
-		Status:   string(http.StatusBadRequest),
+		Status:   400, /* http.StatusBadRequest */
 		ScimType: "invalidValue",
 		Detail:   err.Error(),
 	}, NewError(err))
@@ -45,7 +44,7 @@ func TestNewError(t *testing.T) {
 
 	require.Equal(t, Error{
 		Schemas:  append([]string{}, ErrorURI),
-		Status:   string(http.StatusBadRequest),
+		Status:   400, /* http.StatusBadRequest */
 		ScimType: "invalidSyntax",
 		Detail:   err.Error(),
 	}, NewError(err))
@@ -56,7 +55,7 @@ func TestNewError(t *testing.T) {
 
 	require.JSONEq(t, `{
 		"schemas":["urn:ietf:params:scim:api:messages:2.0:Error"],
-		"status":"Ɛ",
+		"status":400,
 		"scimType":"invalidSyntax",
 		"detail":"invalid character 'n' looking for beginning of object key string"
 		}`, string(byt2))

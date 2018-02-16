@@ -22,7 +22,7 @@ func TestResource(t *testing.T) {
 
 	id := "2819c223-7f76-453a-919d-ab1234567891"
 
-	res := core.GetResourceTypeRepository().Get("User")
+	res := core.GetResourceTypeRepository().Pull("User")
 	require.NotNil(t, res)
 
 	attrs := &api.Attributes{}

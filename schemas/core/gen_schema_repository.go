@@ -18,8 +18,9 @@ type repositorySchema struct {
 
 // SchemaRepository is the ...
 type SchemaRepository interface {
-	Get(key string) *Schema // (fixme) > evaluate whether make senses to do not return a pointer ...
-	Add(filename string) (Schema, error)
+	Pull(key string) *Schema // (fixme) > evaluate whether make senses to do not return a pointer ...
+	PushFromFile(filename string) (Schema, error)
+	PushFromData(data []byte) (Schema, error)
 	List() []Schema
 }
 
@@ -37,8 +38,8 @@ func (repo *repositorySchema) List() []Schema {
 	return res
 }
 
-// Get provides the element for a given key, or nil if it does not exist within the repository.
-func (repo *repositorySchema) Get(key string) *Schema {
+// Pull provides the element for a given key, or nil if it does not exist within the repository.
+func (repo *repositorySchema) Pull(key string) *Schema {
 	repo.mu.RLock()
 	defer repo.mu.RUnlock()
 	if item, ok := repo.items[key]; ok {
@@ -47,30 +48,37 @@ func (repo *repositorySchema) Get(key string) *Schema {
 	return nil
 }
 
-// Add allows to load an element and to store it within this repository
-func (repo *repositorySchema) Add(filename string) (Schema, error) {
-	var data Schema
+// PushFromData allows to load an element from bytes and to store it within this repository
+func (repo *repositorySchema) PushFromData(data []byte) (Schema, error) {
+	var elem Schema
 
-	bytes, err := ioutil.ReadFile(filename)
+	err := json.Unmarshal(data, &elem)
 	if err != nil {
-		return data, err
-	}
-	err = json.Unmarshal(bytes, &data)
-	if err != nil {
-		return data, err
+		return elem, err
 	}
 
 	repo.mu.Lock()
 	defer repo.mu.Unlock()
 
 	var id string
-	if id = interface{}(data).(Identifiable).GetIdentifier(); id == "" {
-		return data, errors.New("missing identifier")
+	if id = interface{}(elem).(Identifiable).GetIdentifier(); id == "" {
+		return elem, errors.New("missing identifier")
 	}
 
-	repo.items[id] = data
+	repo.items[id] = elem
 
-	return data, nil
+	return elem, nil
+}
+
+// PushFromFile allows to load an element from file system and to store it within this repository
+func (repo *repositorySchema) PushFromFile(filename string) (Schema, error) {
+	var elem Schema
+
+	bytes, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return elem, err
+	}
+	return repo.PushFromData(bytes)
 }
 
 var (

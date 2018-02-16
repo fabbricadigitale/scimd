@@ -229,11 +229,11 @@ func TestConvertToMongoQuery(t *testing.T) {
 	// Now we load within repositories the actual resource type and the schema
 	var err error
 	resTypeRepo := core.GetResourceTypeRepository()
-	res, err = resTypeRepo.Add("../../internal/testdata/user.json")
+	res, err = resTypeRepo.PushFromFile("../../internal/testdata/user.json")
 	require.NoError(t, err)
 
 	schemaRepo := core.GetSchemaRepository()
-	_, err = schemaRepo.Add("../../internal/testdata/user_schema.json")
+	_, err = schemaRepo.PushFromFile("../../internal/testdata/user_schema.json")
 	require.NoError(t, err)
 
 	for ii, tt := range mongoTests {

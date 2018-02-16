@@ -15,17 +15,17 @@ import (
 func TestListResponseResource(t *testing.T) {
 
 	resTypeRepo := core.GetResourceTypeRepository()
-	if _, err := resTypeRepo.Add("../../internal/testdata/user.json"); err != nil {
+	if _, err := resTypeRepo.PushFromFile("../../internal/testdata/user.json"); err != nil {
 		t.Log(err)
 		t.Fail()
 	}
 
 	schemaRepo := core.GetSchemaRepository()
-	if _, err := schemaRepo.Add("../../internal/testdata/user_schema.json"); err != nil {
+	if _, err := schemaRepo.PushFromFile("../../internal/testdata/user_schema.json"); err != nil {
 		t.Log(err)
 		t.Fail()
 	}
-	if _, err := schemaRepo.Add("../../internal/testdata/enterprise_user_schema.json"); err != nil {
+	if _, err := schemaRepo.PushFromFile("../../internal/testdata/enterprise_user_schema.json"); err != nil {
 		t.Log(err)
 		t.Fail()
 	}
@@ -109,8 +109,6 @@ func TestListResponseResource(t *testing.T) {
 				"meta": {
 					"location": "https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646",
 					"resourceType": "User",
-					"created": null,
-					"lastModified": null,
 					"version": "Wa330bc54f0671c9"
 				},
 				"schemas": [
