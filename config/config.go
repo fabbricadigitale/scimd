@@ -3,6 +3,8 @@ package config
 import (
 	"strings"
 
+	"github.com/fabbricadigitale/scimd/validation"
+
 	"github.com/fabbricadigitale/scimd/defaults"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fatih/structs"
@@ -15,12 +17,13 @@ type Configuration struct {
 	Storage
 	ServiceProviderConfig string
 	Config                string
+	PageSize              int `default:"10" validate:"min=1,max=10"`
 }
 
 type Storage struct {
 	Type string `default:"mongo"`
 	Host string `default:"0.0.0.0"`
-	Port string `default:"27017"`
+	Port int    `default:"27017"`
 	Name string `default:"scimd"`
 	Coll string `default:"resources"`
 }
@@ -45,6 +48,11 @@ func getConfig(filename string) error {
 	var err error
 	err = vip.ReadInConfig()
 	err = vip.Unmarshal(&Values)
+
+	if err := validation.Validator.Struct(Values); err != nil {
+		// (todo) > better handling and pretty print of validation errors
+		panic(err)
+	}
 
 	return err
 }

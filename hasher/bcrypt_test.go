@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestBCrypt_Hash(t *testing.T) {
@@ -13,7 +14,7 @@ func TestBCrypt_Hash(t *testing.T) {
 	hashedPassword, err := hasher.Hash(password)
 
 	assert.Nil(t, err)
-	assert.True(t, len(expected) == len(hashedPassword))
+	require.True(t, len(expected) == len(hashedPassword))
 }
 
 func TestBCryptHasher_Compare(t *testing.T) {
@@ -21,5 +22,5 @@ func TestBCryptHasher_Compare(t *testing.T) {
 	hasher := NewBCrypt()
 	hashedPassword, err := hasher.Hash(password)
 	assert.Nil(t, err)
-	assert.True(t, hasher.Compare(hashedPassword, password))
+	require.True(t, hasher.Compare(hashedPassword, password))
 }
