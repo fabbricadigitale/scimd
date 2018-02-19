@@ -26,6 +26,7 @@ type repositoryGeneric struct {
 // GenericRepository is the ...
 type GenericRepository interface {
 	Pull(key string) *Elem // (fixme) > evaluate whether make senses to do not return a pointer ...
+	Push(elem Elem) (Elem, error)
 	PushFromFile(filename string) (Elem, error)
 	PushFromData(data []byte) (Elem, error)
 	List() []Elem
@@ -55,15 +56,8 @@ func (repo *repositoryGeneric) Pull(key string) *Elem {
 	return nil
 }
 
-// PushFromData allows to load an element from bytes and to store it within this repository
-func (repo *repositoryGeneric) PushFromData(data []byte) (Elem, error) {
-	var elem Elem
-
-	err := json.Unmarshal(data, &elem)
-	if err != nil {
-		return elem, err
-	}
-
+// PushFromData allows to store an elem within its repository
+func (repo *repositoryGeneric) Push(elem Elem) (Elem, error) {
 	repo.mu.Lock()
 	defer repo.mu.Unlock()
 
@@ -77,7 +71,19 @@ func (repo *repositoryGeneric) PushFromData(data []byte) (Elem, error) {
 	return elem, nil
 }
 
-// PushFromFile allows to load an element from file system and to store it within this repository
+// PushFromData allows to load an element from bytes and to store it within its repository
+func (repo *repositoryGeneric) PushFromData(data []byte) (Elem, error) {
+	var elem Elem
+
+	err := json.Unmarshal(data, &elem)
+	if err != nil {
+		return elem, err
+	}
+
+	return repo.Push(elem)
+}
+
+// PushFromFile allows to load an element from file system and to store it within its repository
 func (repo *repositoryGeneric) PushFromFile(filename string) (Elem, error) {
 	var elem Elem
 

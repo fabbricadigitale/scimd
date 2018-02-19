@@ -19,6 +19,7 @@ type repositorySchema struct {
 // SchemaRepository is the ...
 type SchemaRepository interface {
 	Pull(key string) *Schema // (fixme) > evaluate whether make senses to do not return a pointer ...
+	Push(elem Schema) (Schema, error)
 	PushFromFile(filename string) (Schema, error)
 	PushFromData(data []byte) (Schema, error)
 	List() []Schema
@@ -48,15 +49,8 @@ func (repo *repositorySchema) Pull(key string) *Schema {
 	return nil
 }
 
-// PushFromData allows to load an element from bytes and to store it within this repository
-func (repo *repositorySchema) PushFromData(data []byte) (Schema, error) {
-	var elem Schema
-
-	err := json.Unmarshal(data, &elem)
-	if err != nil {
-		return elem, err
-	}
-
+// PushFromData allows to store an elem within its repository
+func (repo *repositorySchema) Push(elem Schema) (Schema, error) {
 	repo.mu.Lock()
 	defer repo.mu.Unlock()
 
@@ -70,7 +64,19 @@ func (repo *repositorySchema) PushFromData(data []byte) (Schema, error) {
 	return elem, nil
 }
 
-// PushFromFile allows to load an element from file system and to store it within this repository
+// PushFromData allows to load an element from bytes and to store it within its repository
+func (repo *repositorySchema) PushFromData(data []byte) (Schema, error) {
+	var elem Schema
+
+	err := json.Unmarshal(data, &elem)
+	if err != nil {
+		return elem, err
+	}
+
+	return repo.Push(elem)
+}
+
+// PushFromFile allows to load an element from file system and to store it within its repository
 func (repo *repositorySchema) PushFromFile(filename string) (Schema, error) {
 	var elem Schema
 

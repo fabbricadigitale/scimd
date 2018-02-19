@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/json"
+	"time"
 
 	defaults "github.com/mcuadros/go-defaults"
 )
@@ -50,11 +51,17 @@ const ServiceProviderConfigURI = "urn:ietf:params:scim:schemas:core:2.0:ServiceP
 
 // NewServiceProviderConfig returns a new ServiceProviderConfig filled with defaults
 func NewServiceProviderConfig() *ServiceProviderConfig {
+	now := time.Now()
 	spc := &ServiceProviderConfig{
 		Schemas: []string{ServiceProviderConfigURI},
-		Meta:    Meta{ResourceType: "ServiceProviderConfig"},
+		Meta: Meta{
+			ResourceType: "ServiceProviderConfig",
+			Created:      &now,
+			LastModified: &now,
+		},
 	}
 	defaults.SetDefaults(spc)
+
 	return spc
 }
 

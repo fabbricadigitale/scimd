@@ -1,8 +1,8 @@
 package core
 
 import (
-	"io/ioutil"
 	"encoding/json"
+	"io/ioutil"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -65,7 +65,7 @@ func TestSchemaRepository(t *testing.T) {
 
 	require.Equal(t, schema.GetIdentifier(), key)
 
-	// PushFromData - Successful loading of a schema from bytes 
+	// PushFromData - Successful loading of a schema from bytes
 	byt, _ := ioutil.ReadFile("../../internal/testdata/enterprise_user_schema.json")
 	data5, err6 := schemas.PushFromData(byt)
 	require.NoError(t, err6)
@@ -76,6 +76,8 @@ func TestSchemaRepository(t *testing.T) {
 	schema = schemas.Pull(key2)
 
 	require.Equal(t, schema.GetIdentifier(), key2)
+
+	// (todo) > test simple push
 
 	// (todo) > test lock
 }
@@ -99,7 +101,7 @@ func TestResourceTypeRepository(t *testing.T) {
 	require.Error(t, err1)
 	// require.Empty(t, data1)
 
-	// PushFromFile - Wrong structure (ie., missing ID) - Returns it but do not stores it 
+	// PushFromFile - Wrong structure (ie., missing ID) - Returns it but do not stores it
 	_, err2 := rType.PushFromFile("../../internal/testdata/service_provider_config.json")
 	require.EqualError(t, err2, "missing identifier")
 	require.Equal(t, 0, len(rType.List()))
@@ -121,7 +123,7 @@ func TestResourceTypeRepository(t *testing.T) {
 
 	require.Equal(t, rT.GetIdentifier(), key)
 
-	// PushFromData - Successful loading of a schema from bytes 
+	// PushFromData - Successful loading of a schema from bytes
 	byt, _ := ioutil.ReadFile("../../internal/testdata/user_resource.json")
 	data4, err6 := rType.PushFromData(byt)
 	require.NoError(t, err6)
@@ -132,6 +134,8 @@ func TestResourceTypeRepository(t *testing.T) {
 	rT = rType.Pull(key2)
 
 	require.Equal(t, rT.GetIdentifier(), key2)
+
+	// (todo) > test simple push
 
 	// (todo) > test lock
 }

@@ -19,6 +19,7 @@ type repositoryResourceType struct {
 // ResourceTypeRepository is the ...
 type ResourceTypeRepository interface {
 	Pull(key string) *ResourceType // (fixme) > evaluate whether make senses to do not return a pointer ...
+	Push(elem ResourceType) (ResourceType, error)
 	PushFromFile(filename string) (ResourceType, error)
 	PushFromData(data []byte) (ResourceType, error)
 	List() []ResourceType
@@ -48,15 +49,8 @@ func (repo *repositoryResourceType) Pull(key string) *ResourceType {
 	return nil
 }
 
-// PushFromData allows to load an element from bytes and to store it within this repository
-func (repo *repositoryResourceType) PushFromData(data []byte) (ResourceType, error) {
-	var elem ResourceType
-
-	err := json.Unmarshal(data, &elem)
-	if err != nil {
-		return elem, err
-	}
-
+// PushFromData allows to store an elem within its repository
+func (repo *repositoryResourceType) Push(elem ResourceType) (ResourceType, error) {
 	repo.mu.Lock()
 	defer repo.mu.Unlock()
 
@@ -70,7 +64,19 @@ func (repo *repositoryResourceType) PushFromData(data []byte) (ResourceType, err
 	return elem, nil
 }
 
-// PushFromFile allows to load an element from file system and to store it within this repository
+// PushFromData allows to load an element from bytes and to store it within its repository
+func (repo *repositoryResourceType) PushFromData(data []byte) (ResourceType, error) {
+	var elem ResourceType
+
+	err := json.Unmarshal(data, &elem)
+	if err != nil {
+		return elem, err
+	}
+
+	return repo.Push(elem)
+}
+
+// PushFromFile allows to load an element from file system and to store it within its repository
 func (repo *repositoryResourceType) PushFromFile(filename string) (ResourceType, error) {
 	var elem ResourceType
 

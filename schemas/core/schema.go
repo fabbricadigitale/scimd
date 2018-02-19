@@ -83,14 +83,14 @@ type Schema struct {
 	CommonAttributes
 	Name        string     `json:"name,omitempty"`
 	Description string     `json:"description,omitempty"`
-	Attributes  Attributes `json:"attributes,omitempty" validate:"uniquefield=Name"`
+	Attributes  Attributes `json:"attributes,omitempty" validate:"uniqueattr=Name"`
 }
 
 // NewSchema returns a new Schema filled with defaults
-func NewSchema() *Schema {
+func NewSchema(id, name string) *Schema {
 	return &Schema{
-		CommonAttributes: *NewCommon(SchemaURI, "Schema", SchemaURI),
-		Name:             "Schema",
+		CommonAttributes: *NewCommon(SchemaURI, "Schema", id),
+		Name:             name,
 	}
 }
 
