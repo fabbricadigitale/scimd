@@ -1,29 +1,20 @@
 package config
 
 import (
-	"encoding/json"
-	"fmt"
-	"path/filepath"
 	"strings"
 
-	"github.com/gobuffalo/packr"
-	"gopkg.in/go-playground/validator.v9"
-
-	"github.com/fatih/structs"
-	"github.com/mcuadros/go-defaults"
-
+	"github.com/fabbricadigitale/scimd/defaults"
 	"github.com/fabbricadigitale/scimd/schemas/core"
-	v "github.com/fabbricadigitale/scimd/validation"
+	"github.com/fatih/structs"
+	d "github.com/mcuadros/go-defaults"
+
 	"github.com/spf13/viper"
 )
 
 type Configuration struct {
 	Storage
-	Resources
-}
-
-type Resources struct {
-	Dir string `default:"default"`
+	ServiceProviderConfig string
+	Config                string
 }
 
 type Storage struct {
@@ -38,7 +29,7 @@ var Values *Configuration
 
 func getConfig(filename string) error {
 	Values = new(Configuration)
-	defaults.SetDefaults(Values)
+	d.SetDefaults(Values)
 
 	vip := viper.New()
 	for key, value := range structs.Map(Values) {
@@ -47,7 +38,7 @@ func getConfig(filename string) error {
 	vip.SetConfigName(filename)
 	vip.AddConfigPath(".")
 
-	vip.SetEnvPrefix(".scimd")
+	vip.SetEnvPrefix("scimd")
 	vip.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	vip.AutomaticEnv()
 
@@ -58,61 +49,23 @@ func getConfig(filename string) error {
 	return err
 }
 
-func getAssets(dir string, fx func(data []byte)) {
-	box := packr.NewBox(filepath.Join(Values.Resources.Dir, dir))
-	list := box.List()
-
-	for _, p := range list {
-		bytes, err := box.MustBytes(p)
-		if err != nil {
-			panic(err) // (fixme) > panic or exit?
-		}
-		fx(bytes)
-	}
-}
-
 func init() {
-	getConfig("scimd")
-}
-
-// Get returns the service provider configuration.
-//
-// It also populates the repositories.
-func Get() *core.ServiceProviderConfig {
-	// Need this to enforce packr to generate go codes for the default location
-	packr.NewBox("default")
-	packr.NewBox("default/schemas")
-	packr.NewBox("default/resources")
-
-	// Service provider configuration
-	box := packr.NewBox(Values.Resources.Dir)
-	dat, err := box.MustBytes("service_provider_config.json")
-	if err != nil {
-		panic(err) // (fixme) > panic or exit?
-	}
-	spc := core.NewServiceProviderConfig()
-	err = json.Unmarshal(dat, &spc)
-	if err != nil {
-		panic("unmarshalling errors")
-	}
-
-	if err := v.Validator.Struct(spc); err != nil {
-		errs := ""
-		for _, e := range err.(validator.ValidationErrors) {
-			errs += fmt.Sprintf("%s\n", e)
-		}
-		panic(fmt.Sprintf("validation errors\n%s", errs)) // (fixme) > panic or exit?
-	}
+	getConfig(".scimd")
 
 	// Schemas
-	getAssets("schemas", func(data []byte) {
-		core.GetSchemaRepository().PushFromData(data)
-	})
+	core.GetSchemaRepository().Push(defaults.UserSchema)
+	core.GetSchemaRepository().Push(defaults.GroupSchema)
 
 	// Resource types
-	getAssets("resources", func(data []byte) {
-		core.GetResourceTypeRepository().PushFromData(data)
-	})
-
-	return spc
+	core.GetResourceTypeRepository().Push(defaults.UserResourceType)
+	core.GetResourceTypeRepository().Push(defaults.GroupResourceType)
 }
+
+// (todo)
+// OVERRIDE ALL CONFIG
+// scimd --service-provider-config <path> --config <path>
+
+// GET ALL CONFIG
+// Via static command
+// scimd get-config <path> => download config directory <within path>
+// scimd get-service-provider-config <path> => download service provider config file within <path>
