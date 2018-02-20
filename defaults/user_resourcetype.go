@@ -1,6 +1,7 @@
 package defaults
 
 import (
+	"github.com/fabbricadigitale/scimd/validation"
 	"fmt"
 
 	"github.com/fabbricadigitale/scimd/schemas/core"
@@ -10,21 +11,19 @@ import (
 var UserResourceType core.ResourceType
 
 func init() {
-	resType := core.ResourceType{}
-
 	schema := "urn:ietf:params:scim:schemas:core:2.0:ResourceType"
 	commonResType := "ResourceType"
 	id := "User"
 
 	commons := core.NewCommon(schema, commonResType, id)
 
-	resType.CommonAttributes = *commons
-	resType.Name = "User"
-	resType.Endpoint = "/User"
-	resType.Description = "User Account "
-	resType.Schema = "urn:ietf:params:scim:schemas:core:2.0:User"
+	UserResourceType.CommonAttributes = *commons
+	UserResourceType.Name = "User"
+	UserResourceType.Endpoint = "/User"
+	UserResourceType.Description = "User Account "
+	UserResourceType.Schema = "urn:ietf:params:scim:schemas:core:2.0:User"
 
-	resType.Meta.Location = fmt.Sprintf("/v2/ResourceTypes/%s", id)
+	UserResourceType.Meta.Location = fmt.Sprintf("/v2/ResourceTypes/%s", id)
 
 	// No user extension by default, for now
 	// resType.SchemaExtensions = []core.SchemaExtension{
@@ -34,8 +33,10 @@ func init() {
 	// 	},
 	// }
 
-	// (todo) > validation
+	if errors := validation.Validator.Struct(UserResourceType); errors != nil {
+		panic("user resourcetype default configuration incorrect")
+	}
+	
 	// (todo) > mold
 
-	UserResourceType = resType
 }

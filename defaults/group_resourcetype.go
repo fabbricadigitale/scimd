@@ -1,6 +1,7 @@
 package defaults
 
 import (
+	"github.com/fabbricadigitale/scimd/validation"
 	"fmt"
 
 	"github.com/fabbricadigitale/scimd/schemas/core"
@@ -10,24 +11,24 @@ import (
 var GroupResourceType core.ResourceType
 
 func init() {
-	resType := core.ResourceType{}
-
 	schema := "urn:ietf:params:scim:schemas:core:2.0:ResourceType"
 	commonResType := "ResourceType"
 	id := "Group"
 
 	commons := core.NewCommon(schema, commonResType, id)
 
-	resType.CommonAttributes = *commons
-	resType.Name = "Group"
-	resType.Endpoint = "/Group"
-	resType.Description = "Group"
-	resType.Schema = "urn:ietf:params:scim:schemas:core:2.0:Group"
+	GroupResourceType.CommonAttributes = *commons
+	GroupResourceType.Name = "Group"
+	GroupResourceType.Endpoint = "/Group"
+	GroupResourceType.Description = "Group"
+	GroupResourceType.Schema = "urn:ietf:params:scim:schemas:core:2.0:Group"
 
-	resType.Meta.Location = fmt.Sprintf("/v2/ResourceTypes/%s", id)
+	GroupResourceType.Meta.Location = fmt.Sprintf("/v2/ResourceTypes/%s", id)
 
-	// (todo) > validation
+	if errors := validation.Validator.Struct(GroupResourceType); errors != nil {
+		panic("group resourcetype default configuration incorrect")
+	}
+
 	// (todo) > mold
 
-	GroupResourceType = resType
 }
