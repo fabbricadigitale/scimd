@@ -24,6 +24,39 @@ func TestGenericRepository(t *testing.T) {
 	require.Exactly(t, repo1, repo2)
 }
 
+func TestClean(t *testing.T) {
+	// Schema Repostory 
+	repo := GetSchemaRepository()
+
+	data1, _ := repo.PushFromFile("../../internal/testdata/user_schema.json")
+	require.IsType(t, Schema{}, data1)
+	data2, _ := repo.PushFromFile("../../internal/testdata/enterprise_user_schema.json")
+	require.IsType(t, Schema{}, data2)
+
+	list := repo.List()
+	require.Len(t, list, 2)
+
+	repo.Clean()
+	list = repo.List()
+	require.Len(t, list, 0)
+
+	// ResourceType Repository
+
+	repo2 := GetResourceTypeRepository()
+
+	data3, _ := repo2.PushFromFile("../../internal/testdata/user_schema.json")
+	require.IsType(t, ResourceType{}, data3)
+	data4, _ := repo2.PushFromFile("../../internal/testdata/enterprise_user_schema.json")
+	require.IsType(t, ResourceType{}, data4)
+
+	list2 := repo2.List()
+	require.Len(t, list2, 2)
+
+	repo2.Clean()
+	list2 = repo2.List()
+	require.Len(t, list2, 0)
+}
+
 func TestSchemaRepository(t *testing.T) {
 	schemas := GetSchemaRepository()
 
@@ -105,11 +138,10 @@ func TestSchemaRepository(t *testing.T) {
 
 	require.Equal(t, schema.GetIdentifier(), key3)
 	require.Equal(t, 3, len(schemas.List()))
-	
-
-	// (todo) > test simple push
 
 	// (todo) > test lock
+
+	schemas.Clean() // teardown
 }
 
 func TestResourceTypeRepository(t *testing.T) {
@@ -202,6 +234,8 @@ func TestResourceTypeRepository(t *testing.T) {
 	require.Equal(t, rT.GetIdentifier(), key3)
 
 	// (todo) > test lock
+
+	rType.Clean() // teardown
 }
 
 func TestResourceTypeRepositoryList(t *testing.T) {
@@ -221,6 +255,8 @@ func TestResourceTypeRepositoryList(t *testing.T) {
 	require.NotNil(t, list)
 	require.Len(t, list, 2)
 	require.IsType(t, []ResourceType{}, list)
+
+	repos.Clean() // teardown
 }
 
 func TestSchemaRepositoryList(t *testing.T) {
@@ -240,4 +276,6 @@ func TestSchemaRepositoryList(t *testing.T) {
 	require.NotNil(t, list)
 	require.Len(t, list, 2)
 	require.IsType(t, []Schema{}, list)
+
+	repos.Clean() // teardown
 }
