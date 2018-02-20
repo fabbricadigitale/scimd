@@ -23,6 +23,7 @@ type SchemaRepository interface {
 	PushFromFile(filename string) (Schema, error)
 	PushFromData(data []byte) (Schema, error)
 	List() []Schema
+	Clean()
 }
 
 // List returns all elements
@@ -85,6 +86,16 @@ func (repo *repositorySchema) PushFromFile(filename string) (Schema, error) {
 		return elem, err
 	}
 	return repo.PushFromData(bytes)
+}
+
+// Clean empties the repository
+func (repo *repositorySchema) Clean() {
+	repo.mu.Lock()
+	defer repo.mu.Unlock()
+
+	for k := range repo.items {
+		delete(repo.items, k)
+	}
 }
 
 var (

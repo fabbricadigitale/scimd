@@ -23,6 +23,7 @@ type ResourceTypeRepository interface {
 	PushFromFile(filename string) (ResourceType, error)
 	PushFromData(data []byte) (ResourceType, error)
 	List() []ResourceType
+	Clean()
 }
 
 // List returns all elements
@@ -85,6 +86,16 @@ func (repo *repositoryResourceType) PushFromFile(filename string) (ResourceType,
 		return elem, err
 	}
 	return repo.PushFromData(bytes)
+}
+
+// Clean empties the repository
+func (repo *repositoryResourceType) Clean() {
+	repo.mu.Lock()
+	defer repo.mu.Unlock()
+
+	for k := range repo.items {
+		delete(repo.items, k)
+	}
 }
 
 var (

@@ -30,6 +30,7 @@ type GenericRepository interface {
 	PushFromFile(filename string) (Elem, error)
 	PushFromData(data []byte) (Elem, error)
 	List() []Elem
+	Clean()
 }
 
 // List returns all elements
@@ -92,6 +93,16 @@ func (repo *repositoryGeneric) PushFromFile(filename string) (Elem, error) {
 		return elem, err
 	}
 	return repo.PushFromData(bytes)
+}
+
+// Clean empties the repository
+func (repo *repositoryGeneric) Clean() {
+	repo.mu.Lock()
+	defer repo.mu.Unlock()
+
+	for k := range repo.items {
+		delete(repo.items, k)
+	}
 }
 
 var (
