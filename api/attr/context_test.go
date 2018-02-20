@@ -449,34 +449,40 @@ func TestContextDelete(t *testing.T) {
 	assert.Nil(t, displayName)
 }
 
-// (todo) > Test contexts() with filter about attributes sub attributes characteristic
-
 func TestContexts(t *testing.T) {
 	rt := resTypeRepo.Pull("User")
 
 	var fxNilAttrs = make(map[string]bool)
-	fxnil := Contexts(rt, nil)
+	fxnil, err := Contexts(rt, nil)
+	require.NoError(t, err)
+
 	for _, at := range fxnil {
 		fxNilAttrs[at.Path().String()] = true
 	}
 	require.Equal(t, withFxNil, fxNilAttrs)
 
 	var raAttrs = make(map[string]bool)
-	ra := Contexts(rt, withReturned(schemas.ReturnedAlways))
+	ra, err := Contexts(rt, withReturned(schemas.ReturnedAlways))
+	require.NoError(t, err)
+
 	for _, at := range ra {
 		raAttrs[at.Path().String()] = true
 	}
 	require.Equal(t, withReturnedAlways, raAttrs)
 
 	var rnAttrs = make(map[string]bool)
-	rn := Contexts(rt, withReturned(schemas.ReturnedNever))
+	rn, err := Contexts(rt, withReturned(schemas.ReturnedNever))
+	require.NoError(t, err)
+
 	for _, at := range rn {
 		rnAttrs[at.Path().String()] = true
 	}
 	require.Equal(t, withReturnedNever, rnAttrs)
 
 	var rdAttrs = make(map[string]bool)
-	rd := Contexts(rt, withReturned(schemas.ReturnedDefault))
+	rd, err := Contexts(rt, withReturned(schemas.ReturnedDefault))
+	require.NoError(t, err)
+
 	for _, at := range rd {
 		rdAttrs[at.Path().String()] = true
 	}
@@ -484,7 +490,8 @@ func TestContexts(t *testing.T) {
 
 	// TODO > What to do when rt is empty? Panics in core/resource_type/#58 on the GetIdentifier() method
 	//
-	// rt := &core.ResourceType{}
-	// rd := Contexts(rt, withReturned(schemas.ReturnedDefault))
+	rt = &core.ResourceType{}
+	rd, err = Contexts(rt, withReturned(schemas.ReturnedDefault))
+	require.Error(t, err)
 
 }

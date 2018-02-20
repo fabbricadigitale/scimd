@@ -32,14 +32,28 @@ import (
 // So, pragmatically, they are treated as Returned == "never", as per:
 // - https://tools.ietf.org/html/rfc7643#section-7
 //
-func Projection(ctx *core.ResourceType, included []*Path, excluded []*Path) []*Path {
+func Projection(ctx *core.ResourceType, included []*Path, excluded []*Path) ([]*Path, error) {
+	if ctx == nil {
+		return nil, core.ScimError{
+			Msg: "Error ResourceType is nil",
+		}
+	}
+
 	always := set.New()
-	for _, a := range Paths(ctx, withReturned(schemas.ReturnedAlways)) {
+	paths, err := Paths(ctx, withReturned(schemas.ReturnedAlways))
+	if err != nil {
+		return nil, err
+	}
+	for _, a := range paths {
 		always.Add(*a)
 	}
 
 	never := set.New()
-	for _, n := range Paths(ctx, cannotBeReturned) {
+	paths, err = Paths(ctx, cannotBeReturned)
+	if err != nil {
+		return nil, err
+	}
+	for _, n := range paths {
 		never.Add(*n)
 	}
 
@@ -55,7 +69,11 @@ func Projection(ctx *core.ResourceType, included []*Path, excluded []*Path) []*P
 	// When no attribute inclusion or all inclusion was unknown (and thus ignored) attributes ...
 	// Switch to defaults
 	if defaults.Size() == 0 || len(included) == 0 {
-		for _, d := range Paths(ctx, withReturned(schemas.ReturnedDefault)) {
+		paths, err = Paths(ctx, withReturned(schemas.ReturnedDefault))
+		if err != nil {
+			return nil, err
+		}
+		for _, d := range paths {
 			defaults.Add(*d)
 		}
 	}
@@ -70,7 +88,7 @@ func Projection(ctx *core.ResourceType, included []*Path, excluded []*Path) []*P
 
 	ret := set.Union(set.Difference(defaults, exclusions, never), always)
 
-	return getPathSlice(ret)
+	return getPathSlice(ret), nil
 }
 
 func getPathSlice(ret set.Interface) []*Path {

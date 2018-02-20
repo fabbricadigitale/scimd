@@ -139,13 +139,23 @@ func (p Path) matchSchema(rt *core.ResourceType) *core.Schema {
 //
 // It flattens the attributes of rt's schemas returning their contextualized Path representations.
 // When a fx is provided it returns only the attribute paths statisfying fx(attribute).
-func Paths(rt *core.ResourceType, fx func(attribute *core.Attribute) bool) []*Path {
-	ctxs := Contexts(rt, fx)
+func Paths(rt *core.ResourceType, fx func(attribute *core.Attribute) bool) ([]*Path, error) {
+	if rt == nil {
+		return nil, core.ScimError{
+			Msg: "Error ResourceType is nil",
+		}
+	}
+
+	ctxs, err := Contexts(rt, fx)
+	if err != nil {
+		return nil, err
+	}
+
 	acc := make([]*Path, len(ctxs))
 
 	for i, ctx := range ctxs {
 		acc[i] = ctx.Path()
 	}
 
-	return acc
+	return acc, nil
 }

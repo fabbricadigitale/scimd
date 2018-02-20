@@ -52,10 +52,15 @@ func (rt ResourceType) GetSchemaExtensions() map[string]*Schema {
 }
 
 // GetSchemas returns a map containing all the Schema(s) indexed by URN
-func (rt ResourceType) GetSchemas() map[string]*Schema {
+func (rt ResourceType) GetSchemas() (map[string]*Schema, error) {
 	s := rt.GetSchema()
+	if s == nil {
+		return nil, ScimError{
+			Msg: "ResourceType does not have a schema",
+		}
+	}
 	m := rt.GetSchemaExtensions()
 	m[s.GetIdentifier()] = s
 
-	return m
+	return m, nil
 }

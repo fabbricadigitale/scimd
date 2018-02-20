@@ -168,9 +168,10 @@ func TestPaths(t *testing.T) {
 	rt := resTypeRepo.Pull("User")
 
 	for _, tt := range attributesTest {
-		attr := Paths(rt, func(attribute *core.Attribute) bool {
+		attr, err := Paths(rt, func(attribute *core.Attribute) bool {
 			return funk.ContainsString(tt.attribute, attribute.Name)
 		})
+		require.NoError(t, err)
 
 		results := make([]string, len(attr))
 		for i, r := range attr {
@@ -181,7 +182,8 @@ func TestPaths(t *testing.T) {
 
 	// Paths(rt, nil) with fx = nil returns all attributes (ignoring their returned characteristic)
 	var attrs = make(map[string]bool)
-	p := Paths(rt, nil)
+	p, err := Paths(rt, nil)
+	require.NoError(t, err)
 	for _, at := range p {
 		attrs[at.String()] = true
 	}

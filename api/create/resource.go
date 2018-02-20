@@ -52,9 +52,14 @@ func Resource(s storage.Storer, resType *core.ResourceType, res *resource.Resour
 	}
 
 	// Attributes whose mutability is "readOnly" SHALL be ignored
-	ro := attr.Paths(resType, func(attribute *core.Attribute) bool {
+	ro, err := attr.Paths(resType, func(attribute *core.Attribute) bool {
 		return attribute.Mutability == schemas.MutabilityReadOnly
 	})
+	if err != nil {
+		ret = nil
+		return
+	}
+
 	for _, p := range ro {
 		p.Context(resType).Delete(res)
 	}

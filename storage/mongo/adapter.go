@@ -190,7 +190,11 @@ func (a *Adapter) toDoc(r *resource.Resource) *document {
 		d["externalId"] = r.ExternalID
 	}
 
-	for ns := range rt.GetSchemas() {
+	schemas, err := rt.GetSchemas()
+	if err != nil {
+		panic(err)
+	}
+	for ns := range schemas {
 		if c := map[string]interface{}(*r.Values(ns)); c != nil {
 			d[ns] = c
 		}
@@ -215,7 +219,11 @@ func toResource(d *document) *resource.Resource {
 
 	rt := r.ResourceType()
 
-	for ns, s := range rt.GetSchemas() {
+	schemas, err := rt.GetSchemas()
+	if err != nil {
+		panic(err)
+	}
+	for ns, s := range schemas {
 		if values := dd[ns]; values != nil {
 			c, err := s.Enforce(values.(bson.M))
 			if err != nil {
@@ -225,7 +233,7 @@ func toResource(d *document) *resource.Resource {
 		}
 	}
 
-	return r
+	return nil
 }
 
 func toStringSlice(iSlice []interface{}) []string {

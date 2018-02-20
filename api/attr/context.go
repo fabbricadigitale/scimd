@@ -87,7 +87,14 @@ func (p Path) Context(rt *core.ResourceType) (ctx *Context) {
 //
 // It flattens the attributes of rt's schemas returning their Context representations.
 // When a fx is provided it returns all the attributes statisfying fx(attribute).
-func Contexts(rt *core.ResourceType, fx func(attribute *core.Attribute) bool) []Context {
+func Contexts(rt *core.ResourceType, fx func(attribute *core.Attribute) bool) ([]Context, error) {
+
+	if rt == nil {
+		return nil, core.ScimError{
+			Msg: "Error ResourceType is nil",
+		}
+	}
+
 	// Tautology
 	if fx == nil {
 		fx = func(attribute *core.Attribute) bool {
@@ -113,7 +120,11 @@ func Contexts(rt *core.ResourceType, fx func(attribute *core.Attribute) bool) []
 		}
 	}
 
-	for _, sc := range rt.GetSchemas() {
+	schemas, err := rt.GetSchemas()
+	if err != nil {
+		return nil, err
+	}
+	for _, sc := range schemas {
 		if sc != nil {
 			ctx := Context{
 				Schema: sc,
@@ -134,7 +145,7 @@ func Contexts(rt *core.ResourceType, fx func(attribute *core.Attribute) bool) []
 		}
 	}
 
-	return acc
+	return acc, nil
 }
 
 func (ctx *Context) getValuerValues(valuer resource.Valuer) *datatype.Complex {

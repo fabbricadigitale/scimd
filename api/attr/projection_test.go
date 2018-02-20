@@ -385,7 +385,9 @@ func TestProjection(t *testing.T) {
 			}
 		}
 
-		result := Projection(rt, included, excluded)
+		result, err := Projection(rt, included, excluded)
+		require.NoError(t, err)
+
 		results := make(map[string]bool)
 		for _, r := range result {
 			results[r.String()] = true

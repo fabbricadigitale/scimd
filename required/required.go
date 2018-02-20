@@ -14,9 +14,13 @@ import (
 // ValidateRequired is a function to check that required field is not null
 func ValidateRequired(res *resource.Resource) (err error) {
 
-	attrs := attr.Paths(res.ResourceType(), func(attribute *core.Attribute) bool {
+	attrs, err := attr.Paths(res.ResourceType(), func(attribute *core.Attribute) bool {
 		return (attribute.Required == true && attribute.Mutability != schemas.MutabilityReadOnly)
 	})
+
+	if err != nil {
+		return
+	}
 
 	// ID is a required but readOnly property.
 	// Using StructExcept we can exclude ID attribute validation.
