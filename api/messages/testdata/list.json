@@ -11,7 +11,7 @@
         "urn:ietf:params:scim:schemas:core:2.0:User"
       ],
       "id": "123",
-      "externaId": "456",
+      "externalId": "456",
       "userName": "Ale",
       "meta": {
         "location": "https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646",
