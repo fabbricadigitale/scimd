@@ -16,8 +16,18 @@ func TestPathExists(t *testing.T){
 	err = Validator.Var(absPath, "pathexists")
 	require.NoError(t, err)
 
+	okPathDir := "../../scimd/internal/testdata"
+	absPath, _ = filepath.Abs(okPathDir)
+	err = Validator.Var(absPath, "pathexists")
+	require.NoError(t, err)
+
 	wrongPath := "../../scimd/internal/testdata/service_provider.json"
 	absPath, _ = filepath.Abs(wrongPath)
+	err = Validator.Var(absPath, "pathexists")
+	require.Error(t, err)
+
+	wrongPathDir := "../../scimd/internal/nonexistingdir"
+	absPath, _ = filepath.Abs(wrongPathDir)
 	err = Validator.Var(absPath, "pathexists")
 	require.Error(t, err)
 
