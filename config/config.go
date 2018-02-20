@@ -18,6 +18,7 @@ type Configuration struct {
 	ServiceProviderConfig string
 	Config                string
 	PageSize              int `default:"10" validate:"min=1,max=10"`
+	EnableSelf            bool
 }
 
 type Storage struct {
