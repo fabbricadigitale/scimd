@@ -10,6 +10,7 @@ var Validator *validator.Validate
 func init() {
 	Validator = validator.New()
 	Validator.RegisterValidation("startswith", startsWith)
+	Validator.RegisterValidation("nstartswith", notStartsWith)
 	Validator.RegisterValidation("endswith", endsWith)
 	Validator.RegisterValidation("urn", urn)
 	Validator.RegisterValidation("attrname", attrName)

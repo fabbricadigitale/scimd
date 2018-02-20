@@ -24,8 +24,8 @@ type Storage struct {
 	Type string `default:"mongo" validate:"eq=mongo"` // (note) > since we are only supporting mongo at the moment
 	Host string `default:"0.0.0.0" validate:"hostname|ip4_addr"`
 	Port int    `default:"27017" validate:"min=1024,max=65535"`
-	Name string `default:"scimd"`
-	Coll string `default:"resources"`
+	Name string `default:"scimd" validate:"min=1,excludesall=/\\.*<>:?$\""` // cannot contain any of these characters /, \, ., *, <, >, :, , ?, $, " (fixme) exclude also => |
+	Coll string `default:"resources" validate:"min=1,excludes=$,nstartswith=system."`
 }
 
 var Values *Configuration
