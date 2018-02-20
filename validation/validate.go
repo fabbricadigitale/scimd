@@ -19,6 +19,6 @@ func init() {
 	Validator.RegisterValidation("isset", depsOn)
 	Validator.RegisterValidation("uniqueattr", uniqueAttr)
 	Validator.RegisterValidation("pathexists", pathExists)
-	//Validator.RegisterValidation("isdir", isDirectory)
-	//Validator.RegisterValidation("isfile", isFile)
+	Validator.RegisterValidation("isdir", isDirectory)
+	Validator.RegisterValidation("isfile", isFile)
 }
