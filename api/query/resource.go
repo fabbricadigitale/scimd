@@ -8,7 +8,9 @@ import (
 	"github.com/fabbricadigitale/scimd/api/attr"
 	"github.com/fabbricadigitale/scimd/api/filter"
 	"github.com/fabbricadigitale/scimd/api/messages"
+	"github.com/fabbricadigitale/scimd/hasher"
 	"github.com/fabbricadigitale/scimd/schemas/core"
+	"github.com/fabbricadigitale/scimd/schemas/datatype"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/storage"
 	"github.com/fabbricadigitale/scimd/validation"
@@ -122,12 +124,61 @@ func Resources(s storage.Storer, resTypes []*core.ResourceType, search *api.Sear
 		}
 	}
 
+	/// CUSTOM LOGIC to detect if filter contains a password comparison (eq, ne)
+	var passwords map[string]passwordInfo
+	var cs customizer
+	pwd := &passwordInfo{
+		not: false,
+	}
+	passwords = make(map[string]passwordInfo)
+	for _, resType := range resTypes {
+		cs.customize(resType, &f, pwd)
+		passwords[resType.ID] = *pwd
+	}
+	/// CUSTOM LOGIC
+
 	// Make query
 	var q storage.Querier
 	q, err = s.Find(resTypes, f)
 	defer q.Close()
 	if err != nil {
 		return
+	}
+
+	hasher := hasher.NewBCrypt()
+	var exclude []string
+	exclude = make([]string, 0)
+	// compare plain password with the stored hashed password
+	if len(passwords) > 0 {
+
+		var res *resource.Resource
+		for it := q.Iter(); !it.Done(); {
+			res = it.Next()
+
+			resourceType := res.Meta.ResourceType
+
+			values := res.Values("urn:ietf:params:scim:schemas:core:2.0:User")
+
+			hashedPassword := (*values)["password"].(datatype.String)
+
+			b := hasher.Compare([]byte(hashedPassword), []byte(passwords[resourceType].value))
+
+			if passwords[resourceType].operator == "eq" && !passwords[resourceType].not && !b {
+				exclude = append(exclude, res.ID)
+			}
+
+			if passwords[resourceType].operator == "eq" && passwords[resourceType].not && b {
+				exclude = append(exclude, res.ID)
+			}
+
+			if passwords[resourceType].operator == "ne" && !passwords[resourceType].not && b {
+				exclude = append(exclude, res.ID)
+			}
+
+			if passwords[resourceType].operator == "ne" && passwords[resourceType].not && !b {
+				exclude = append(exclude, res.ID)
+			}
+		}
 	}
 
 	// Fields projection
@@ -147,6 +198,8 @@ func Resources(s storage.Storer, resTypes []*core.ResourceType, search *api.Sear
 	if err != nil {
 		return
 	}
+	// Remove excluded
+	list.TotalResults -= len(exclude)
 
 	if search.Count > config.Values.PageSize {
 		search.Count = config.Values.PageSize
@@ -181,8 +234,97 @@ func Resources(s storage.Storer, resTypes []*core.ResourceType, search *api.Sear
 	var r *resource.Resource
 	for iter := q.Iter(); !iter.Done(); {
 		r = iter.Next()
-		list.Resources = append(list.Resources, r)
+		if !contains(exclude, r.ID) {
+			list.Resources = append(list.Resources, r)
+		}
 	}
 
 	return
+}
+
+func contains(slice []string, ID string) bool {
+	for _, value := range slice {
+		if value == ID {
+			return true
+		}
+	}
+	return false
+}
+
+type customizer struct{}
+type passwordInfo struct {
+	value    string
+	operator string
+	not      bool
+}
+
+func (c *customizer) customize(resType *core.ResourceType, ft *filter.Filter, pwd *passwordInfo) {
+
+	switch (*ft).(type) {
+
+	case filter.Group:
+		node := (*ft).(filter.Group)
+		var filter filter.Group
+		c.customize(resType, &node.Filter, pwd)
+		filter.Filter = node.Filter
+		*ft = filter
+
+	case filter.And:
+		node := (*ft).(filter.And)
+		var filter filter.And
+		if node.Left != nil {
+			c.customize(resType, &node.Left, pwd)
+			filter.Left = node.Left
+		}
+		if node.Right != nil {
+			c.customize(resType, &node.Right, pwd)
+			filter.Right = node.Right
+		}
+		(*ft) = filter
+
+	case filter.Or:
+		node := (*ft).(filter.Or)
+		var filter filter.Or
+		if node.Left != nil {
+			c.customize(resType, &node.Left, pwd)
+			filter.Left = node.Left
+		}
+		if node.Right != nil {
+			c.customize(resType, &node.Right, pwd)
+			filter.Right = node.Right
+		}
+		(*ft) = filter
+
+	case filter.Not:
+		node := (*ft).(filter.Not)
+		var ftn filter.Not
+
+		switch node.Filter.(type) {
+		case *filter.AttrExpr:
+			pwd.not = true
+		}
+
+		c.customize(resType, &node.Filter, pwd)
+		ftn.Filter = node.Filter
+
+		(*ft) = ftn
+
+	case *filter.AttrExpr:
+		filter := (*ft).Normalize(resType).(*filter.AttrExpr)
+		if filter.Path.URI == "urn:ietf:params:scim:schemas:core:2.0:User" && filter.Path.Name == "password" && (filter.Op == "eq" || filter.Op == "ne") {
+
+			pwd.value = filter.Value.(string)
+			pwd.operator = filter.Op
+
+			// Change the filter with a more inclusive one
+			// and we delegate this search logic to the next step
+			// when we can iterate trough query resultset where there is also password attribute
+			// so we can compare hashed password and plain password
+
+			// NOTE: Ensure the custom search logic implemented for the 'eq' and 'ne' operators is enough to represent all compare password operations
+			filter.Op = (map[bool]string{false: "ne", true: "eq"})[pwd.not]
+			filter.Value = ""
+			*ft = filter
+		}
+	}
 }
