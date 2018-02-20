@@ -16,7 +16,7 @@ func (e ScimError) Error() string { return e.Msg }
 
 // Meta ...
 type Meta struct {
-	Location     string     `json:"location,omitempty" validate:"uri"`
+	Location     string     `json:"location,omitempty" validate:"omitempty,uri"`
 	ResourceType string     `json:"resourceType" validate:"required"`
 	Created      *time.Time `json:"created,omitempty"`
 	LastModified *time.Time `json:"lastModified,omitempty"`
