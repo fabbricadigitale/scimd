@@ -38,6 +38,11 @@ func TestSchemaRepository(t *testing.T) {
 	require.Error(t, err5)
 	require.Zero(t, x2)
 
+	// Push - Malformed JSON
+	x3, err10 := schemas.Push(x0)
+	require.Error(t, err10)
+	require.Zero(t, x3)
+
 	//PushFromFile - Wrong path
 	x1, err1 := schemas.PushFromFile("WRONG/uschema.json")
 	require.Error(t, err1)
@@ -54,6 +59,12 @@ func TestSchemaRepository(t *testing.T) {
 	require.EqualError(t, err4, "missing identifier")
 	require.Equal(t, 0, len(schemas.List()))
 
+	// Push - Wrong structure (ie., missing ID) - Returns it but do not stores it
+	var missingIDSchema Schema
+	_, err7 := schemas.Push(missingIDSchema)
+	require.EqualError(t, err7, "missing identifier")
+	require.Equal(t, 0, len(schemas.List()))
+
 	// PushFromFile - Successful loading of a schema from file
 	data3, err3 := schemas.PushFromFile("../../internal/testdata/user_schema.json")
 	require.NoError(t, err3)
@@ -64,6 +75,7 @@ func TestSchemaRepository(t *testing.T) {
 	schema := schemas.Pull(key)
 
 	require.Equal(t, schema.GetIdentifier(), key)
+	require.Equal(t, 1, len(schemas.List()))
 
 	// PushFromData - Successful loading of a schema from bytes
 	byt, _ := ioutil.ReadFile("../../internal/testdata/enterprise_user_schema.json")
@@ -76,6 +88,24 @@ func TestSchemaRepository(t *testing.T) {
 	schema = schemas.Pull(key2)
 
 	require.Equal(t, schema.GetIdentifier(), key2)
+	require.Equal(t, 2, len(schemas.List()))
+
+	ktm := &Schema{}
+	if err := json.Unmarshal(byt, ktm); err != nil {
+		t.Fatalf("error unmarshalling")
+	}
+	ktm.ID = "urn:ietf:params:scim:schemas:core:2.0:Shop"
+	data7, err8 := schemas.Push(*ktm)
+	require.NoError(t, err8)
+	require.Implements(t, (*Identifiable)(nil), data7)
+	require.IsType(t, Schema{}, data7)
+
+	key3 := "urn:ietf:params:scim:schemas:core:2.0:Shop"
+	schema = schemas.Pull(key3)
+
+	require.Equal(t, schema.GetIdentifier(), key3)
+	require.Equal(t, 3, len(schemas.List()))
+	
 
 	// (todo) > test simple push
 
@@ -86,8 +116,9 @@ func TestResourceTypeRepository(t *testing.T) {
 	rType := GetResourceTypeRepository()
 
 	// PushFromFile - Malformed JSON
-	_, err0 := rType.PushFromFile("../../internal/testdata/malformed.json")
+	x0, err0 := rType.PushFromFile("../../internal/testdata/malformed.json")
 	require.Error(t, err0)
+	require.Zero(t, x0)
 	// require.Empty(t, data0)
 
 	// PushFromData - Malformed JSON
@@ -95,6 +126,11 @@ func TestResourceTypeRepository(t *testing.T) {
 	x2, err4 := rType.PushFromData([]byte(malformed))
 	require.Error(t, err4)
 	require.Zero(t, x2)
+
+	// Push - Malformed JSON
+	x3, err9 := rType.Push(x0)
+	require.Error(t, err9)
+	require.Zero(t, x3)
 
 	// PushFromFile - Wrong path
 	_, err1 := rType.PushFromFile("WRONG/urt.json")
@@ -113,6 +149,18 @@ func TestResourceTypeRepository(t *testing.T) {
 	require.EqualError(t, err5, "missing identifier")
 	require.Equal(t, 0, len(rType.List()))
 
+	// Push - Wrong structure (ie., missing ID) - Returns it but do not stores it
+	var missingIDResType ResourceType
+	missingIDResType.Endpoint = "/User"
+	missingIDResType.Description = "User Account "
+	missingIDResType.Schema = "urn:ietf:params:scim:schemas:core:2.0:User"
+	commons := NewCommon("urn:ietf:params:scim:schemas:core:2.0:ResourceType", "ResourceType", "")
+	missingIDResType.CommonAttributes = *commons
+	_, err7 := rType.Push(missingIDResType)
+	require.EqualError(t, err7, "missing identifier")
+	require.Equal(t, 0, len(rType.List()))
+
+	// PushFromFile - Successful loading of a schema from file
 	data3, err3 := rType.PushFromFile("../../internal/testdata/user.json")
 	require.NoError(t, err3)
 	require.Implements(t, (*Identifiable)(nil), data3)
@@ -135,7 +183,23 @@ func TestResourceTypeRepository(t *testing.T) {
 
 	require.Equal(t, rT.GetIdentifier(), key2)
 
-	// (todo) > test simple push
+	// Push - Successful loading of a schema
+	var resType ResourceType
+	resType.Name = "User 3"
+	resType.Endpoint = "/User"
+	resType.Description = "User Account "
+	resType.Schema = "urn:ietf:params:scim:schemas:core:2.0:User"
+	resType.CommonAttributes = *commons
+	data5, err8 := rType.Push(resType)
+
+	require.NoError(t, err8)
+	require.Implements(t, (*Identifiable)(nil), data5)
+	require.IsType(t, ResourceType{}, data5)
+
+	key3 := "User 3"
+	rT = rType.Pull(key3)
+
+	require.Equal(t, rT.GetIdentifier(), key3)
 
 	// (todo) > test lock
 }
