@@ -233,7 +233,7 @@ func toResource(d *document) *resource.Resource {
 		}
 	}
 
-	return nil
+	return r
 }
 
 func toStringSlice(iSlice []interface{}) []string {
