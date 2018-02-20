@@ -15,10 +15,11 @@ import (
 
 type Configuration struct {
 	Storage
-	ServiceProviderConfig string
-	Config                string
-	PageSize              int `default:"10" validate:"min=1,max=10"`
-	EnableSelf            bool
+	Port                  int    `default:"8787" validate:"min=1024,max=65535"`
+	ServiceProviderConfig string `validate:"omitempty,pathexists,isfile=.json"`
+	Config                string `validate:"omitempty,pathexists,isdir"` // (todo) > check the config directory contains two directories, one for resource types and one for schemas, and that them contains json files
+	PageSize              int    `default:"10" validate:"min=1,max=10"`
+	Enable
 }
 
 type Storage struct {
@@ -27,6 +28,10 @@ type Storage struct {
 	Port int    `default:"27017" validate:"min=1024,max=65535"`
 	Name string `default:"scimd" validate:"min=1,excludesall=/\\.*<>:?$\""` // cannot contain any of these characters /, \, ., *, <, >, :, , ?, $, " (fixme) exclude also => |
 	Coll string `default:"resources" validate:"min=1,excludes=$,nstartswith=system."`
+}
+
+type Enable struct {
+	Self bool
 }
 
 var Values *Configuration

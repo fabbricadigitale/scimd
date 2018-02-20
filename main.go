@@ -5,5 +5,12 @@ import (
 )
 
 func main() {
+	// if len(os.Args) > 1 {
+	// 	cmd.Execute()
+	// 	return
+	// }
+
+	// fmt.Println("SERVER MODE")
+
 	cmd.Execute()
 }
