@@ -12,7 +12,7 @@ type ScimError struct {
 	Msg string // description of error
 }
 
-func (e *ScimError) Error() string { return e.Msg }
+func (e ScimError) Error() string { return e.Msg }
 
 // Meta ...
 type Meta struct {
