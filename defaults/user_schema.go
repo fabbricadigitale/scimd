@@ -898,6 +898,7 @@ func init() {
 		fmt.Println(errors)
 		panic("default user schema configuration incorrect")
 	}
+	// (todo) > mold
 
 	UserSchema = *schema
 }

@@ -94,6 +94,7 @@ func init() {
 		fmt.Println(errors)
 		panic("default group schema configuration incorrect")
 	}
+	// (todo) > mold
 
 	GroupSchema = *schema
 }

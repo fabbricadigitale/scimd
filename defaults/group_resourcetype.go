@@ -27,6 +27,7 @@ func init() {
 	resType.Meta.Location = fmt.Sprintf("/v2/ResourceTypes/%s", id)
 
 	// (todo) > validation
+	// (todo) > mold
 
 	GroupResourceType = resType
 }

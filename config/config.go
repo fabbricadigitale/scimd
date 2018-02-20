@@ -21,9 +21,9 @@ type Configuration struct {
 }
 
 type Storage struct {
-	Type string `default:"mongo"`
-	Host string `default:"0.0.0.0"`
-	Port int    `default:"27017"`
+	Type string `default:"mongo" validate:"eq=mongo"` // (note) > since we are only supporting mongo at the moment
+	Host string `default:"0.0.0.0" validate:"hostname|ip4_addr"`
+	Port int    `default:"27017" validate:"min=1024,max=65535"`
 	Name string `default:"scimd"`
 	Coll string `default:"resources"`
 }
