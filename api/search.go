@@ -41,11 +41,11 @@ const (
 
 type Sorting struct {
 	SortBy    string `form:"sortBy" json:"sortBy,omitempty"`
-	SortOrder string `form:"sortOrder" json:"sortOrder,omitempty" default:"ascending" validate:"eq=ascending|eq=descending"`
+	SortOrder string `form:"sortOrder" json:"sortOrder,omitempty" default:"ascending" validate:"omitempty,eq=ascending|eq=descending"`
 }
 
 type Pagination struct {
-	StartIndex int `form:"startIndex" json:"startIndex,omitempty" default:"1" validate:"gt=0"`
+	StartIndex int `form:"startIndex" json:"startIndex,omitempty" default:"1" validate:"omitempty,gt=0"`
 	Count      int `form:"count" json:"count,omitempty" mold:"min=0"`
 }
 
