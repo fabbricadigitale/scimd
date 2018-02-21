@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/fabbricadigitale/scimd/validation"
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 	validator "gopkg.in/go-playground/validator.v9"
 
@@ -56,21 +57,27 @@ var serviceProviderConfig core.ServiceProviderConfig
 // 2. Configuration file
 func getConfig(filename string) {
 	Values = new(Configuration)
-	d.SetDefaults(Values)
 
+	// Defaults
+	d.SetDefaults(Values)
 	for key, value := range structs.Map(Values) {
 		viper.SetDefault(key, value)
 	}
-	viper.SetConfigName(filename)
-	viper.AddConfigPath(".")
 
-	// (todo) > search within $HOME XDG style
+	viper.SetConfigName(filename)
+
+	viper.AddConfigPath(".")
+	// Search home directory
+	home, err := homedir.Dir()
+	if err != nil {
+		panic(err)
+	}
+	viper.AddConfigPath(home)
 
 	viper.SetEnvPrefix("scimd")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 
-	var err error
 	err = viper.ReadInConfig()
 	err = viper.Unmarshal(&Values)
 	// (todo) > better handling of errors - invalid syntax - etc. etc.
