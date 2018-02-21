@@ -1,6 +1,7 @@
 package mongo
 
 import (
+	"github.com/fabbricadigitale/scimd/schemas/datatype"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -99,10 +100,124 @@ func TestMongotoDoc(t *testing.T) {
 }
 
 func TestMongotoResource(t *testing.T) {
+
+	var expectedNameGivenName datatype.String
+	expectedCommons := core.CommonAttributes{
+		Schemas: []string{"urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"},
+		ID: "2819c223-7f76-453a-919d-ab1234567891",
+		ExternalID: "1234567890",
+		Meta: core.Meta{
+			Version: "W/\"a330bc54f0671c9\"",
+			Location: "https://example.com/v2/Users/2819c223-7f76-453a-919d-ab1234567890",
+			ResourceType: "User",
+		},
+	}
+
+	expectedEmailsVal := []datatype.String{"tfork@example.com", "tiffy@fork.org"}
+	expectedEmailsTyp := []datatype.String{"work", "home"}
+	expectedNameGivenName = "Tiffany"
+
+
+	// Document with a complete set of attributes
 	doc := &document{
 		"id":         "2819c223-7f76-453a-919d-ab1234567891",
 		"schemas":    []interface{}{"urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"},
 		"externalId": "1234567890",
+		"meta": bson.M{
+			"version":      "W/\"a330bc54f0671c9\"",
+			"location":     "https://example.com/v2/Users/2819c223-7f76-453a-919d-ab1234567890",
+			"resourceType": "User",
+		},
+		"urn:ietf:params:scim:schemas:core:2.0:User": bson.M{
+			"userName": "tfork@example.com",
+            "name": bson.M{
+                "givenName": "Tiffany",
+                "middleName": "Geraldine",
+                "honorificPrefix": "Ms.",
+                "honorificSuffix": "II",
+                "formatted": "Ms. Tiffany G Fork, II",
+                "familyName": "Fork",
+			},
+			"emails": []bson.M{
+                {
+                    "value": "tfork@example.com",
+                    "type": "work",
+                },
+                {
+                    "value": "tiffy@fork.org",
+                    "type": "home",
+                },
+			},
+    	},
+	}
+	
+	res := toResource(doc)
+	require.NotNil(t, res)
+	require.Equal(t, expectedCommons, res.CommonAttributes)
+	
+	values := res.Values("urn:ietf:params:scim:schemas:core:2.0:User")
+	
+	emails := (*values)["emails"]
+	for i, val := range emails.([]datatype.DataTyper) {
+		e := val.(*datatype.Complex)
+		require.Equal(t, expectedEmailsVal[i], (*e)["value"])
+	}
+	for i, typ := range emails.([]datatype.DataTyper) {
+		e := typ.(*datatype.Complex)
+		require.Equal(t, expectedEmailsTyp[i], (*e)["type"])
+	}
+
+	name := (*values)["name"].(*datatype.Complex)
+	require.Equal(t, expectedNameGivenName, (*name)["givenName"])
+
+
+	// ID, Schemas and Meta.ResourceType
+	// essential attributes that are REQUIRED for a document to be valid for the toResource() method
+
+	expectedCommons2 := core.CommonAttributes{
+		Schemas: []string{"urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"},
+		ID: "2819c223-7f76-453a-919d-ab1234567891",
+		Meta: core.Meta{
+			ResourceType: "User",
+		},
+	}
+
+	doc = &document{
+		"id":         "2819c223-7f76-453a-919d-ab1234567891",
+		"schemas":    []interface{}{"urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"},
+		"meta": bson.M{
+			"resourceType": "User",
+		},
+	}
+
+	res = toResource(doc)
+	require.NotNil(t, res)
+	require.Equal(t, expectedCommons2, res.CommonAttributes)
+
+	require.Equal(t, "", res.ExternalID)
+
+	// This set of panics tests will follow our assumption made on toResource()
+	// that Schemas, ID and Meta.ResourceType will always be present 
+	//
+	// EMPTY DOCUMENT
+	doc = &document{}
+	require.Panics(t, func(){
+		toResource(doc)
+	})
+
+	// ONLY RESOURCE TYPE
+	doc = &document{
+		"meta": bson.M{
+			"resourceType": "User",
+		},
+	}
+	require.Panics(t, func(){
+		toResource(doc)
+	})
+
+	// NO ID	
+	doc = &document{
+		"schemas":    []interface{}{"urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"},
 		"meta": bson.M{
 			"created":      time.Date(2018, time.January, 12, 12, 12, 12, 12, time.Local),
 			"lastModified": time.Now(),
@@ -111,9 +226,46 @@ func TestMongotoResource(t *testing.T) {
 			"resourceType": "User",
 		},
 	}
+	require.Panics(t, func(){
+		toResource(doc)
+	})
 
-	res := toResource(doc)
-	require.NotNil(t, res)
+	// NO SCHEMAS
+	doc = &document{
+		"id":         "2819c223-7f76-453a-919d-ab1234567891",
+		"meta": bson.M{
+			"created":      time.Date(2018, time.January, 12, 12, 12, 12, 12, time.Local),
+			"lastModified": time.Now(),
+			"version":      "W/\"a330bc54f0671c9\"",
+			"location":     "https://example.com/v2/Users/2819c223-7f76-453a-919d-ab1234567890",
+			"resourceType": "User",
+		},
+	}
+	require.Panics(t, func(){
+		toResource(doc)
+	})
 
-	// (todo) > please test seriously ...
+	// NO RESOURCE TYPE
+	doc = &document{
+		"id":         "2819c223-7f76-453a-919d-ab1234567891",
+		"schemas":    []interface{}{"urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"},
+		"meta": bson.M{
+			"created":      time.Date(2018, time.January, 12, 12, 12, 12, 12, time.Local),
+			"lastModified": time.Now(),
+			"version":      "W/\"a330bc54f0671c9\"",
+			"location":     "https://example.com/v2/Users/2819c223-7f76-453a-919d-ab1234567890",
+		},
+	}
+	require.Panics(t, func(){
+		toResource(doc)
+	})
+
+	// NO META	
+	doc = &document{
+		"id":         "2819c223-7f76-453a-919d-ab1234567891",
+		"schemas":    []interface{}{"urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"},
+	}
+	require.Panics(t, func(){
+		toResource(doc)
+	})	
 }
