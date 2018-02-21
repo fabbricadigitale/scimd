@@ -96,6 +96,12 @@ func Resource(s storage.Storer, resType *core.ResourceType, id string, attrs *ap
 }
 
 func Resources(s storage.Storer, resTypes []*core.ResourceType, search *api.Search) (list *messages.ListResponse, err error) {
+
+	// (TODO) > wrap errors here
+	if err = validation.Validator.Var(resTypes, "gt=0"); err != nil {
+		return
+	}
+
 	if err = validation.Validator.Struct(search); err != nil {
 		return
 	}
