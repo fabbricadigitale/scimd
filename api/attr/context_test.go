@@ -488,8 +488,6 @@ func TestContexts(t *testing.T) {
 	}
 	require.Equal(t, withReturnedDefault, rdAttrs)
 
-	// TODO > What to do when rt is empty? Panics in core/resource_type/#58 on the GetIdentifier() method
-	//
 	rt = &core.ResourceType{}
 	rd, err = Contexts(rt, withReturned(schemas.ReturnedDefault))
 	require.Error(t, err)

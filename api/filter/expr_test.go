@@ -1,6 +1,7 @@
 package filter
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/fabbricadigitale/scimd/api/attr"
@@ -30,6 +31,95 @@ const (
 	filter19 = `title pr or userType eq "Intern"`
 	filter20 = `id eq "one" and meta[resourceType eq "User"]`
 )
+
+type filterTestCase struct {
+	filter           string
+	normalizedFilter string
+	unknown          string
+}
+
+var filterTestCases = []filterTestCase{
+	{
+		filter:           `userType ne "Employee" and not (emails co "example.com" or emails.value co "example.org")`,
+		normalizedFilter: `urn:ietf:params:scim:schemas:core:2.0:User:userType ne "Employee" and not (urn:ietf:params:scim:schemas:core:2.0:User:emails.value co "example.com" or urn:ietf:params:scim:schemas:core:2.0:User:emails.value co "example.org")`,
+		unknown:          `ne "Employee" and not ( co "example.com" or  co "example.org")`,
+	},
+	{
+		filter:           `userName eq "bjensen"`,
+		normalizedFilter: `urn:ietf:params:scim:schemas:core:2.0:User:userName eq "bjensen"`,
+		unknown:          ` eq "bjensen"`,
+	},
+	{
+		filter:           `userType eq "Employee" and emails[type eq "work" and value co "@example.com"]`,
+		normalizedFilter: `urn:ietf:params:scim:schemas:core:2.0:User:userType eq "Employee" and (urn:ietf:params:scim:schemas:core:2.0:User:emails.type eq "work" and urn:ietf:params:scim:schemas:core:2.0:User:emails.value co "@example.com")`,
+		unknown:          ` eq "Employee" and ( eq "work" and  co "@example.com")`,
+	},
+	{
+		filter:           `emails.type ne true`,
+		normalizedFilter: `urn:ietf:params:scim:schemas:core:2.0:User:emails.type ne true`,
+		unknown:          ` ne true`,
+	},
+	{
+		filter:           `name.familyName co "O'Malley"`,
+		normalizedFilter: `urn:ietf:params:scim:schemas:core:2.0:User:name.familyName co "O'Malley"`,
+		unknown:          ` co "O'Malley"`,
+	},
+	{
+		filter:           `userName sw "J"`,
+		normalizedFilter: `urn:ietf:params:scim:schemas:core:2.0:User:userName sw "J"`,
+		unknown:          ` sw "J"`,
+	},
+	{
+		filter:           `meta.lastModified gt "2011-05-13T04:42:34Z"`,
+		normalizedFilter: `meta.lastModified gt "2011-05-13T04:42:34Z"`,
+		unknown:          `meta.lastModified gt "2011-05-13T04:42:34Z"`,
+	},
+	{
+		filter:           `emails[type eq "work" and value co "@example.com"] or ims[type eq "xmpp" and value co "@foo.com"]`,
+		normalizedFilter: `(urn:ietf:params:scim:schemas:core:2.0:User:emails.type eq "work" and urn:ietf:params:scim:schemas:core:2.0:User:emails.value co "@example.com") or (urn:ietf:params:scim:schemas:core:2.0:User:ims.type eq "xmpp" and urn:ietf:params:scim:schemas:core:2.0:User:ims.value co "@foo.com")`,
+		unknown:          `( eq "work" and  co "@example.com") or ( eq "xmpp" and  co "@foo.com")`,
+	},
+	{
+		filter:           `userType eq "Employee" and (emails co "example.com" or emails.value co "example.org")`,
+		normalizedFilter: `urn:ietf:params:scim:schemas:core:2.0:User:userType eq "Employee" and (urn:ietf:params:scim:schemas:core:2.0:User:emails.value co "example.com" or urn:ietf:params:scim:schemas:core:2.0:User:emails.value co "example.org")`,
+		unknown:          ` eq "Employee" and ( co "example.com" or  co "example.org")`,
+	},
+	{
+		filter:           `userType eq "Employee" and (emails.type eq "work")`,
+		normalizedFilter: `urn:ietf:params:scim:schemas:core:2.0:User:userType eq "Employee" and (urn:ietf:params:scim:schemas:core:2.0:User:emails.type eq "work")`,
+		unknown:          ` eq "Employee" and ( eq "work")`,
+	},
+	{
+		filter:           `title pr`,
+		normalizedFilter: `urn:ietf:params:scim:schemas:core:2.0:User:title pr`,
+		unknown:          ` pr`,
+	},
+	{
+		filter:           `not (userName eq "strings")`,
+		normalizedFilter: `not (urn:ietf:params:scim:schemas:core:2.0:User:userName eq "strings")`,
+		unknown:          `not ( eq "strings")`,
+	},
+	{
+		filter:           `emails[not (type sw null)]`,
+		normalizedFilter: `(not (urn:ietf:params:scim:schemas:core:2.0:User:emails.type sw null))`,
+		unknown:          `(not ( sw null))`,
+	},
+	{
+		filter:           `title pr and userType eq "Employee"`,
+		normalizedFilter: `urn:ietf:params:scim:schemas:core:2.0:User:title pr and urn:ietf:params:scim:schemas:core:2.0:User:userType eq "Employee"`,
+		unknown:          ` pr and  eq "Employee"`,
+	},
+	{
+		filter:           `title pr or userType eq "Intern"`,
+		normalizedFilter: `urn:ietf:params:scim:schemas:core:2.0:User:title pr or urn:ietf:params:scim:schemas:core:2.0:User:userType eq "Intern"`,
+		unknown:          ` pr or  eq "Intern"`,
+	},
+	{
+		filter:           `id eq "one" and meta[resourceType eq "User"]`,
+		normalizedFilter: `id eq "one" and (meta.resourceType eq "User")`,
+		unknown:          `id eq "one" and (meta.resourceType eq "User")`,
+	},
+}
 
 func TestStringer(t *testing.T) {
 	var f1 Filter = And{
@@ -184,56 +274,31 @@ func loadRt(t *testing.T) {
 	}
 }
 func TestNormalize(t *testing.T) {
+
+	rt := &core.ResourceType{}
+
+	for _, testCase := range filterTestCases {
+		f, _ := CompileString(testCase.filter)
+		nf := f.Normalize(rt)
+
+		assert.Equal(
+			t,
+			strings.Trim(testCase.unknown, " "),
+			strings.Trim(nf.String(), " "),
+		)
+	}
+
 	loadRt(t)
-	rt := core.GetResourceTypeRepository().Pull("User")
+	rt = core.GetResourceTypeRepository().Pull("User")
 
-	// Test value filter
-	f12, _ := CompileString(filter12)
-	nf12 := f12.Normalize(rt)
+	for _, testCase := range filterTestCases {
+		f, _ := CompileString(testCase.filter)
+		nf := f.Normalize(rt)
 
-	assert.Equal(
-		t,
-		`urn:ietf:params:scim:schemas:core:2.0:User:userType eq "Employee" and (urn:ietf:params:scim:schemas:core:2.0:User:emails.type eq "work" and urn:ietf:params:scim:schemas:core:2.0:User:emails.value co "@example.com")`,
-		nf12.String(),
-	)
-
-	assert.Equal(
-		t,
-		nf12.String(),
-		nf12.Normalize(rt).String(),
-	)
-
-	// Test not
-	f17, _ := CompileString(filter17)
-	nf17 := f17.Normalize(rt)
-
-	assert.Equal(
-		t,
-		`(not (urn:ietf:params:scim:schemas:core:2.0:User:emails.type sw null))`,
-		nf17.String(),
-	)
-
-	assert.Equal(
-		t,
-		nf17.String(),
-		nf17.Normalize(rt).String(),
-	)
-
-	// Test common attributes
-	f20, _ := CompileString(filter20)
-	nf20 := f20.Normalize(rt)
-
-	assert.Equal(
-		t,
-		`id eq "one" and (meta.resourceType eq "User")`,
-		nf20.String(),
-	)
-
-	assert.Equal(
-		t,
-		nf20.String(),
-		nf20.Normalize(rt).String(),
-	)
-
-	// (todo) add more testing cases
+		assert.Equal(
+			t,
+			testCase.normalizedFilter,
+			nf.String(),
+		)
+	}
 }
