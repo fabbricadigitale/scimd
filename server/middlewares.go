@@ -1,12 +1,15 @@
 package server
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/cenk/backoff"
+	"github.com/fabbricadigitale/scimd/api/messages"
+	"github.com/fabbricadigitale/scimd/config"
 	"github.com/fabbricadigitale/scimd/storage"
 	"github.com/fabbricadigitale/scimd/storage/listeners"
 	"github.com/fabbricadigitale/scimd/storage/mongo"
@@ -63,7 +66,14 @@ func Storage(endpoint, db, collection string) gin.HandlerFunc {
 		}, b)
 
 		if err != nil {
-			log.Printf("error after retrying: %v", err)
+			if config.Values.Debug {
+				log.Printf("error after retrying: %v", err)
+			}
+
+			e := messages.NewError(InternalServerError{
+				msg: fmt.Sprintf("error after retrying: %v", err),
+			})
+			ctx.JSON(e.Status, e)
 			ctx.Abort()
 		}
 
@@ -93,4 +103,13 @@ func Authentication(authenticationType string) gin.HandlerFunc {
 	default:
 		panic("authentication scheme not available")
 	}
+}
+
+// InternalServerError is a generic server error
+type InternalServerError struct {
+	msg string
+}
+
+func (e InternalServerError) Error() string {
+	return fmt.Sprintf("%s", e.msg)
 }
