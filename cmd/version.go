@@ -9,7 +9,7 @@ import (
 var version string
 
 func init() {
-	scimdCmd.AddCommand(versionCmd)
+	scimd.AddCommand(versionCmd)
 }
 
 var versionCmd = &cobra.Command{
