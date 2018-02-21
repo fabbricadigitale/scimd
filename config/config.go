@@ -1,20 +1,22 @@
 package config
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/fabbricadigitale/scimd/validation"
+	"github.com/spf13/viper"
+	validator "gopkg.in/go-playground/validator.v9"
 
 	"github.com/fabbricadigitale/scimd/defaults"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fatih/structs"
 	d "github.com/mcuadros/go-defaults"
-
-	"github.com/spf13/viper"
 )
 
 type Configuration struct {
 	Storage
+	Debug                 bool
 	Port                  int    `default:"8787" validate:"min=1024,max=65535"`
 	ServiceProviderConfig string `validate:"omitempty,pathexists,isfile=.json"`
 	Config                string `validate:"omitempty,pathexists,isdir"` // (todo) > check the config directory contains two directories, one for resource types and one for schemas, and that them contains json files
@@ -34,33 +36,48 @@ type Enable struct {
 	Self bool
 }
 
+// Values contains the configuration values
 var Values *Configuration
 
-func getConfig(filename string) error {
+// Errors contains the happened configuration errors
+var Errors validator.ValidationErrors
+
+// getConfig is responsible to set configuration values
+//
+// The priority model from higher to lower is the following one.
+// 0. Flags
+// 1. Environment variables
+// 2. Configuration file
+func getConfig(filename string) {
 	Values = new(Configuration)
 	d.SetDefaults(Values)
 
-	vip := viper.New()
 	for key, value := range structs.Map(Values) {
-		vip.SetDefault(key, value)
+		viper.SetDefault(key, value)
 	}
-	vip.SetConfigName(filename)
-	vip.AddConfigPath(".")
+	viper.SetConfigName(filename)
+	viper.AddConfigPath(".")
 
-	vip.SetEnvPrefix("scimd")
-	vip.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	vip.AutomaticEnv()
+	viper.SetEnvPrefix("scimd")
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	viper.AutomaticEnv()
 
 	var err error
-	err = vip.ReadInConfig()
-	err = vip.Unmarshal(&Values)
-
-	if err := validation.Validator.Struct(Values); err != nil {
-		// (todo) > better handling and pretty print of validation errors
+	err = viper.ReadInConfig()
+	err = viper.Unmarshal(&Values)
+	// (todo) > better handling of errors - invalid syntax - etc. etc.
+	// exit(1) ?
+	if err != nil {
+		fmt.Println("xxxxxx")
 		panic(err)
 	}
 
-	return err
+	// Validate the configurations and collect errors
+	_, err = Valid()
+	if err != nil {
+		errors, _ := err.(validator.ValidationErrors)
+		Errors = append(Errors, errors...)
+	}
 }
 
 func init() {
@@ -75,11 +92,10 @@ func init() {
 	core.GetResourceTypeRepository().Push(defaults.GroupResourceType)
 }
 
-// (todo)
-// OVERRIDE ALL CONFIG
-// scimd --service-provider-config <path> --config <path>
-
-// GET ALL CONFIG
-// Via static command
-// scimd get-config <path> => download config directory <within path>
-// scimd get-service-provider-config <path> => download service provider config file within <path>
+// Valid checks wheter the configuration is valid or not
+func Valid() (bool, error) {
+	if err := validation.Validator.Struct(Values); err != nil {
+		return false, err
+	}
+	return true, nil
+}
