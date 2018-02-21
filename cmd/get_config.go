@@ -13,8 +13,10 @@ func init() {
 	scimd.AddCommand(getConfig)
 }
 
+const getConfigArgName = "destination"
+
 var getConfig = &cobra.Command{
-	Use:   "get-config <destination>",
+	Use:   fmt.Sprintf("get-config <%s>", getConfigArgName),
 	Short: "Get the default configuration",
 	Long: `Retrieve the default configurations.
 It will generate the JSON files representing the default schemas and resource types, within the chosen destination path.
@@ -25,7 +27,7 @@ It will generate the JSON files representing the default schemas and resource ty
 			dest := args[0]
 			errs := validation.Validator.Var(dest, "pathexists,isdir")
 			if errs != nil {
-				return fmt.Errorf("%s%s", arg, validation.Errors(errs))
+				return fmt.Errorf("%s%s", getConfigArgName, validation.Errors(errs))
 			}
 
 			return nil

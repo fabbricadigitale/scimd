@@ -12,13 +12,13 @@ import (
 )
 
 func init() {
-	scimd.AddCommand(getServiceProviderConfigCmd)
+	scimd.AddCommand(getServiceProviderConfig)
 }
 
-var arg = "destination"
+const getServiceProviderConfigArgName = "destination"
 
-var getServiceProviderConfigCmd = &cobra.Command{
-	Use:   fmt.Sprintf("get-service-provider-config <%s>", arg),
+var getServiceProviderConfig = &cobra.Command{
+	Use:   fmt.Sprintf("get-service-provider-config <%s>", getServiceProviderConfigArgName),
 	Short: "Get the default service provider configuration",
 	Long: `Retrieve the default service provider configuration in JSON format. 
 It will generate a "service_provider_config.json" within the chosen destination path.
@@ -29,7 +29,7 @@ It will generate a "service_provider_config.json" within the chosen destination 
 			dest := args[0]
 			errs := validation.Validator.Var(dest, "pathexists,isdir")
 			if errs != nil {
-				return fmt.Errorf("%s%s", arg, validation.Errors(errs))
+				return fmt.Errorf("%s%s", getServiceProviderConfigArgName, validation.Errors(errs))
 			}
 
 			return nil

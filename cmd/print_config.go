@@ -12,12 +12,13 @@ import (
 
 func init() {
 	scimd.AddCommand(printConfig)
+	// (fixme) > should have the same flags of the root command to completely mimic its functioning and print the current config
 }
 
 var printConfig = &cobra.Command{
 	Use:   "print-config",
 	Short: "Print the current configuration",
-	Long:  `Explicitly dump the current configuration objects for debuggin purposes`,
+	Long:  `Explicitly dump the current configuration objects for debugging purposes.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		dump := spew.NewDefaultConfig()
 		dump.DisablePointerAddresses = true

@@ -16,7 +16,7 @@ func init() {
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Print the version number of SCIMD",
-	Long:  `...`,
+	Long:  `Shows the version number of SCIMD.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Fprintf(os.Stdout, "Version %s.\n", version)
 	},
