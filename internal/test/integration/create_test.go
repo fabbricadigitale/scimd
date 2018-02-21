@@ -19,29 +19,31 @@ func TestCreate(t *testing.T) {
 			ExternalID: "5666",
 			Meta: core.Meta{
 				ResourceType: "User",
-				Location:     "something",
 			},
 		},
 	}
-
 	res.SetValues("urn:ietf:params:scim:schemas:core:2.0:User", &datatype.Complex{
 		"userName": datatype.String("alelb"),
 	})
-
 	res.SetValues("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User", &datatype.Complex{
 		"employeeNumber": "701984",
 	})
 
 	retRes, err := create.Resource(adapter, resTypeRepo.Pull("User"), res)
-
 	require.Nil(t, err)
 	require.NotNil(t, retRes)
+
+	// check urn:ietf:params:scim:schemas:core:2.0:User.userName
 	r := retRes.(*resource.Resource)
 	values := r.Values("urn:ietf:params:scim:schemas:core:2.0:User")
 	userName := (*values)["userName"]
+	require.Equal(t, datatype.String("alelb"), userName)
+
+	// check urn:ietf:params:scim:schemas:extension:enterprise:2.0:User.employeeNumber
 	extensionValues := r.Values("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User")
 	employeeNumber := (*extensionValues)["employeeNumber"]
-	require.Equal(t, res.Meta.Version, r.Meta.Version)
-	require.Equal(t, datatype.String("alelb"), userName)
 	require.Equal(t, datatype.String("701984"), employeeNumber)
+
+	require.Equal(t, res.ID, r.ID)
+	require.Equal(t, res.Meta.Version, r.Meta.Version)
 }

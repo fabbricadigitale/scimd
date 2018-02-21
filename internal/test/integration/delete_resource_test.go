@@ -14,10 +14,11 @@ import (
 
 func TestDeleteResource(t *testing.T) {
 
-	notExistingID := "fake-id-doent-exist"
+	// Delete a not-existing resource
+	notExistingID := "fake-id-doesnt-exist"
 
 	err := delete.Resource(adapter, resTypeRepo.Pull("User"), notExistingID)
-	require.Error(t, err, err)
+	require.Error(t, err)
 
 	// Create a new resource to be deleted
 	res := &resource.Resource{
@@ -26,7 +27,6 @@ func TestDeleteResource(t *testing.T) {
 			ExternalID: "5666",
 			Meta: core.Meta{
 				ResourceType: "User",
-				Location:     "something",
 			},
 		},
 	}
@@ -39,7 +39,8 @@ func TestDeleteResource(t *testing.T) {
 		"employeeNumber": "701984",
 	})
 
-	create.Resource(adapter, resTypeRepo.Pull("User"), res)
+	_, err = create.Resource(adapter, resTypeRepo.Pull("User"), res)
+	require.NoError(t, err)
 
 	id := res.ID
 
@@ -47,8 +48,8 @@ func TestDeleteResource(t *testing.T) {
 	err = delete.Resource(adapter, resTypeRepo.Pull("User"), id)
 	require.Nil(t, err)
 
-	// checks the successfully deletion
-	retRes, err := adapter.Get(resTypeRepo.Pull("User"), id, "", nil)
-	require.Nil(t, retRes)
+	// check the successfully deletion
+	_, err = adapter.Get(resTypeRepo.Pull("User"), id, "", nil)
+	require.Error(t, err)
 
 }
