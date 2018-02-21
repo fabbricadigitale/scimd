@@ -50,9 +50,6 @@ func Get(spc *core.ServiceProviderConfig) *gin.Engine {
 		v2.Use(Authentication(authScheme.Type))
 	}
 
-	// (todo) > Retrieve service provider config
-	// v2.GET(svcpcfgEndpoint, getting)
-
 	// Retrieve supported resource types
 	Scim2(v2, NewStaticResourceService(restypeEndpoint, resourceTypes))
 
@@ -60,7 +57,7 @@ func Get(spc *core.ServiceProviderConfig) *gin.Engine {
 	Scim2(v2, NewStaticResourceService(schemasEndpoint, schemas))
 
 	// Retrieve the ServiceProviderConfig
-	Scim2(v2, NewStaticResourceService(svcpcfgEndpoint, config.ServiceProviderConfig()))
+	Scim2(v2, NewNotIdentifiableStaticResourceService(svcpcfgEndpoint, config.ServiceProviderConfig()))
 
 	// Bulk updates to one or more supported schemas
 	if spc.Bulk.Supported {

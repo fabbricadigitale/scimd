@@ -28,12 +28,6 @@ func NewStaticResourceService(endpoint string, resources interface{}) *StaticRes
 			res := rv.Index(i).Interface()
 			m[res.(core.Identifiable).GetIdentifier()] = res
 		}
-	case reflect.Struct:
-		res := rv.Interface()
-		switch res.(type) {
-		case core.ServiceProviderConfig:
-			m[endpoint] = res
-		}
 	default:
 		panic("not available...")
 	}
@@ -51,10 +45,7 @@ func (rs *StaticResourceService) Path() string {
 
 // List ...
 func (rs *StaticResourceService) List(c *gin.Context) {
-	if val, ok := rs.resources[rs.endpoint]; ok {
-		c.JSON(http.StatusOK, val)
-		return
-	}
+	// (todo) > return list responses
 	c.JSON(http.StatusOK, rs.resources)
 }
 
