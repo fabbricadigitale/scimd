@@ -8,21 +8,16 @@ import (
 	validator "gopkg.in/go-playground/validator.v9"
 )
 
-// PathExists checks whether the given path exists or not
-func PathExists(path string) bool {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return false
-	}
-	return true
-}
-
-// pathExists ...
+// pathExists checks whether the given path exists or not
 var pathExists = func(fl validator.FieldLevel) bool {
 	field := fl.Field()
 
 	switch field.Kind() {
 	case reflect.String:
-		return PathExists(field.String())
+		if _, err := os.Stat(field.String()); os.IsNotExist(err) {
+			return false
+		}
+		return true
 	}
 
 	panic(fmt.Sprintf("Bad field type %T", field.Interface()))

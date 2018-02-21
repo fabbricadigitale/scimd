@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/fabbricadigitale/scimd/config"
 	"github.com/fabbricadigitale/scimd/validation"
@@ -13,8 +15,10 @@ func init() {
 	scimd.AddCommand(getServiceProviderConfigCmd)
 }
 
+var arg = "destination"
+
 var getServiceProviderConfigCmd = &cobra.Command{
-	Use:   "get-service-provider-config <destination>",
+	Use:   fmt.Sprintf("get-service-provider-config <%s>", arg),
 	Short: "Get the default service provider configuration",
 	Long: `Retrieve the default service provider configuration in JSON format. 
 It will generate a "service_provider_config.json" within the chosen destination path.
@@ -23,19 +27,44 @@ It will generate a "service_provider_config.json" within the chosen destination 
 		err := cobra.ExactArgs(1)(cmd, args)
 		if err == nil {
 			dest := args[0]
-			if !validation.PathExists(dest) {
-				// (todo) > use the same error of validator encapsulating this check
-				return fmt.Errorf("not a path")
+			errs := validation.Validator.Var(dest, "pathexists,isdir")
+			if errs != nil {
+				return fmt.Errorf("%s%s", arg, validation.Errors(errs))
 			}
+
 			return nil
 		}
 		return err
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		if config.Values.Debug {
-			fmt.Fprintln(os.Stdout, "Generating config ...")
+			fmt.Fprintln(os.Stdout, "Generating JSON ...")
 		}
-		// (todo) > impl
-		fmt.Println("NOT IMPLEMENTED YET.", args)
+
+		bytes, err := json.MarshalIndent(config.ServiceProviderConfig(), "", "  ")
+		check(err)
+
+		dest := filepath.Join(args[0], "service_provider_config.json")
+		file, err := os.Create(dest)
+		defer file.Close()
+		check(err)
+
+		if config.Values.Debug {
+			fmt.Fprintf(os.Stdout, "Writing JSON at \"%s\" ...\n", dest)
+		}
+
+		_, err = file.Write(bytes)
+		check(err)
+
+		if config.Values.Debug {
+			fmt.Fprintln(os.Stdout, "Done")
+		}
 	},
+}
+
+func check(e error) {
+	if e != nil {
+		fmt.Fprintln(os.Stderr, e)
+		os.Exit(1)
+	}
 }

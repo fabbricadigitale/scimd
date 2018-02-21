@@ -15,6 +15,7 @@ import (
 	d "github.com/mcuadros/go-defaults"
 )
 
+// Configuration is ...
 type Configuration struct {
 	Storage
 	Debug                 bool
@@ -25,6 +26,7 @@ type Configuration struct {
 	Enable
 }
 
+// Storage is ...
 type Storage struct {
 	Type string `default:"mongo" validate:"eq=mongo"` // (note) > since we are only supporting mongo at the moment
 	Host string `default:"0.0.0.0" validate:"hostname|ip4_addr"`
@@ -33,19 +35,17 @@ type Storage struct {
 	Coll string `default:"resources" validate:"min=1,excludes=$,nstartswith=system."`
 }
 
-// (fixme) > can make this pvt?
-
+// Enable is ...
 type Enable struct {
 	Self bool
 }
 
-// (todo) > make getters for the following variables (making them pvt to config)
-
-// Values contains the configuration values
-var Values *Configuration
-
-// Errors contains the happened configuration errors
-var Errors validator.ValidationErrors
+var (
+	// Values contains the configuration values
+	Values *Configuration
+	// Errors contains the happened configuration errors
+	Errors validator.ValidationErrors
+)
 
 var serviceProviderConfig core.ServiceProviderConfig
 
@@ -90,8 +90,8 @@ func getConfig(filename string) {
 	// Validate the configurations and collect errors
 	_, err = Valid()
 	if err != nil {
-		errors, _ := err.(validator.ValidationErrors)
-		Errors = append(Errors, errors...)
+		errs, _ := err.(validator.ValidationErrors)
+		Errors = append(Errors, errs...)
 	}
 }
 

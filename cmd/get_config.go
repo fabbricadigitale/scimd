@@ -10,10 +10,10 @@ import (
 )
 
 func init() {
-	scimd.AddCommand(getConfigCmd)
+	scimd.AddCommand(getConfig)
 }
 
-var getConfigCmd = &cobra.Command{
+var getConfig = &cobra.Command{
 	Use:   "get-config <destination>",
 	Short: "Get the default configuration",
 	Long: `Retrieve the default configurations.
@@ -23,14 +23,11 @@ It will generate the JSON files representing the default schemas and resource ty
 		err := cobra.ExactArgs(1)(cmd, args)
 		if err == nil {
 			dest := args[0]
-			if !validation.PathExists(dest) {
-				// (todo) > use the same error of validator encapsulating this check
-				return fmt.Errorf("not a path")
+			errs := validation.Validator.Var(dest, "pathexists,isdir")
+			if errs != nil {
+				return fmt.Errorf("%s%s", arg, validation.Errors(errs))
 			}
-			if !validation.IsDir(dest) {
-				// (todo) > use the same error of validator encapsulating this check
-				return fmt.Errorf("not a dir")
-			}
+
 			return nil
 		}
 		return err

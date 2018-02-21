@@ -8,9 +8,7 @@ import (
 	"github.com/spf13/viper"
 	validator "gopkg.in/go-playground/validator.v9"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/fabbricadigitale/scimd/config"
-	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/server"
 	"github.com/fabbricadigitale/scimd/validation"
 	"github.com/spf13/cobra"
@@ -38,17 +36,8 @@ Complete documentation is available at ...`,
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
+		// Start the server with the current service provider config
 		spc := config.ServiceProviderConfig()
-
-		// (todo) > make print-config command
-		spew.Dump(spc)
-		fmt.Println()
-		spew.Dump(core.GetSchemaRepository().List())
-		fmt.Println()
-		spew.Dump(core.GetResourceTypeRepository().List())
-		fmt.Println()
-		spew.Dump(config.Values)
-
 		server.Get(&spc).Run(":" + strconv.Itoa(config.Values.Port))
 	},
 }
