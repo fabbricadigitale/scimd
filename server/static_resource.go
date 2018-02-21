@@ -1,7 +1,6 @@
 package server
 
 import (
-	"log"
 	"net/http"
 	"reflect"
 
@@ -29,6 +28,12 @@ func NewStaticResourceService(endpoint string, resources interface{}) *StaticRes
 			res := rv.Index(i).Interface()
 			m[res.(core.Identifiable).GetIdentifier()] = res
 		}
+	case reflect.Struct:
+		res := rv.Interface()
+		switch res.(type) {
+		case core.ServiceProviderConfig:
+			m[endpoint] = res
+		}
 	default:
 		panic("not available...")
 	}
@@ -46,8 +51,11 @@ func (rs *StaticResourceService) Path() string {
 
 // List ...
 func (rs *StaticResourceService) List(c *gin.Context) {
-	log.Println(rs.resources)
-	// (fixme) > how to return a list response message (which contains resource.Resource(s)) ?
+	if val, ok := rs.resources[rs.endpoint]; ok {
+		c.JSON(http.StatusOK, val)
+		return
+	}
+	c.JSON(http.StatusOK, rs.resources)
 }
 
 // Get ...

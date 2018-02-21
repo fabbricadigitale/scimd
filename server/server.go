@@ -59,6 +59,9 @@ func Get(spc *core.ServiceProviderConfig) *gin.Engine {
 	// Retrieve one or more supported schemas
 	Scim2(v2, NewStaticResourceService(schemasEndpoint, schemas))
 
+	// Retrieve the ServiceProviderConfig
+	Scim2(v2, NewStaticResourceService(svcpcfgEndpoint, config.ServiceProviderConfig()))
+
 	// Bulk updates to one or more supported schemas
 	if spc.Bulk.Supported {
 		v2.POST(bulkEndpoint, bulking)
