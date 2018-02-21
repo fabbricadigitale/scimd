@@ -1,8 +1,9 @@
 package defaults
 
 import (
-	"github.com/fabbricadigitale/scimd/validation"
 	"fmt"
+
+	"github.com/fabbricadigitale/scimd/validation"
 
 	"github.com/fabbricadigitale/scimd/schemas/core"
 )
@@ -19,7 +20,7 @@ func init() {
 
 	UserResourceType.CommonAttributes = *commons
 	UserResourceType.Name = "User"
-	UserResourceType.Endpoint = "/User"
+	UserResourceType.Endpoint = "/Users"
 	UserResourceType.Description = "User Account "
 	UserResourceType.Schema = "urn:ietf:params:scim:schemas:core:2.0:User"
 
@@ -36,7 +37,7 @@ func init() {
 	if errors := validation.Validator.Struct(UserResourceType); errors != nil {
 		panic("user resourcetype default configuration incorrect")
 	}
-	
+
 	// (todo) > mold
 
 }

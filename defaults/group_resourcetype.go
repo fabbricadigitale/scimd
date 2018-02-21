@@ -1,8 +1,9 @@
 package defaults
 
 import (
-	"github.com/fabbricadigitale/scimd/validation"
 	"fmt"
+
+	"github.com/fabbricadigitale/scimd/validation"
 
 	"github.com/fabbricadigitale/scimd/schemas/core"
 )
@@ -19,7 +20,7 @@ func init() {
 
 	GroupResourceType.CommonAttributes = *commons
 	GroupResourceType.Name = "Group"
-	GroupResourceType.Endpoint = "/Group"
+	GroupResourceType.Endpoint = "/Groups"
 	GroupResourceType.Description = "Group"
 	GroupResourceType.Schema = "urn:ietf:params:scim:schemas:core:2.0:Group"
 
