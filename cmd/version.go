@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -17,6 +18,6 @@ var versionCmd = &cobra.Command{
 	Short: "Print the version number of SCIMD",
 	Long:  `...`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("Version %s.\n", version)
+		fmt.Fprintf(os.Stdout, "Version %s.\n", version)
 	},
 }

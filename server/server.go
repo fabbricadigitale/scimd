@@ -37,7 +37,7 @@ func Get(spc *core.ServiceProviderConfig) *gin.Engine {
 	schemas := schemasRepo.List()
 
 	// (todo) > Switch endpoint by config.Values.Storage.Type
-	endpoint := fmt.Sprintf("%s:%s", config.Values.Storage.Host, config.Values.Storage.Port)
+	endpoint := fmt.Sprintf("%s:%d", config.Values.Storage.Host, config.Values.Storage.Port)
 	v2.Use(Storage(endpoint, config.Values.Storage.Name, config.Values.Storage.Coll))
 
 	unsupportedMethods := []string{}

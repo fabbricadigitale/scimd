@@ -32,15 +32,21 @@ type Storage struct {
 	Coll string `default:"resources" validate:"min=1,excludes=$,nstartswith=system."`
 }
 
+// (fixme) > can make this pvt?
+
 type Enable struct {
 	Self bool
 }
+
+// (todo) > make getters for the following variables (making them pvt to config)
 
 // Values contains the configuration values
 var Values *Configuration
 
 // Errors contains the happened configuration errors
 var Errors validator.ValidationErrors
+
+var serviceProviderConfig core.ServiceProviderConfig
 
 // getConfig is responsible to set configuration values
 //
@@ -57,6 +63,8 @@ func getConfig(filename string) {
 	}
 	viper.SetConfigName(filename)
 	viper.AddConfigPath(".")
+
+	// (todo) > search within $HOME XDG style
 
 	viper.SetEnvPrefix("scimd")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
@@ -83,6 +91,9 @@ func getConfig(filename string) {
 func init() {
 	getConfig(".scimd")
 
+	// ServiceProviderConfig
+	serviceProviderConfig = defaults.ServiceProviderConfig
+
 	// Schemas
 	core.GetSchemaRepository().Push(defaults.UserSchema)
 	core.GetSchemaRepository().Push(defaults.GroupSchema)
@@ -90,6 +101,10 @@ func init() {
 	// Resource types
 	core.GetResourceTypeRepository().Push(defaults.UserResourceType)
 	core.GetResourceTypeRepository().Push(defaults.GroupResourceType)
+
+	// (todo) > check wheter custom configs are given, in such case override the defaults one
+	// 2. clean, then new push on repositories
+	// 1. override svc variable
 }
 
 // Valid checks wheter the configuration is valid or not
@@ -98,4 +113,9 @@ func Valid() (bool, error) {
 		return false, err
 	}
 	return true, nil
+}
+
+// ServiceProviderConfig returns the current service provider config
+func ServiceProviderConfig() core.ServiceProviderConfig {
+	return serviceProviderConfig
 }

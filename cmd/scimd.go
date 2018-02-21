@@ -10,7 +10,6 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/fabbricadigitale/scimd/config"
-	"github.com/fabbricadigitale/scimd/defaults"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/server"
 	"github.com/fabbricadigitale/scimd/validation"
@@ -39,7 +38,10 @@ Complete documentation is available at ...`,
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		spew.Dump(defaults.ServiceProviderConfig)
+		spc := config.ServiceProviderConfig()
+
+		// (todo) > make print-config command
+		spew.Dump(spc)
 		fmt.Println()
 		spew.Dump(core.GetSchemaRepository().List())
 		fmt.Println()
@@ -47,7 +49,7 @@ Complete documentation is available at ...`,
 		fmt.Println()
 		spew.Dump(config.Values)
 
-		server.Get(defaults.ServiceProviderConfig).Run(":" + strconv.Itoa(config.Values.Port))
+		server.Get(&spc).Run(":" + strconv.Itoa(config.Values.Port))
 	},
 }
 

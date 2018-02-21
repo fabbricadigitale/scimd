@@ -17,7 +17,7 @@ var getConfigCmd = &cobra.Command{
 	Use:   "get-config <destination>",
 	Short: "Get the default configuration",
 	Long: `Retrieve the default configurations.
-It will generate the JSON files representing the default schemas and resource types, within the chosen destination.
+It will generate the JSON files representing the default schemas and resource types, within the chosen destination path.
 `,
 	Args: func(cmd *cobra.Command, args []string) error {
 		err := cobra.ExactArgs(1)(cmd, args)

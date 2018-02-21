@@ -54,10 +54,10 @@ func Storage(endpoint, db, collection string) gin.HandlerFunc {
 		err := backoff.Retry(func() error {
 			var err error
 			adapter, err = mongo.New(endpoint, db, collection)
-			listeners.AddListeners(adapter.Emitter())
 			if err != nil {
 				return err
 			}
+			listeners.AddListeners(adapter.Emitter())
 
 			return adapter.Ping()
 		}, b)

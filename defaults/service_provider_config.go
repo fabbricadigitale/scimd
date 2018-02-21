@@ -9,12 +9,12 @@ import (
 )
 
 // ServiceProviderConfig is the default service provider configuration
-var ServiceProviderConfig *core.ServiceProviderConfig
+var ServiceProviderConfig core.ServiceProviderConfig
 
 var v = version.GenerateVersion(true, time.Now().String())
 
 func init() {
-	ServiceProviderConfig = core.NewServiceProviderConfig()
+	ServiceProviderConfig = *core.NewServiceProviderConfig()
 	ServiceProviderConfig.Meta.Version = v
 	ServiceProviderConfig.Meta.Location = "/v2/ServiceProviderConfigs"
 	ServiceProviderConfig.DocumentationURI = "/help/scim.html"
