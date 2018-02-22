@@ -1,9 +1,12 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"reflect"
 
+	"github.com/fabbricadigitale/scimd/api"
+	"github.com/fabbricadigitale/scimd/api/messages"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/gin-gonic/gin"
 )
@@ -46,7 +49,39 @@ func (rs *StaticResourceService) Path() string {
 // List ...
 func (rs *StaticResourceService) List(c *gin.Context) {
 	// (todo) > return list responses
-	c.JSON(http.StatusOK, rs.resources)
+
+	params := api.NewSearch()
+	// Using the form binding engine (query)
+	if err := c.ShouldBindQuery(params); err != nil {
+		err := messages.NewError(err)
+		c.JSON(err.Status, err)
+	}
+
+	var q = &staticQuery{}
+	q.Load(rs.resources)
+
+	// Make list
+	list := messages.NewListResponse()
+
+	// Count
+	list.TotalResults = q.Count()
+
+	// Unlimited
+	if params.Count == 0 {
+		params.Count = list.TotalResults
+		// (todo) > We need a way to LIMIT this to a MAX value (from config) - issue https://github.com/fabbricadigitale/scimd/issues/55
+	}
+
+	// Pagination
+	q.Skip(params.StartIndex - 1).Limit(params.Count - (params.StartIndex - 1))
+	list.StartIndex = params.StartIndex
+	list.ItemsPerPage = q.Count()
+
+	for _, v := range q.result {
+		list.Resources = append(list.Resources, v)
+	}
+
+	c.JSON(http.StatusOK, list)
 }
 
 // Get ...
@@ -54,4 +89,42 @@ func (rs *StaticResourceService) Get(c *gin.Context) {
 	id := c.Param("id")
 	message := rs.resources[id]
 	c.JSON(http.StatusOK, message)
+}
+
+type staticQuery struct {
+	result []interface{}
+}
+
+func (sq *staticQuery) Load(m map[string]interface{}) {
+	var s []interface{}
+	for _, v := range m {
+		s = append(s, v)
+	}
+	sq.result = s
+}
+
+func (sq *staticQuery) Skip(index int) *staticQuery {
+	if index < 0 {
+		index = 0
+	}
+
+	fmt.Printf("index %d", index)
+
+	sq.result = sq.result[index:]
+	return sq
+}
+
+func (sq *staticQuery) Limit(index int) *staticQuery {
+	if index < 0 {
+		index = len(sq.result)
+	}
+	if index > len(sq.result) {
+		index = len(sq.result)
+	}
+	sq.result = sq.result[:index]
+	return sq
+}
+
+func (sq *staticQuery) Count() int {
+	return len(sq.result)
 }
