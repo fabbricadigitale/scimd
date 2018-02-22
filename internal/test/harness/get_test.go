@@ -85,3 +85,21 @@ func TestListResourceTypes(t *testing.T) {
 
 	fmt.Println(rec.Body.String()) // (todo) > test returns a list response containing them
 }
+
+func TestGetServiceProviderConfig(t *testing.T) {
+	setup()
+	defer teardown()
+
+	spc := config.ServiceProviderConfig()
+	srv := server.Get(&spc)
+	rec := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/v2/ServiceProviderConfigs", nil)
+	req.Header.Add("Authorization", aaa)
+	srv.ServeHTTP(rec, req)
+
+	var exp []byte
+	if exp, err = json.Marshal(spc); err != nil {
+		t.Fatalf("%s", err)
+	}
+	require.Equal(t, string(exp), rec.Body.String())
+}
