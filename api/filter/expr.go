@@ -75,6 +75,8 @@ func (e AttrExpr) String() string {
 }
 
 func (e AttrExpr) Normalize(rt *core.ResourceType) Filter {
+
+	// (todo) > handling error when e is empty
 	ctx := e.Path.Context(rt)
 
 	var p attr.Path

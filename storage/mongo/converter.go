@@ -24,8 +24,13 @@ func convertToMongoQuery(resType *core.ResourceType, ft filter.Filter) (m bson.M
 		}
 	}()
 
+	var normFilterByResType filter.Filter
+	if ft != nil {
+		normFilterByResType = ft.Normalize(resType)
+	}
+
 	var conv *convert
-	m, err = conv.do(resType, ft.Normalize(resType)), nil
+	m = conv.do(resType, normFilterByResType)
 	m["meta.resourceType"] = resType.GetIdentifier()
 	return m, err
 }
@@ -38,7 +43,6 @@ func (c *convert) do(resType *core.ResourceType, f interface{}) bson.M {
 	)
 
 	switch f.(type) {
-
 	case *filter.Group:
 		node := f.(*filter.Group)
 		return c.do(resType, node.Filter)
@@ -74,9 +78,9 @@ func (c *convert) do(resType *core.ResourceType, f interface{}) bson.M {
 	case *filter.AttrExpr:
 		node := f.(*filter.AttrExpr)
 		return c.relationalOperators(resType, f, node)
+	default:
+		return bson.M{}
 	}
-
-	return nil
 }
 
 // Represent a mongo key that's always not present
