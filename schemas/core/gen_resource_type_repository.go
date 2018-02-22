@@ -27,6 +27,8 @@ type ResourceTypeRepository interface {
 }
 
 // List returns all elements
+//
+// Notice that since the internal representation is a map the order is not guaranteed.
 func (repo *repositoryResourceType) List() []ResourceType {
 	repo.mu.RLock()
 	defer repo.mu.RUnlock()

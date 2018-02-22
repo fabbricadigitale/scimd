@@ -19,7 +19,7 @@ import (
 
 // ResourceService describes ...
 type ResourceService struct {
-	rt *core.ResourceType
+	rt core.ResourceType
 	Service
 	Lister
 	Getter
@@ -30,7 +30,7 @@ type ResourceService struct {
 }
 
 // NewResourceService creates a new `ResourceService` for the given `core.ResourceTyper`
-func NewResourceService(rt *core.ResourceType) *ResourceService {
+func NewResourceService(rt core.ResourceType) *ResourceService {
 	return &ResourceService{
 		rt: rt,
 	}
@@ -64,7 +64,7 @@ func (rs *ResourceService) List(c *gin.Context) {
 	}
 
 	rtArr := make([]*core.ResourceType, 0)
-	rtArr = append(rtArr, rs.rt)
+	rtArr = append(rtArr, &rs.rt)
 
 	list, err := query.Resources(store.(storage.Storer), rtArr, params)
 	if err != nil {
@@ -98,10 +98,11 @@ func (rs *ResourceService) Get(c *gin.Context) {
 	// Retrieve the id segment
 	id := c.Param("id")
 
-	res, err := query.Resource(store.(storage.Storer), rs.rt, id, &attrs)
+	res, err := query.Resource(store.(storage.Storer), &rs.rt, id, &attrs)
 	if err != nil {
 		err := messages.NewError(err)
 		c.JSON(err.Status, err)
+		return
 	}
 
 	c.JSON(http.StatusOK, res.(*resource.Resource))
@@ -123,7 +124,7 @@ func (rs *ResourceService) Post(c *gin.Context) {
 			c.JSON(err.Status, err)
 		}
 
-		res, err := create.Resource(store.(storage.Storer), rs.rt, &contents)
+		res, err := create.Resource(store.(storage.Storer), &rs.rt, &contents)
 		if err != nil {
 			err := messages.NewError(err)
 			c.JSON(err.Status, err)
@@ -151,7 +152,7 @@ func (rs *ResourceService) Search(c *gin.Context) {
 	}
 
 	rtArr := make([]*core.ResourceType, 0)
-	rtArr = append(rtArr, rs.rt)
+	rtArr = append(rtArr, &rs.rt)
 
 	list, err := query.SearchRequest(store.(storage.Storer), rtArr, contents)
 	if err != nil {
@@ -190,7 +191,7 @@ func (rs *ResourceService) Put(c *gin.Context) {
 		})
 		c.JSON(err.Status, err)
 	}
-	res, err := update.Resource(store.(storage.Storer), rs.rt, id, contents)
+	res, err := update.Resource(store.(storage.Storer), &rs.rt, id, contents)
 	if err != nil {
 		err := messages.NewError(err)
 		c.JSON(err.Status, err)
@@ -217,7 +218,7 @@ func (rs *ResourceService) Delete(c *gin.Context) {
 		c.JSON(err.Status, err)
 	}
 
-	err := delete.Resource(store.(storage.Storer), rs.rt, id)
+	err := delete.Resource(store.(storage.Storer), &rs.rt, id)
 	if err != nil {
 		err := messages.NewError(err)
 		c.JSON(err.Status, err)

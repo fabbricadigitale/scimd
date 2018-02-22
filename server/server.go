@@ -69,7 +69,7 @@ func Get(spc *core.ServiceProviderConfig) *gin.Engine {
 
 	// Create endpoints for all resource types
 	for _, rt := range resourceTypes {
-		Scim2(v2, NewResourceService(&rt))
+		Scim2(v2, NewResourceService(rt))
 	}
 
 	// Alias for operations against a resource mapped to an authenticated subject
@@ -80,7 +80,7 @@ func Get(spc *core.ServiceProviderConfig) *gin.Engine {
 	}
 	if self := resTypeRepo.Pull("User"); self != nil {
 		self.Endpoint = ""
-		Scim2(me, NewResourceService(self))
+		Scim2(me, NewResourceService(*self))
 	}
 
 	return router
