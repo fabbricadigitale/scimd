@@ -5,9 +5,12 @@ import (
 	"log"
 	"os"
 	"path"
+	"strconv"
 
+	"github.com/fabbricadigitale/scimd/config"
 	"github.com/fabbricadigitale/scimd/storage"
 	"github.com/fabbricadigitale/scimd/storage/mongo"
+	dc "github.com/fsouza/go-dockerclient"
 	"github.com/ory/dockertest"
 )
 
@@ -33,6 +36,9 @@ func setup() {
 		},
 		Mounts: []string{
 			path.Clean(fmt.Sprintf("%s/../../testdata/initdb.d:/docker-entrypoint-initdb.d", cwd)),
+		},
+		PortBindings: map[dc.Port][]dc.PortBinding{
+			"27017/tcp": {{HostIP: "", HostPort: strconv.Itoa(config.Values.Storage.Port)}},
 		},
 	}
 	res, err = pul.RunWithOptions(&opt)
