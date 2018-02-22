@@ -16,6 +16,10 @@ func TestDefaults(t *testing.T) {
 	fmt.Printf("GRESTYP: %#v\n", GroupResourceType)
 
 	require.IsType(t, ServiceProviderConfig, &core.ServiceProviderConfig{})
+	require.IsType(t, UserSchema, core.Schema{})
+	require.IsType(t, GroupSchema, core.Schema{})
+	require.IsType(t, UserResourceType, core.ResourceType{})
+	require.IsType(t, GroupResourceType, core.ResourceType{})
 
 	// (todo) > test the defaults
 }

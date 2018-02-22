@@ -1,6 +1,8 @@
 package harness
 
 import (
+
+	"io/ioutil"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -103,3 +105,61 @@ func TestGetServiceProviderConfig(t *testing.T) {
 	}
 	require.Equal(t, string(exp), rec.Body.String())
 }
+
+func TestGetWithoutInclusions(t *testing.T) {
+	setup()
+	defer teardown()
+
+	spc := config.ServiceProviderConfig()
+	srv := server.Get(&spc)
+	rec := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/v2/Users/2819c223-7f76-453a-919d-ab1234567891", nil)
+	req.Header.Add("Authorization", aaa)
+	srv.ServeHTTP(rec, req)
+	exp, _ := ioutil.ReadFile("../../testdata/resp_user_full_attributes.json")
+
+	require.JSONEq(t, string(exp), rec.Body.String())
+}
+
+func TestGetWithExistingAttributes(t *testing.T) {
+	setup()
+	defer teardown()
+
+	spc := config.ServiceProviderConfig()
+	srv := server.Get(&spc)
+	rec := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/v2/Users/2819c223-7f76-453a-919d-ab1234567891?attributes=displayname,name.givenname", nil)
+	req.Header.Add("Authorization", aaa)
+	srv.ServeHTTP(rec, req)
+
+	resp := rec.Body.String()
+
+	usr, _ := ioutil.ReadFile("../../testdata/resp_user_existing_attributes.json")
+
+	require.JSONEq(t, string(usr), resp)
+}
+
+
+func TestListUsers(t *testing.T) {
+	setup()
+	defer teardown()
+
+	spc := config.ServiceProviderConfig()
+	srv := server.Get(&spc)
+	rec := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/v2/Users", nil)
+	req.Header.Add("Authorization", aaa)
+	srv.ServeHTTP(rec, req)
+
+	// (todo) > Add expected
+	// exp := ...
+	// require.Equal(t, , rec.Body.String())
+
+	// require.Equal(t, 2, len()) // (todo) > check response have 2 users
+	fmt.Println(rec.Body.String()) // (todo) > test returns a list response containing them
+}
+
+// PAGINATION

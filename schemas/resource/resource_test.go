@@ -1,6 +1,7 @@
 package resource
 
 import (
+	"time"
 	"encoding/json"
 	"io/ioutil"
 	"testing"
@@ -135,3 +136,24 @@ func TestMarshalResource(t *testing.T) {
 }
 
 // (todo) > test resource.Resource
+
+func TestResource(t *testing.T){
+	cr := time.Date(2012, time.December, 12, 12, 12, 12, 0, time.Local)
+	lm := time.Now()
+	res := Resource{
+		CommonAttributes: core.CommonAttributes{
+			Schemas:    []string{"urn:ietf:params:scim:schemas:core:2.0:User"},
+			ID:         "123",
+			ExternalID: "456",
+			Meta: core.Meta{
+				Created:      &cr,
+				LastModified: &lm,
+				Location:     "https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646",
+				ResourceType: "User",
+				Version:      "Wa330bc54f0671c9",
+			},
+		},
+	}
+
+	require.IsType(t, Resource{}, res)
+}

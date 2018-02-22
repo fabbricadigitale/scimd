@@ -1,0 +1,97 @@
+{
+  "active": true,
+  "addresses": [
+      {
+          "country": "USA",
+          "formatted": "637 Keyser Ridge Road\nGreensboro, NC 27401 USA",
+          "locality": "Greensboro",
+          "postalCode": "27401",
+          "primary": true,
+          "region": "NC",
+          "streetAddress": "637 Keyser Ridge Road",
+          "type": "work"
+      },
+      {
+          "country": "USA",
+          "formatted": "456 Greensboro Blvd\nGreensboro, NC 27401 USA",
+          "locality": "Greensboro",
+          "postalCode": "27401",
+          "region": "NC",
+          "streetAddress": "456 Greensboro Blvd",
+          "type": "home"
+      }
+  ],
+  "displayName": "Tiffany Fork",
+  "emails": [
+      {
+          "primary": true,
+          "type": "work",
+          "value": "tfork@example.com"
+      },
+      {
+          "type": "home",
+          "value": "tiffy@fork.org"
+      }
+  ],
+  "groups": [
+      {
+          "$ref": "/v2/Groups/fc348aa8-3835-40eb-a20b-c726e15c55b5",
+          "display": "Employees",
+          "value": "fc348aa8-3835-40eb-a20b-c726e15c55b5"
+      }
+  ],
+  "id": "2819c223-7f76-453a-919d-ab1234567891",
+  "ims": [
+      {
+          "type": "aim",
+          "value": "tiffyaim"
+      }
+  ],
+  "locale": "en-US",
+  "meta": {
+      "location": "/v2/Users/2819c223-7f76-453a-919d-ab1234567891",
+      "resourceType": "User",
+      "created": "2010-01-23T04:56:22Z",
+      "lastModified": "2011-05-13T04:42:34Z",
+      "version": "W/\"a330bc54f0671c9\""
+  },
+  "name": {
+      "familyName": "Fork",
+      "formatted": "Ms. Tiffany G Fork, II",
+      "givenName": "Tiffany",
+      "honorificPrefix": "Ms.",
+      "honorificSuffix": "II",
+      "middleName": "Geraldine"
+  },
+  "nickName": "Tiffy",
+  "phoneNumbers": [
+      {
+          "type": "work",
+          "value": "336-485-7643"
+      },
+      {
+          "type": "mobile",
+          "value": "336-485-3456"
+      }
+  ],
+  "photos": [
+      {
+          "type": "photo",
+          "value": "https://photos.example.com/profilephoto/72930000000Ccne/G"
+      },
+      {
+          "type": "thumbnail",
+          "value": "https://photos.example.com/profilephoto/72930000000Ccne/H"
+      }
+  ],
+  "preferredLanguage": "en-US",
+  "profileUrl": "https://login.example.com/tfork",
+  "schemas": [
+      "urn:ietf:params:scim:schemas:core:2.0:User",
+      "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"
+  ],
+  "timezone": "America/Los_Angeles",
+  "title": "Electronic home entertainment equipment installer",
+  "userName": "tfork@example.com",
+  "userType": "Employee"
+}
