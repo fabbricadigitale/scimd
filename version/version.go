@@ -8,7 +8,7 @@ import (
 
 // GenerateVersion is an utility to create a weak validator to assign to the resource's version attribute.
 // Refs [rfc7232](https://tools.ietf.org/html/rfc7232#section-2.3).
-// TODO => Generate strong validator
+// (todo) > generate strong validator
 func GenerateVersion(weak bool, args ...string) string {
 	hash := sha1.New()
 	for _, arg := range args {

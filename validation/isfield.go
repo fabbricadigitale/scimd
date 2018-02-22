@@ -28,5 +28,5 @@ var isField = func(fl validator.FieldLevel) bool {
 	// FieldByName panics if fl.Parent() is not a struct and returns the zero Value if no field is found
 	return parent.FieldByName(params[0]).String() == params[1]
 
-	// TODO: this validator works only with string value; it needs to extend the matching with any type of value
+	// (todo) > this validator works only with string value; it needs to extend the matching with any type of value
 }

@@ -96,9 +96,8 @@ func Set(key string, val interface{}) gin.HandlerFunc {
 func Authentication(authenticationType string) gin.HandlerFunc {
 	switch authenticationType {
 	case strings.ToLower(HTTPBasic.String()):
-		// (todo) > fetch http basic auth credentials from config
 		return gin.BasicAuth(gin.Accounts{
-			"admin": "admin", // (todo) > from config ?
+			"admin": "admin", // (todo) > get http basic auth credentials from config
 		})
 	default:
 		panic("authentication scheme not available")

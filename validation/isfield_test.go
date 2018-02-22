@@ -61,7 +61,7 @@ func TestIsField(t *testing.T) {
 		Validator.Struct(w)
 	})
 
-	/* TODO: test for value different from string (int and other values)
+	/* (todo) > test for value different from string (int and other values); missing impl.
 
 	eg:
 

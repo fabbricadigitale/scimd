@@ -110,6 +110,6 @@ func (it *Iter) Done() bool {
 
 // Close kills the current iterator.
 func (it *Iter) Close() {
-	// TODO handle error
+	// (todo) > handle error
 	it.i.Close()
 }

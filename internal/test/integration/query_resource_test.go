@@ -2,7 +2,6 @@ package integration
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"testing"
 
@@ -37,18 +36,27 @@ func TestResource(t *testing.T) {
 
 	require.NotNil(t, userName)
 
-	// (todo) > reenable/review when excluding subattributes will work corrcetly (issue #51, #53)
-	// Excluding attribute
-	// attrs.ExcludedAttributes = []string{"urn:ietf:params:scim:schemas:core:2.0:User:name"}
-	// r2, err2 := query.Resource(adapter, res, id, attrs)
-	// require.NotNil(t, r2)
-	// require.NoError(t, err2)
+	// Test that we do not support excluding attributes that have subattributes
+	attrs.ExcludedAttributes = []string{"urn:ietf:params:scim:schemas:core:2.0:User:name"}
+	r2, err2 := query.Resource(adapter, res, id, attrs)
+	require.NotNil(t, r2)
+	require.NoError(t, err2)
 
-	// retRes2 := r2.(*resource.Resource)
-	// values2 := retRes2.Values("urn:ietf:params:scim:schemas:core:2.0:User")
-	// nameValue := (*values2)["name"].(*datatype.Complex)
-	// fmt.Println(nameValue)
-	// require.Nil(t, nameValue)
+	retRes2 := r2.(*resource.Resource)
+	values2 := retRes2.Values("urn:ietf:params:scim:schemas:core:2.0:User")
+	nameValue := (*values2)["name"].(*datatype.Complex)
+	require.NotNil(t, nameValue) // not excluded since "name" attribute has sub attributes
+
+	// Test that we support excluding first level attributes that does not have subattributes
+	attrs.ExcludedAttributes = []string{"urn:ietf:params:scim:schemas:core:2.0:User:displayName"}
+	r3, err3 := query.Resource(adapter, res, id, attrs)
+	require.NotNil(t, r3)
+	require.NoError(t, err3)
+
+	retRes3 := r3.(*resource.Resource)
+	values3 := retRes3.Values("urn:ietf:params:scim:schemas:core:2.0:User")
+	dNameValue := (*values3)["displayName"]
+	require.Nil(t, dNameValue) // excluded since "displayName" is a first level attribute without subattributes
 
 	// Excluding attribute's subattribute
 	attrs.ExcludedAttributes = []string{"urn:ietf:params:scim:schemas:core:2.0:User:emails.value"}
@@ -62,13 +70,12 @@ func TestResource(t *testing.T) {
 
 	for _, email := range emails.([]datatype.DataTyper) {
 		e := email.(*datatype.Complex)
-		fmt.Printf("%+v\n", e)
 		assert.Nil(t, (*e)["value"])
 	}
 
 	// Fail test, non existing id
 	id = "wrong-id"
-	r2, err := query.Resource(adapter, res, id, attrs)
+	r2, err = query.Resource(adapter, res, id, attrs)
 	require.Nil(t, r2)
 	require.Error(t, err)
 }

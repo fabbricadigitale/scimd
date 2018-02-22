@@ -36,7 +36,7 @@ func Get(spc *core.ServiceProviderConfig) *gin.Engine {
 	// Retrieve list of schemas
 	schemas := schemasRepo.List()
 
-	// (todo) > Switch endpoint by config.Values.Storage.Type
+	// (todo) > switch endpoint by config.Values.Storage.Type
 	endpoint := fmt.Sprintf("%s:%d", config.Values.Storage.Host, config.Values.Storage.Port)
 	v2.Use(Storage(endpoint, config.Values.Storage.Name, config.Values.Storage.Coll))
 
@@ -64,7 +64,7 @@ func Get(spc *core.ServiceProviderConfig) *gin.Engine {
 		v2.POST(bulkEndpoint, bulking)
 	}
 
-	// (todo) > Search from system root for one or more resource types using POST
+	// (todo) > search from system root for one or more resource types using POST
 	// v2.POST(fmt.Sprintf("/%s", searchAction), searching)
 
 	// Create endpoints for all resource types
