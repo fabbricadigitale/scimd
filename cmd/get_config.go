@@ -1,10 +1,13 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/fabbricadigitale/scimd/config"
+	"github.com/fabbricadigitale/scimd/defaults"
 	"github.com/fabbricadigitale/scimd/validation"
 	"github.com/spf13/cobra"
 )
@@ -38,7 +41,66 @@ It will generate the JSON files representing the default schemas and resource ty
 		if config.Values.Debug {
 			fmt.Fprintln(os.Stdout, "Generating config ...")
 		}
-		// (todo) > impl
-		fmt.Println("NOT IMPLEMENTED YET.", args)
+
+		destin := args[0]
+		pathSc := filepath.Join(destin, "schemas")
+		pathRt := filepath.Join(destin, "resources")
+
+		var e error
+		e = os.MkdirAll(pathSc, os.ModePerm)
+		check(e)
+
+		groupSc, e := json.MarshalIndent(defaults.GroupSchema, "", "  ")
+		check(e)
+
+		userSc, e := json.MarshalIndent(defaults.UserSchema, "", "  ")
+		check(e)
+
+		e = os.MkdirAll(pathRt, os.ModePerm)
+		check(e)
+
+		groupRt, e := json.MarshalIndent(defaults.GroupResourceType, "", "  ")
+		check(e)
+
+		userRt, e := json.MarshalIndent(defaults.UserResourceType, "", "  ")
+		check(e)
+
+		fileGroupSc, e := os.Create(filepath.Join(pathSc, "group.json"))
+		defer fileGroupSc.Close()
+		check(e)
+
+		fileUserSc, e := os.Create(filepath.Join(pathSc, "user.json"))
+		defer fileUserSc.Close()
+		check(e)
+
+		fileGroupRt, e := os.Create(filepath.Join(pathRt, "group.json"))
+		defer fileGroupRt.Close()
+		check(e)
+
+		fileUserRt, e := os.Create(filepath.Join(pathRt, "user.json"))
+		defer fileUserRt.Close()
+		check(e)
+
+		if config.Values.Debug {
+			fmt.Fprintf(os.Stdout, "Writing JSON files at \"%s\" ...\n", destin)
+		}
+
+		_, e = fileGroupSc.Write(groupSc)
+		check(e)
+
+		_, e = fileUserSc.Write(userSc)
+		check(e)
+
+		_, e = fileGroupRt.Write(groupRt)
+		check(e)
+
+		_, e = fileUserRt.Write(userRt)
+		check(e)
+
+		if config.Values.Debug {
+			fmt.Fprintln(os.Stdout, "Done")
+		}
 	},
 }
+
+// (fixme) > default variables contains "meta" and "schema" fields, should not ..

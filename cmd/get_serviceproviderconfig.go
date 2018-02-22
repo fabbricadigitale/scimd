@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/fabbricadigitale/scimd/config"
+	"github.com/fabbricadigitale/scimd/defaults"
 	"github.com/fabbricadigitale/scimd/validation"
 	"github.com/spf13/cobra"
 )
@@ -41,7 +42,7 @@ It will generate a "service_provider_config.json" within the chosen destination 
 			fmt.Fprintln(os.Stdout, "Generating JSON ...")
 		}
 
-		bytes, err := json.MarshalIndent(config.ServiceProviderConfig(), "", "  ")
+		bytes, err := json.MarshalIndent(defaults.ServiceProviderConfig, "", "  ")
 		check(err)
 
 		dest := filepath.Join(args[0], "service_provider_config.json")
