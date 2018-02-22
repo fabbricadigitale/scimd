@@ -108,14 +108,40 @@ func init() {
 	// Resource types
 	core.GetResourceTypeRepository().Push(defaults.UserResourceType)
 	core.GetResourceTypeRepository().Push(defaults.GroupResourceType)
+}
 
+// Config ... (todo) > complete
+func Config() {
 	// (todo) > check wheter custom configs are given, in such case override the defaults one
+	// 1. override spc variable
 	// 2. clean, then new push on repositories
-	// 1. override svc variable
+
+	// (todo) > found a smart way to check custom spc and resources are valid ones
+
+	// if Values.ServiceProviderConfig != "" {
+	// 	dat, _ := ioutil.ReadFile(Values.ServiceProviderConfig)
+
+	// 	serviceProviderConfig = *core.NewServiceProviderConfig()
+	// 	json.Unmarshal(dat, &serviceProviderConfig)
+
+	// 	fmt.Println("=====>")
+	// 	spew.Dump(Values.ServiceProviderConfig)
+	// 	spew.Dump(serviceProviderConfig)
+	// 	errs := validation.Validator.Struct(serviceProviderConfig)
+	// 	fmt.Println(validation.Errors(errs))
+	// }
+
+	// 	if config.Values.Config != "" {
+	// 		if config.Values.Debug {
+	// 			fmt.Fprintf(os.Stdout, "Using resources from \"%s\" ... \n", config.Values.Config)
+	// 		}
+	// 		fmt.Println(config.Values.Config)
+	// 	}
 }
 
 // Valid checks wheter the configuration is valid or not
 func Valid() (bool, error) {
+
 	if err := validation.Validator.Struct(Values); err != nil {
 		return false, err
 	}

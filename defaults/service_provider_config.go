@@ -41,7 +41,8 @@ func init() {
 	}
 
 	if errors := validation.Validator.Struct(ServiceProviderConfig); errors != nil {
-		panic("service provider default configuration incorrect")
+		panic(validation.Errors(errors))
 	}
+
 	// (todo) > mold
 }

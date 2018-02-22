@@ -73,9 +73,8 @@ func Get(spc *core.ServiceProviderConfig) *gin.Engine {
 	}
 
 	// Alias for operations against a resource mapped to an authenticated subject
-	const mountSelf = false
 	me := v2.Group(selfEndpoint)
-	if !mountSelf {
+	if !config.Values.Enable.Self {
 		// RFC 7644 - Section 3.11 - 1st bullet
 		me.Use(Status(http.StatusNotImplemented))
 	}
