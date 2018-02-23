@@ -142,17 +142,17 @@ func Resources(s storage.Storer, resTypes []*core.ResourceType, search *api.Sear
 	}
 
 	// Unlimited
-	if search.Count <= 0 || search.Count>list.TotalResults {
+	if search.Count <= 0 || search.Count > list.TotalResults {
 		search.Count = list.TotalResults
 		// (todo) > We need a way to LIMIT this to a MAX value (from config) - issue https://github.com/fabbricadigitale/scimd/issues/55
 	}
 
 	// Pagination
-	q.Skip(search.StartIndex - 1).Limit(search.Count-(search.StartIndex-1))
+	q.Skip(search.StartIndex - 1).Limit(search.Count - (search.StartIndex - 1))
 	list.StartIndex = search.StartIndex
 
-	if (search.Count-(list.StartIndex -1) >=0 ){
-		list.ItemsPerPage = search.Count-(list.StartIndex -1)	
+	if search.Count-(list.StartIndex-1) >= 0 {
+		list.ItemsPerPage = search.Count - (list.StartIndex - 1)
 	} else {
 		list.ItemsPerPage = 0
 	}
@@ -167,6 +167,7 @@ func Resources(s storage.Storer, resTypes []*core.ResourceType, search *api.Sear
 		q.Sort(*sortBy, search.SortOrder != api.DescendingOrder)
 	}
 
+	list.Resources = make([]interface{}, 0)
 	// Finally, fetch resources
 	var r *resource.Resource
 	for iter := q.Iter(); !iter.Done(); {
