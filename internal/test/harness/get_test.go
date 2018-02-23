@@ -2,7 +2,6 @@ package harness
 
 import (
 	"github.com/fabbricadigitale/scimd/api/messages"
-
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -51,7 +50,30 @@ func TestListSchemas(t *testing.T) {
 	req.Header.Add("Authorization", aaa)
 	srv.ServeHTTP(rec, req)
 
-	fmt.Println(rec.Body.String()) // (todo) > test returns a list response containing them
+	var list messages.ListResponse
+	json.Unmarshal([]byte(rec.Body.String()), &list)
+
+	listResponseURN := []string{"urn:ietf:params:scim:api:messages:2.0:ListResponse"}
+	require.Equal(t, 2, list.ItemsPerPage)
+	require.Equal(t, 2, list.TotalResults)
+	require.Equal(t, 1, list.StartIndex)
+	require.Equal(t, 2, len(list.Resources))
+	require.Equal(t, listResponseURN, list.Schemas)
+
+	respUsrSchema := list.Resources[0]
+	actSchema, _ := json.Marshal(respUsrSchema)
+
+	respGroupSchema := list.Resources[1]
+	actGroup, _ := json.Marshal(respGroupSchema)
+
+	expUserSchema := core.GetSchemaRepository().Pull("urn:ietf:params:scim:schemas:core:2.0:User")
+	expSchema, _ := json.Marshal(expUserSchema)
+
+	expGroupSchema := core.GetSchemaRepository().Pull("urn:ietf:params:scim:schemas:core:2.0:Group")
+	expGroup, _ := json.Marshal(expGroupSchema)
+
+	require.JSONEq(t, string(expSchema), string(actSchema))
+	require.JSONEq(t, string(expGroup), string(actGroup))
 }
 
 func TestGetResourceType(t *testing.T) {
@@ -89,7 +111,30 @@ func TestListResourceTypes(t *testing.T) {
 	req.Header.Add("Authorization", aaa)
 	srv.ServeHTTP(rec, req)
 
-	fmt.Println(rec.Body.String()) // (todo) > test returns a list response containing them
+	var list messages.ListResponse
+	json.Unmarshal([]byte(rec.Body.String()), &list)
+
+	listResponseURN := []string{"urn:ietf:params:scim:api:messages:2.0:ListResponse"}
+	require.Equal(t, 2, list.ItemsPerPage)
+	require.Equal(t, 2, list.TotalResults)
+	require.Equal(t, 1, list.StartIndex)
+	require.Equal(t, 2, len(list.Resources))
+	require.Equal(t, listResponseURN, list.Schemas)
+
+	respUserResType := list.Resources[0]
+	actUserResType, _ := json.Marshal(respUserResType)
+
+	respGroupResType := list.Resources[1]
+	actGroupResType, _ := json.Marshal(respGroupResType)
+
+	expectedUserResType := core.GetResourceTypeRepository().Pull("User")
+	expUserResType, _ := json.Marshal(expectedUserResType)
+
+	expectedGroupResType := core.GetResourceTypeRepository().Pull("Group")
+	expGroupResType, _ := json.Marshal(expectedGroupResType)
+
+	require.JSONEq(t, string(expUserResType), string(actUserResType))
+	require.JSONEq(t, string(expGroupResType), string(actGroupResType))
 }
 
 func TestGetServiceProviderConfig(t *testing.T) {
@@ -157,12 +202,25 @@ func TestListUsers(t *testing.T) {
 	req.Header.Add("Authorization", aaa)
 	srv.ServeHTTP(rec, req)
 
-	// (todo) > Add expected
-	// exp := ...
-	// require.Equal(t, , rec.Body.String())
+	var list messages.ListResponse
+	json.Unmarshal([]byte(rec.Body.String()), &list)
 
-	// require.Equal(t, 2, len()) // (todo) > check response have 2 users
-	fmt.Println(rec.Body.String()) // (todo) > test returns a list response containing them
+	listResponseURN := []string{"urn:ietf:params:scim:api:messages:2.0:ListResponse"}
+	require.Equal(t, 2, list.ItemsPerPage)
+	require.Equal(t, 2, list.TotalResults)
+	require.Equal(t, 1, list.StartIndex)
+	require.Equal(t, 2, len(list.Resources))
+	require.Equal(t, listResponseURN, list.Schemas)
+
+	respUser1 := list.Resources[0]
+	actUser1, _ := json.Marshal(respUser1)	
+	expUser1, _ := ioutil.ReadFile("../../testdata/resp_user_full_attributes.json")
+	require.JSONEq(t, string(expUser1), string(actUser1))
+
+	respUser2 := list.Resources[1]
+	actUser2, _ := json.Marshal(respUser2)	
+	expUser2, _ := ioutil.ReadFile("../../testdata/user_resource_2.json")
+	require.JSONEq(t, string(expUser2), string(actUser2))
 }
 
 // PAGINATION
@@ -291,7 +349,7 @@ func TestListUsersWithABiggerLimit(t *testing.T) {
 	list := &messages.ListResponse{}
 	json.Unmarshal([]byte(rec.Body.String()), list)
 
-	exp, _ := ioutil.ReadFile("../../testdata/user_resource_2.json")
+	exp, _ := ioutil.ReadFile("../../testdata/user_resource_3.json")
 
 	require.Equal(t, 1, len(list.Resources))
 	require.Equal(t, 2, list.StartIndex)
