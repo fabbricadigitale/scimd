@@ -183,6 +183,8 @@ func TestListUsersWithPagination(t *testing.T) {
 
 	srv.ServeHTTP(rec, req)
 
+	require.Equal(t, 200, rec.Code)
+
 	list := &messages.ListResponse{}
 	json.Unmarshal([]byte(rec.Body.String()), list)
 
@@ -217,6 +219,8 @@ func TestListUsersWithStartIndexAndCount(t *testing.T) {
 
 	srv.ServeHTTP(rec, req)
 
+	require.Equal(t, 200, rec.Code)
+
 	list := &messages.ListResponse{}
 	json.Unmarshal([]byte(rec.Body.String()), list)
 
@@ -231,4 +235,104 @@ func TestListUsersWithStartIndexAndCount(t *testing.T) {
 	act, _ := json.Marshal(res)
 
 	require.JSONEq(t, string(exp), string(act))
+}
+
+func TestListUsersWrongPagination(t *testing.T) {
+	setup()
+	defer teardown()
+
+	spc := config.ServiceProviderConfig()
+	srv := server.Get(&spc)
+	rec := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/v2/Users", nil)
+	req.Header.Add("Authorization", aaa)
+
+	q := req.URL.Query()
+	q.Add("startIndex", "-1")
+	q.Add("count", "-1")
+	req.URL.RawQuery = q.Encode()
+
+	srv.ServeHTTP(rec, req)
+
+	require.Equal(t, 500, rec.Code)
+
+	// TODO => Why this doesn't work?
+	/* byt := []byte(`{
+		"schemas": [
+			"urn:ietf:params:scim:api:messages:2.0:Error"
+		],
+		"status": 500,
+		"detail": "Key: 'Search.Pagination.StartIndex' Error:Field validation for 'StartIndex' failed on the 'gt' tag"
+	}`)
+	require.JSONEq(t, string(byt), rec.Body.String()) */
+}
+
+func TestListUsersWithABiggerLimit(t *testing.T) {
+	setup()
+	defer teardown()
+
+	spc := config.ServiceProviderConfig()
+	srv := server.Get(&spc)
+	rec := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/v2/Users", nil)
+	req.Header.Add("Authorization", aaa)
+
+	q := req.URL.Query()
+	q.Add("startIndex", "2")
+	q.Add("count", "33")
+	req.URL.RawQuery = q.Encode()
+
+	srv.ServeHTTP(rec, req)
+
+	require.Equal(t, 200, rec.Code)
+
+	list := &messages.ListResponse{}
+	json.Unmarshal([]byte(rec.Body.String()), list)
+
+	exp, _ := ioutil.ReadFile("../../testdata/user_resource_2.json")
+
+	require.Equal(t, 1, len(list.Resources))
+	require.Equal(t, 2, list.StartIndex)
+	require.Equal(t, 1, list.ItemsPerPage)
+	require.Equal(t, 2, list.TotalResults)
+
+	res := list.Resources[0]
+	act, _ := json.Marshal(res)
+
+	require.JSONEq(t, string(exp), string(act))
+}
+
+func TestListUsersWithABiggerStartIndex(t *testing.T) {
+	setup()
+	defer teardown()
+
+	spc := config.ServiceProviderConfig()
+	srv := server.Get(&spc)
+	rec := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/v2/Users", nil)
+	req.Header.Add("Authorization", aaa)
+
+	q := req.URL.Query()
+	q.Add("startIndex", "33")
+	q.Add("count", "2")
+	req.URL.RawQuery = q.Encode()
+
+	srv.ServeHTTP(rec, req)
+
+	require.Equal(t, 200, rec.Code)
+
+	list := &messages.ListResponse{}
+	json.Unmarshal([]byte(rec.Body.String()), list)
+
+	require.Equal(t, 0, len(list.Resources))
+	require.Equal(t, 33, list.StartIndex)
+	require.Equal(t, 0, list.ItemsPerPage)
+	require.Equal(t, 2, list.TotalResults)
+
+	res := list.Resources
+
+	require.Empty(t, res)
 }
