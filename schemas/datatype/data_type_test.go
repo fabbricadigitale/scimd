@@ -21,15 +21,15 @@ type complexLike map[string]interface{}
 
 var castTable = []castTest{
 	// error
-	castTest{"non-existing-type", nil, nil, &InvalidDataTypeError{t: "non-existing-type"}},
+	{"non-existing-type", nil, nil, &InvalidDataTypeError{t: "non-existing-type"}},
 
 	// ok
-	castTest{StringType, "just a string", String("just a string"), nil},
-	castTest{ComplexType, make(map[string]interface{}), Complex{}, nil},
-	castTest{ComplexType, complexLike{"foo": "bar"}, Complex{"foo": "bar"}, nil},
+	{StringType, "just a string", String("just a string"), nil},
+	{ComplexType, make(map[string]interface{}), Complex{}, nil},
+	{ComplexType, complexLike{"foo": "bar"}, Complex{"foo": "bar"}, nil},
 
 	// not castable
-	castTest{ComplexType, make(map[int]string), nil, nil},
+	{ComplexType, make(map[int]string), nil, nil},
 
 	// (todo) add more cases
 }

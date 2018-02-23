@@ -1,10 +1,10 @@
 package resource
 
 import (
-	"time"
 	"encoding/json"
 	"io/ioutil"
 	"testing"
+	"time"
 
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/datatype"
@@ -137,7 +137,7 @@ func TestMarshalResource(t *testing.T) {
 
 // (todo) > test resource.Resource
 
-func TestResource(t *testing.T){
+func TestResource(t *testing.T) {
 	cr := time.Date(2012, time.December, 12, 12, 12, 12, 0, time.Local)
 	lm := time.Now()
 	res := Resource{

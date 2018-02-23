@@ -25,7 +25,7 @@ func TestGenericRepository(t *testing.T) {
 }
 
 func TestClean(t *testing.T) {
-	// Schema Repostory 
+	// Schema Repostory
 	repo := GetSchemaRepository()
 
 	data1, _ := repo.PushFromFile("../../internal/testdata/user_schema.json")

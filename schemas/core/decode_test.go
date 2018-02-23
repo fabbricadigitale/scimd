@@ -53,31 +53,31 @@ func TestDecodeNullWhenSingle(t *testing.T) {
 func TestDecodeValuedWhenSingle(t *testing.T) {
 
 	attributes := []Attribute{
-		Attribute{
+		{
 			Type:          "complex",
 			SubAttributes: Attributes{&Attribute{Type: "string", Name: "a"}},
 		},
-		Attribute{
+		{
 			Type:          "complex",
 			SubAttributes: Attributes{&Attribute{Type: "boolean", Name: "b"}},
 		},
-		Attribute{
+		{
 			Type:          "complex",
 			SubAttributes: Attributes{&Attribute{Type: "decimal", Name: "c"}},
 		},
-		Attribute{
+		{
 			Type:          "complex",
 			SubAttributes: Attributes{&Attribute{Type: "integer", Name: "d"}},
 		},
-		Attribute{
+		{
 			Type:          "complex",
 			SubAttributes: Attributes{&Attribute{Type: "dateTime", Name: "e"}},
 		},
-		Attribute{
+		{
 			Type:          "complex",
 			SubAttributes: Attributes{&Attribute{Type: "binary", Name: "f"}},
 		},
-		Attribute{
+		{
 			Type:          "complex",
 			SubAttributes: Attributes{&Attribute{Type: "reference", Name: "g"}},
 		},
@@ -252,31 +252,31 @@ func TestDecodeNullWhenMulti(t *testing.T) {
 func TestDecodeValuedWhenMulti(t *testing.T) {
 
 	attributes := []Attribute{
-		Attribute{
+		{
 			Type:          "complex",
 			SubAttributes: Attributes{&Attribute{MultiValued: true, Type: "string", Name: "a"}},
 		},
-		Attribute{
+		{
 			Type:          "complex",
 			SubAttributes: Attributes{&Attribute{MultiValued: true, Type: "boolean", Name: "b"}},
 		},
-		Attribute{
+		{
 			Type:          "complex",
 			SubAttributes: Attributes{&Attribute{MultiValued: true, Type: "decimal", Name: "c"}},
 		},
-		Attribute{
+		{
 			Type:          "complex",
 			SubAttributes: Attributes{&Attribute{MultiValued: true, Type: "integer", Name: "d"}},
 		},
-		Attribute{
+		{
 			Type:          "complex",
 			SubAttributes: Attributes{&Attribute{MultiValued: true, Type: "dateTime", Name: "e"}},
 		},
-		Attribute{
+		{
 			Type:          "complex",
 			SubAttributes: Attributes{&Attribute{MultiValued: true, Type: "binary", Name: "f"}},
 		},
-		Attribute{
+		{
 			Type:          "complex",
 			SubAttributes: Attributes{&Attribute{MultiValued: true, Type: "reference", Name: "g"}},
 		},
