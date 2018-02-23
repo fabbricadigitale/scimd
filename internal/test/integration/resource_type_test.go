@@ -123,7 +123,7 @@ func TestResourceTypeValidation(t *testing.T) {
 	// nested struct schemaext
 	// Valid URN
 	res.SchemaExtensions = []core.SchemaExtension{
-		core.SchemaExtension{
+		{
 			Schema: "urn:ietf:params:scim:schemas:core:2.0:User",
 		},
 	}
@@ -132,7 +132,7 @@ func TestResourceTypeValidation(t *testing.T) {
 
 	// Invalid URN
 	res.SchemaExtensions = []core.SchemaExtension{
-		core.SchemaExtension{
+		{
 			Schema: "notValidUrn",
 		},
 	}

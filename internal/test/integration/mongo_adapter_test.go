@@ -151,7 +151,7 @@ func TestMongoFind(t *testing.T) {
 	require.NotNil(t, adapter)
 
 	res := []*core.ResourceType{
-		&core.ResourceType{
+		{
 			CommonAttributes: core.CommonAttributes{
 				Schemas: []string{"urn:ietf:params:scim:schemas:core:2.0:ResourceType"},
 				ID:      "User",
@@ -165,7 +165,7 @@ func TestMongoFind(t *testing.T) {
 			Description: "User Account",
 			Schema:      "urn:ietf:params:scim:schemas:core:2.0:User",
 			SchemaExtensions: []core.SchemaExtension{
-				core.SchemaExtension{
+				{
 					Schema:   "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User",
 					Required: true,
 				},
