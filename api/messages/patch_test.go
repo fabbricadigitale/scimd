@@ -34,7 +34,7 @@ func TestPatchResource(t *testing.T) {
 	p.Operations = make([]*Operation, 1)
 	p.Schemas = []string{"urn:ietf:params:scim:api:messages:2.0:PatchOp"}
 	value := []*Value{
-		&Value{
+		{
 			Display: "Babs Jensen",
 			Ref:     "https://example.com/v2/Users/2819c223",
 			Value:   "2819c223-7f76",
@@ -69,7 +69,7 @@ func TestPatchResource(t *testing.T) {
 func TestPatchOpValid(t *testing.T) {
 	var err error
 	value := []*Value{
-		&Value{
+		{
 			Display: "Babs Jensen",
 			Ref:     "https://example.com/v2/Users/2819c223",
 			Value:   "2819c223-7f76",
