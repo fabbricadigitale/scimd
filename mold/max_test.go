@@ -1,8 +1,8 @@
 package mold
 
 import (
-	"fmt"
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -15,7 +15,7 @@ type maxTestCase struct {
 	res interface{} // resulting value
 }
 
-var maxTests = []maxTestCase {
+var maxTests = []maxTestCase{
 	// Above the max threshold
 	{float32(0.4), float32(0.25), true, float32(0.25)},
 
@@ -79,12 +79,12 @@ func TestMax(t *testing.T) {
 		max := test.max
 
 		switch max.(type) {
-			case int, uint, int8, int16, int32, int64, uint8, uint16, uint32, uint64:
-				err = Transformer.Field(context.Background(), &input, fmt.Sprintf("max=%v", max))
-			case float32, float64:
-				err = Transformer.Field(context.Background(), &input, fmt.Sprintf("max=%f", max))
-			case string:
-				err = Transformer.Field(context.Background(), &input, fmt.Sprintf("max=%s", max))
+		case int, uint, int8, int16, int32, int64, uint8, uint16, uint32, uint64:
+			err = Transformer.Field(context.Background(), &input, fmt.Sprintf("max=%v", max))
+		case float32, float64:
+			err = Transformer.Field(context.Background(), &input, fmt.Sprintf("max=%f", max))
+		case string:
+			err = Transformer.Field(context.Background(), &input, fmt.Sprintf("max=%s", max))
 		}
 
 		if test.pos {

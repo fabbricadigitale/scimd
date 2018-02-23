@@ -29,11 +29,11 @@ func max(ctx context.Context, t *m.Transformer, v reflect.Value, param string) (
 		}
 		e = err
 	case float32, float64:
-		threshold, err := strconv.ParseFloat(param, 64) 
-			if err == nil {
+		threshold, err := strconv.ParseFloat(param, 64)
+		if err == nil {
 			v.SetFloat(math.Min(v.Float(), threshold))
-			}
-			e = err
+		}
+		e = err
 	default:
 		e = &Error{
 			message: fmt.Sprintf("Bad field type %T", v.Interface()),

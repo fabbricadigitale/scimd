@@ -1,9 +1,9 @@
 package validation
 
 import (
-	"strings"
-	"reflect"
 	"fmt"
+	"reflect"
+	"strings"
 
 	validator "gopkg.in/go-playground/validator.v9"
 )
@@ -30,7 +30,7 @@ var uniqueAttr = func(fl validator.FieldLevel) bool {
 		m := make(map[string]struct{})
 		for i := 0; i < field.Len(); i++ {
 			iV := field.Index(i)
-			
+
 			if iV.Kind() == reflect.Ptr {
 				iV = iV.Elem()
 			}

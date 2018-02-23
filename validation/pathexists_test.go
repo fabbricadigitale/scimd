@@ -1,13 +1,13 @@
 package validation
 
 import (
-	"testing"
 	"path/filepath"
+	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
-func TestPathExists(t *testing.T){
+func TestPathExists(t *testing.T) {
 	var err error
 	var absPath string
 
@@ -36,7 +36,7 @@ func TestPathExists(t *testing.T){
 	require.Error(t, err)
 
 	badType := 123123
-	require.PanicsWithValue(t, "Bad field type int", func(){
+	require.PanicsWithValue(t, "Bad field type int", func() {
 		err = Validator.Var(badType, "pathexists")
 	})
 }

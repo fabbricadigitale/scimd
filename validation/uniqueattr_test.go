@@ -5,12 +5,12 @@ import (
 	"testing"
 )
 
-type Tests []*Test 
+type Tests []*Test
 
 type Test struct {
-	Name 	string 
-	Surname string 
-	Age 	int
+	Name    string
+	Surname string
+	Age     int
 }
 
 type Testy struct {
@@ -32,11 +32,11 @@ func TestUniqueAttr(t *testing.T) {
 
 	y := Tests{
 		{
-			Name: "Waldo",
+			Name:    "Waldo",
 			Surname: "Baldo",
 		},
 		{
-			Name: "Baldo",
+			Name:    "Baldo",
 			Surname: "Waldo",
 		},
 	}
@@ -49,11 +49,11 @@ func TestUniqueAttr(t *testing.T) {
 	// Fail test, fields values are not unique
 	yz := Tests{
 		{
-			Name: "Waldo",
+			Name:    "Waldo",
 			Surname: "Baldo",
 		},
 		{
-			Name: "waldo",
+			Name:    "waldo",
 			Surname: "Waldo",
 		},
 	}
