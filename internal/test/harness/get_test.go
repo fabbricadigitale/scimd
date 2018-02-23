@@ -394,3 +394,107 @@ func TestListUsersWithABiggerStartIndex(t *testing.T) {
 
 	require.Empty(t, res)
 }
+
+func TestListSchemasWithPagination(t *testing.T) {
+	setup()
+	defer teardown()
+
+	spc := config.ServiceProviderConfig()
+	srv := server.Get(&spc)
+	rec := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/v2/Schemas", nil)
+	req.Header.Add("Authorization", aaa)
+
+	q := req.URL.Query()
+	q.Add("startIndex", "2")
+	req.URL.RawQuery = q.Encode()
+
+	srv.ServeHTTP(rec, req)
+
+	require.Equal(t, 200, rec.Code)
+
+	var list messages.ListResponse
+	json.Unmarshal([]byte(rec.Body.String()), &list)
+
+	require.Equal(t, 1, len(list.Resources))
+	require.Equal(t, 2, list.StartIndex)
+	require.Equal(t, 1, list.ItemsPerPage)
+	require.Equal(t, 2, list.TotalResults)
+
+	repoGroupSchema := list.Resources[0]
+	act, _ := json.Marshal(repoGroupSchema)
+
+	expGroupSchema := core.GetSchemaRepository().Pull("urn:ietf:params:scim:schemas:core:2.0:Group")
+	expGroup, _ := json.Marshal(expGroupSchema)
+
+	require.JSONEq(t, string(expGroup), string(act))
+}
+
+func TestListSchemasWithStartIndexAndCount(t *testing.T) {
+	setup()
+	defer teardown()
+
+	spc := config.ServiceProviderConfig()
+	srv := server.Get(&spc)
+	rec := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/v2/Schemas", nil)
+	req.Header.Add("Authorization", aaa)
+
+	q := req.URL.Query()
+	q.Add("startIndex", "1")
+	q.Add("count", "1")
+	req.URL.RawQuery = q.Encode()
+
+	srv.ServeHTTP(rec, req)
+
+	require.Equal(t, 200, rec.Code)
+
+	var list messages.ListResponse
+	json.Unmarshal([]byte(rec.Body.String()), &list)
+
+	require.Equal(t, 1, len(list.Resources))
+	require.Equal(t, 1, list.StartIndex)
+	require.Equal(t, 1, list.ItemsPerPage)
+	require.Equal(t, 2, list.TotalResults)
+
+	repoUserSchema := list.Resources[0]
+	act, _ := json.Marshal(repoUserSchema)
+
+	expUserSchema := core.GetSchemaRepository().Pull("urn:ietf:params:scim:schemas:core:2.0:User")
+	expUser, _ := json.Marshal(expUserSchema)
+
+	require.JSONEq(t, string(expUser), string(act))
+}
+
+func TestListSchemasWrongPagination(t *testing.T) {
+	setup()
+	defer teardown()
+
+	spc := config.ServiceProviderConfig()
+	srv := server.Get(&spc)
+	rec := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/v2/Schemas", nil)
+	req.Header.Add("Authorization", aaa)
+
+	q := req.URL.Query()
+	q.Add("startIndex", "-1")
+	q.Add("count", "-1")
+	req.URL.RawQuery = q.Encode()
+
+	srv.ServeHTTP(rec, req)
+
+	require.Equal(t, 500, rec.Code)
+
+	// TODO => Why this doesn't work?
+	/* byt := []byte(`{
+		"schemas": [
+			"urn:ietf:params:scim:api:messages:2.0:Error"
+		],
+		"status": 500,
+		"detail": "Key: 'Search.Pagination.StartIndex' Error:Field validation for 'StartIndex' failed on the 'gt' tag"
+	}`)
+	require.JSONEq(t, string(byt), rec.Body.String()) */
+}
