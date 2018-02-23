@@ -33,8 +33,14 @@ func TestResource(t *testing.T) {
 	retRes := r.(*resource.Resource)
 	values := retRes.Values("urn:ietf:params:scim:schemas:core:2.0:User")
 	userName := (*values)["userName"]
-
 	require.NotNil(t, userName)
+
+	// Test extensions
+	extensions := retRes.Values("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User")
+	department := (*extensions)["department"]
+
+	require.NotNil(t, department)
+	require.Equal(t, datatype.String("Tour Operations"), department)
 
 	// Test that we do not support excluding attributes that have subattributes
 	attrs.ExcludedAttributes = []string{"urn:ietf:params:scim:schemas:core:2.0:User:name"}
