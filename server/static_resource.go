@@ -5,6 +5,10 @@ import (
 	"net/http"
 	"reflect"
 
+	"github.com/fabbricadigitale/scimd/config"
+	"github.com/fabbricadigitale/scimd/mold"
+	"github.com/fabbricadigitale/scimd/validation"
+
 	"github.com/fabbricadigitale/scimd/api"
 	"github.com/fabbricadigitale/scimd/api/messages"
 	"github.com/fabbricadigitale/scimd/schemas/core"
@@ -55,6 +59,19 @@ func (rs *StaticResourceService) List(c *gin.Context) {
 	if err := c.ShouldBindQuery(params); err != nil {
 		err := messages.NewError(err)
 		c.JSON(err.Status, err)
+		return
+	}
+
+	if e := validation.Validator.Struct(params); e != nil {
+		err := messages.NewError(e)
+		c.JSON(err.Status, err)
+		return
+	}
+
+	if e := mold.Transformer.Struct(nil, params); e != nil {
+		err := messages.NewError(e)
+		c.JSON(err.Status, err)
+		return
 	}
 
 	var q = &staticQuery{}
@@ -66,10 +83,12 @@ func (rs *StaticResourceService) List(c *gin.Context) {
 	// Count
 	list.TotalResults = q.Count()
 
-	// Unlimited
-	if params.Count == 0 {
+	if params.Count > config.Values.PageSize {
+		params.Count = config.Values.PageSize
+	}
+
+	if params.Count == 0 || params.Count > list.TotalResults {
 		params.Count = list.TotalResults
-		// (todo) > We need a way to LIMIT this to a MAX value (from config) - issue https://github.com/fabbricadigitale/scimd/issues/55
 	}
 
 	// Pagination
