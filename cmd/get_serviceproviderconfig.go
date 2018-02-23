@@ -22,6 +22,7 @@ var getServiceProviderConfig = &cobra.Command{
 	Use:   fmt.Sprintf("get-service-provider-config <%s>", getServiceProviderConfigArgName),
 	Short: "Get the default service provider configuration",
 	Long: `Retrieve the default service provider configuration in JSON format. 
+	
 It will generate a "service_provider_config.json" within the chosen destination path.
 `,
 	Args: func(cmd *cobra.Command, args []string) error {
@@ -61,6 +62,7 @@ It will generate a "service_provider_config.json" within the chosen destination 
 			fmt.Fprintln(os.Stdout, "Done")
 		}
 	},
+	DisableAutoGenTag: true,
 }
 
 func check(e error) {

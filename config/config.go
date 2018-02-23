@@ -141,7 +141,6 @@ func Config() {
 
 // Valid checks wheter the configuration is valid or not
 func Valid() (bool, error) {
-
 	if err := validation.Validator.Struct(Values); err != nil {
 		return false, err
 	}

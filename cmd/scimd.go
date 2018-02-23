@@ -18,9 +18,9 @@ var scimd = &cobra.Command{
 	Use: "scimd",
 	// TraverseChildren: true,
 	Short: "SCIMD is ...",
-	Long: `Long description here ...
+	Long: `...
 	
-Bla bla ...
+	SCIM 2 RFC - published under the IETF - defines an open API for managing identities.
 Complete documentation is available at ...`,
 	PreRun: func(cmd *cobra.Command, args []string) {
 		// Flags overrides (or merge with) configuration values
@@ -41,6 +41,7 @@ Complete documentation is available at ...`,
 		spc := config.ServiceProviderConfig()
 		server.Get(&spc).Run(":" + strconv.Itoa(config.Values.Port))
 	},
+	DisableAutoGenTag: true,
 }
 
 func init() {
@@ -72,4 +73,8 @@ func Execute() {
 	if err := scimd.Execute(); err != nil {
 		os.Exit(1)
 	}
+}
+
+func Get() *cobra.Command {
+	return scimd
 }

@@ -15,9 +15,10 @@ func init() {
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "Print the version number of SCIMD",
-	Long:  `Shows the version number of SCIMD.`,
+	Short: "Print the version number of scimd",
+	Long:  `Shows the version number of scimd.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Fprintf(os.Stdout, "Version %s.\n", version)
 	},
+	DisableAutoGenTag: true,
 }

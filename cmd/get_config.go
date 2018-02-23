@@ -22,6 +22,7 @@ var getConfig = &cobra.Command{
 	Use:   fmt.Sprintf("get-config <%s>", getConfigArgName),
 	Short: "Get the default configuration",
 	Long: `Retrieve the default configurations.
+	
 It will generate the JSON files representing the default schemas and resource types, within the chosen destination path.
 `,
 	Args: func(cmd *cobra.Command, args []string) error {
@@ -37,6 +38,8 @@ It will generate the JSON files representing the default schemas and resource ty
 		}
 		return err
 	},
+	// Since we do not use nor care configuration values here
+	// We do not check and print configuration validation errors at pre-run time
 	Run: func(cmd *cobra.Command, args []string) {
 		if config.Values.Debug {
 			fmt.Fprintln(os.Stdout, "Generating config ...")
@@ -98,9 +101,10 @@ It will generate the JSON files representing the default schemas and resource ty
 		check(e)
 
 		if config.Values.Debug {
-			fmt.Fprintln(os.Stdout, "Done")
+			fmt.Fprintln(os.Stdout, "Done.")
 		}
 	},
+	DisableAutoGenTag: true,
 }
 
 // (fixme) > default variables contains "meta" and "schema" fields, should not ..
