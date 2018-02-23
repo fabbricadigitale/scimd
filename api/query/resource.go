@@ -1,6 +1,9 @@
 package query
 
 import (
+	"github.com/fabbricadigitale/scimd/config"
+	"github.com/fabbricadigitale/scimd/mold"
+
 	"github.com/fabbricadigitale/scimd/api"
 	"github.com/fabbricadigitale/scimd/api/attr"
 	"github.com/fabbricadigitale/scimd/api/filter"
@@ -106,6 +109,10 @@ func Resources(s storage.Storer, resTypes []*core.ResourceType, search *api.Sear
 		return
 	}
 
+	if err = mold.Transformer.Struct(nil, search); err != nil {
+		return
+	}
+
 	// Make filter
 	var f filter.Filter
 	if len(search.Filter) > 0 {
@@ -141,10 +148,12 @@ func Resources(s storage.Storer, resTypes []*core.ResourceType, search *api.Sear
 		return
 	}
 
-	// Unlimited
-	if search.Count <= 0 || search.Count > list.TotalResults {
+	if search.Count > config.Values.PageSize {
+		search.Count = config.Values.PageSize
+	}
+
+	if search.Count == 0 || search.Count > list.TotalResults {
 		search.Count = list.TotalResults
-		// (todo) > We need a way to LIMIT this to a MAX value (from config) - issue https://github.com/fabbricadigitale/scimd/issues/55
 	}
 
 	// Pagination
