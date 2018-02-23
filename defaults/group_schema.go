@@ -34,7 +34,7 @@ func init() {
 		Name: "members",
 		Type: "complex",
 		SubAttributes: []*core.Attribute{
-			&core.Attribute{
+			{
 				Name:        "value",
 				Type:        "string",
 				MultiValued: false,
@@ -45,7 +45,7 @@ func init() {
 				Returned:    "default",
 				Uniqueness:  "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "$ref",
 				Type:        "reference",
 				MultiValued: false,
@@ -60,7 +60,7 @@ func init() {
 					"Group",
 				},
 			},
-			&core.Attribute{
+			{
 				Name:        "type",
 				Type:        "string",
 				MultiValued: false,

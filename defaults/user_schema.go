@@ -34,7 +34,7 @@ func init() {
 		Name: "name",
 		Type: "complex",
 		SubAttributes: []*core.Attribute{
-			&core.Attribute{
+			{
 				Name:        "formatted",
 				Type:        "string",
 				MultiValued: false,
@@ -45,7 +45,7 @@ func init() {
 				Returned:    "default",
 				Uniqueness:  "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "familyName",
 				Type:        "string",
 				MultiValued: false,
@@ -56,7 +56,7 @@ func init() {
 				Returned:    "default",
 				Uniqueness:  "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "givenName",
 				Type:        "string",
 				MultiValued: false,
@@ -67,7 +67,7 @@ func init() {
 				Returned:    "default",
 				Uniqueness:  "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "middleName",
 				Type:        "string",
 				MultiValued: false,
@@ -78,7 +78,7 @@ func init() {
 				Returned:    "default",
 				Uniqueness:  "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "honorificPrefix",
 				Type:        "string",
 				MultiValued: false,
@@ -89,7 +89,7 @@ func init() {
 				Returned:    "default",
 				Uniqueness:  "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "honorificSuffix",
 				Type:        "string",
 				MultiValued: false,
@@ -237,7 +237,7 @@ func init() {
 		Name: "emails",
 		Type: "complex",
 		SubAttributes: []*core.Attribute{
-			&core.Attribute{
+			{
 				Name:        "value",
 				Type:        "string",
 				MultiValued: false,
@@ -248,7 +248,7 @@ func init() {
 				Returned:    "default",
 				Uniqueness:  "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "display",
 				Type:        "string",
 				MultiValued: false,
@@ -259,7 +259,7 @@ func init() {
 				Returned:    "default",
 				Uniqueness:  "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "type",
 				Type:        "string",
 				MultiValued: false,
@@ -275,7 +275,7 @@ func init() {
 				Returned:   "default",
 				Uniqueness: "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "primary",
 				Type:        "boolean",
 				MultiValued: false,
@@ -300,7 +300,7 @@ func init() {
 		Name: "phoneNumbers",
 		Type: "complex",
 		SubAttributes: []*core.Attribute{
-			&core.Attribute{
+			{
 				Name:        "value",
 				Type:        "string",
 				MultiValued: false,
@@ -311,7 +311,7 @@ func init() {
 				Returned:    "default",
 				Uniqueness:  "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "display",
 				Type:        "string",
 				MultiValued: false,
@@ -322,7 +322,7 @@ func init() {
 				Returned:    "default",
 				Uniqueness:  "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "type",
 				Type:        "string",
 				MultiValued: false,
@@ -341,7 +341,7 @@ func init() {
 				Returned:   "default",
 				Uniqueness: "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "primary",
 				Type:        "boolean",
 				MultiValued: false,
@@ -366,7 +366,7 @@ func init() {
 		Name: "ims",
 		Type: "complex",
 		SubAttributes: []*core.Attribute{
-			&core.Attribute{
+			{
 				Name:        "value",
 				Type:        "string",
 				MultiValued: false,
@@ -377,7 +377,7 @@ func init() {
 				Returned:    "default",
 				Uniqueness:  "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "display",
 				Type:        "string",
 				MultiValued: false,
@@ -388,7 +388,7 @@ func init() {
 				Returned:    "default",
 				Uniqueness:  "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "type",
 				Type:        "string",
 				MultiValued: false,
@@ -410,7 +410,7 @@ func init() {
 				Returned:   "default",
 				Uniqueness: "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "primary",
 				Type:        "boolean",
 				MultiValued: false,
@@ -435,7 +435,7 @@ func init() {
 		Name: "photos",
 		Type: "complex",
 		SubAttributes: []*core.Attribute{
-			&core.Attribute{
+			{
 				Name:        "value",
 				Type:        "reference",
 				MultiValued: false,
@@ -449,7 +449,7 @@ func init() {
 					"external",
 				},
 			},
-			&core.Attribute{
+			{
 				Name:        "display",
 				Type:        "string",
 				MultiValued: false,
@@ -460,7 +460,7 @@ func init() {
 				Returned:    "default",
 				Uniqueness:  "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "type",
 				Type:        "string",
 				MultiValued: false,
@@ -475,7 +475,7 @@ func init() {
 				Returned:   "default",
 				Uniqueness: "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "primary",
 				Type:        "boolean",
 				MultiValued: false,
@@ -500,7 +500,7 @@ func init() {
 		Name: "addresses",
 		Type: "complex",
 		SubAttributes: []*core.Attribute{
-			&core.Attribute{
+			{
 				Name:        "formatted",
 				Type:        "string",
 				MultiValued: false,
@@ -511,7 +511,7 @@ func init() {
 				Returned:    "default",
 				Uniqueness:  "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "streetAddress",
 				Type:        "string",
 				MultiValued: false,
@@ -522,7 +522,7 @@ func init() {
 				Returned:    "default",
 				Uniqueness:  "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "locality",
 				Type:        "string",
 				MultiValued: false,
@@ -533,7 +533,7 @@ func init() {
 				Returned:    "default",
 				Uniqueness:  "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "region",
 				Type:        "string",
 				MultiValued: false,
@@ -544,7 +544,7 @@ func init() {
 				Returned:    "default",
 				Uniqueness:  "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "postalCode",
 				Type:        "string",
 				MultiValued: false,
@@ -555,7 +555,7 @@ func init() {
 				Returned:    "default",
 				Uniqueness:  "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "country",
 				Type:        "string",
 				MultiValued: false,
@@ -566,7 +566,7 @@ func init() {
 				Returned:    "default",
 				Uniqueness:  "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "type",
 				Type:        "string",
 				MultiValued: false,
@@ -582,7 +582,7 @@ func init() {
 				Returned:   "default",
 				Uniqueness: "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "primary",
 				Type:        "boolean",
 				MultiValued: false,
@@ -607,7 +607,7 @@ func init() {
 		Name: "groups",
 		Type: "complex",
 		SubAttributes: []*core.Attribute{
-			&core.Attribute{
+			{
 				Name:        "value",
 				Type:        "string",
 				MultiValued: false,
@@ -618,7 +618,7 @@ func init() {
 				Returned:    "default",
 				Uniqueness:  "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "$ref",
 				Type:        "reference",
 				MultiValued: false,
@@ -633,7 +633,7 @@ func init() {
 					"Group",
 				},
 			},
-			&core.Attribute{
+			{
 				Name:        "display",
 				Type:        "string",
 				MultiValued: false,
@@ -644,7 +644,7 @@ func init() {
 				Returned:    "default",
 				Uniqueness:  "none",
 			},
-			&core.Attribute{
+			{
 				Name:        "type",
 				Type:        "string",
 				MultiValued: false,
@@ -674,7 +674,7 @@ func init() {
 		Name: "entitlements",
 		Type: "complex",
 		SubAttributes: []*core.Attribute{
-			&core.Attribute{
+			{
 				Name: "value",
 				Type: "string",
 
@@ -687,7 +687,7 @@ func init() {
 				Returned:   "default",
 				Uniqueness: "none",
 			},
-			&core.Attribute{
+			{
 				Name: "display",
 				Type: "string",
 
@@ -700,7 +700,7 @@ func init() {
 				Returned:   "default",
 				Uniqueness: "none",
 			},
-			&core.Attribute{
+			{
 				Name: "type",
 				Type: "string",
 
@@ -713,7 +713,7 @@ func init() {
 				Returned:   "default",
 				Uniqueness: "none",
 			},
-			&core.Attribute{
+			{
 				Name: "primary",
 				Type: "boolean",
 
@@ -741,7 +741,7 @@ func init() {
 		Name: "roles",
 		Type: "complex",
 		SubAttributes: []*core.Attribute{
-			&core.Attribute{
+			{
 				Name: "value",
 				Type: "string",
 
@@ -754,7 +754,7 @@ func init() {
 				Returned:   "default",
 				Uniqueness: "none",
 			},
-			&core.Attribute{
+			{
 				Name: "display",
 				Type: "string",
 
@@ -767,7 +767,7 @@ func init() {
 				Returned:   "default",
 				Uniqueness: "none",
 			},
-			&core.Attribute{
+			{
 				Name: "type",
 				Type: "string",
 
@@ -780,7 +780,7 @@ func init() {
 				Returned:   "default",
 				Uniqueness: "none",
 			},
-			&core.Attribute{
+			{
 				Name: "primary",
 				Type: "boolean",
 
@@ -808,7 +808,7 @@ func init() {
 		Name: "x509Cerficates",
 		Type: "complex",
 		SubAttributes: []*core.Attribute{
-			&core.Attribute{
+			{
 				Name: "value",
 				Type: "binary",
 
@@ -821,7 +821,7 @@ func init() {
 				Returned:   "default",
 				Uniqueness: "none",
 			},
-			&core.Attribute{
+			{
 				Name: "display",
 				Type: "string",
 
@@ -834,7 +834,7 @@ func init() {
 				Returned:   "default",
 				Uniqueness: "none",
 			},
-			&core.Attribute{
+			{
 				Name: "type",
 				Type: "string",
 
@@ -846,7 +846,7 @@ func init() {
 				Returned:    "default",
 				Uniqueness:  "none",
 			},
-			&core.Attribute{
+			{
 				Name: "primary",
 				Type: "boolean",
 
