@@ -1,11 +1,12 @@
 package harness
 
 import (
+	"github.com/fabbricadigitale/scimd/api/messages"
 
-	"io/ioutil"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -61,6 +62,9 @@ func TestGetResourceType(t *testing.T) {
 	srv := server.Get(&spc)
 
 	for _, rt := range core.GetResourceTypeRepository().List() {
+
+		fmt.Printf("%T %+v", rt, rt)
+
 		rec := httptest.NewRecorder()
 		req, _ := http.NewRequest("GET", fmt.Sprintf("/v2/ResourceTypes/%s", rt.GetIdentifier()), nil)
 		req.Header.Add("Authorization", aaa)
@@ -141,7 +145,6 @@ func TestGetWithExistingAttributes(t *testing.T) {
 	require.JSONEq(t, string(usr), resp)
 }
 
-
 func TestListUsers(t *testing.T) {
 	setup()
 	defer teardown()
@@ -163,3 +166,69 @@ func TestListUsers(t *testing.T) {
 }
 
 // PAGINATION
+func TestListUsersWithPagination(t *testing.T) {
+	setup()
+	defer teardown()
+
+	spc := config.ServiceProviderConfig()
+	srv := server.Get(&spc)
+	rec := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/v2/Users", nil)
+	req.Header.Add("Authorization", aaa)
+
+	q := req.URL.Query()
+	q.Add("startIndex", "2")
+	req.URL.RawQuery = q.Encode()
+
+	srv.ServeHTTP(rec, req)
+
+	list := &messages.ListResponse{}
+	json.Unmarshal([]byte(rec.Body.String()), list)
+
+	exp, _ := ioutil.ReadFile("../../testdata/user_resource_2.json")
+
+	require.Equal(t, 1, len(list.Resources))
+	require.Equal(t, 2, list.StartIndex)
+	require.Equal(t, 1, list.ItemsPerPage)
+	require.Equal(t, 2, list.TotalResults)
+
+	res := list.Resources[0]
+	act, _ := json.Marshal(res)
+
+	require.JSONEq(t, string(exp), string(act))
+}
+
+func TestListUsersWithStartIndexAndCount(t *testing.T) {
+	setup()
+	defer teardown()
+
+	spc := config.ServiceProviderConfig()
+	srv := server.Get(&spc)
+	rec := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/v2/Users", nil)
+	req.Header.Add("Authorization", aaa)
+
+	q := req.URL.Query()
+	q.Add("startIndex", "1")
+	q.Add("count", "1")
+	req.URL.RawQuery = q.Encode()
+
+	srv.ServeHTTP(rec, req)
+
+	list := &messages.ListResponse{}
+	json.Unmarshal([]byte(rec.Body.String()), list)
+
+	exp, _ := ioutil.ReadFile("../../testdata/resp_user_full_attributes.json")
+
+	require.Equal(t, 1, len(list.Resources))
+	require.Equal(t, 1, list.StartIndex)
+	require.Equal(t, 1, list.ItemsPerPage)
+	require.Equal(t, 2, list.TotalResults)
+
+	res := list.Resources[0]
+	act, _ := json.Marshal(res)
+
+	require.JSONEq(t, string(exp), string(act))
+}

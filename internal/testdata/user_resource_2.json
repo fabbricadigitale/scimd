@@ -1,0 +1,98 @@
+{
+    "id": "2819c223-7f76-453a-919d-ab1234567892",
+    "meta": {
+        "created": "2010-01-23T04:56:22Z",
+        "lastModified": "2011-05-13T04:42:34Z",
+        "version": "W/\"a330bc54f0671c9\"",
+        "location": "/v2/Users/2819c223-7f76-453a-919d-ab1234567892",
+        "resourceType": "User"
+    },
+    "userName": "ajames@example.com",
+    "name": {
+        "givenName": "Alexandra",
+        "middleName": "Brandi",
+        "honorificPrefix": "Ms.",
+        "honorificSuffix": "III",
+        "formatted": "Ms. Alexandra B James, III",
+        "familyName": "James"
+    },
+    "title": "Electronic home entertainment equipment installer",
+    "locale": "en-US",
+    "emails": [
+        {
+            "value": "ajames@example.com",
+            "type": "work",
+            "primary": true
+        },
+        {
+            "value": "alex@james.org",
+            "type": "home"
+        }
+    ],
+    "addresses": [
+        {
+            "region": "NC",
+            "postalCode": "27401",
+            "country": "USA",
+            "type": "work",
+            "primary": true,
+            "formatted": "647 Keyser Ridge Road\nGreensboro, NC 27401 USA",
+            "streetAddress": "647 Keyser Ridge Road",
+            "locality": "Greensboro"
+        },
+        {
+            "type": "home",
+            "formatted": "654 Greensboro Blvd\nGreensboro, NC 27401 USA",
+            "streetAddress": "654 Greensboro Blvd",
+            "locality": "Greensboro",
+            "region": "NC",
+            "postalCode": "27401",
+            "country": "USA"
+        }
+    ],
+    "profileUrl": "https://login.example.com/ajames",
+    "preferredLanguage": "en-US",
+    "active": true,
+    "photos": [
+        {
+            "type": "photo",
+            "value": "https://photos.example.com/profilephoto/72930000000Ccne/G"
+        },
+        {
+            "value": "https://photos.example.com/profilephoto/72930000000Ccne/H",
+            "type": "thumbnail"
+        }
+    ],
+    "displayName": "Alexandra James",
+    "userType": "Employee",
+    "phoneNumbers": [
+        {
+            "value": "336-485-6543",
+            "type": "work"
+        },
+        {
+            "value": "336-485-9876",
+            "type": "mobile"
+        }
+    ],
+    "ims": [
+        {
+            "value": "alexaim",
+            "type": "aim"
+        }
+    ],
+    "nickName": "Alex",
+    "timezone": "America/Los_Angeles",
+    "groups": [
+        {
+            "display": "Employees",
+            "value": "e9e30dba-f08f-4109-8486-d5c6a331660a",
+            "$ref": "/v2/Groups/e9e30dba-f08f-4109-8486-d5c6a331660a"
+        }
+    ],
+    
+    "schemas": [
+        "urn:ietf:params:scim:schemas:core:2.0:User",
+        "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"
+    ]
+}
