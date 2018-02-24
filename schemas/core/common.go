@@ -98,7 +98,7 @@ func init() {
 			Required:    false,
 			// CanonicalValues
 			CaseExact:  true,
-			Mutability: schemas.MutabilityReadOnly,
+			Mutability: schemas.MutabilityReadWrite,
 			Returned:   schemas.ReturnedDefault,
 			Uniqueness: schemas.UniquenessNone,
 			// ReferenceTypes
