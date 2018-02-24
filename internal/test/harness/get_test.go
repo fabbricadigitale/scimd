@@ -1,7 +1,6 @@
 package harness
 
 import (
-	"github.com/fabbricadigitale/scimd/api/messages"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -9,6 +8,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/fabbricadigitale/scimd/api/messages"
 
 	"github.com/fabbricadigitale/scimd/config"
 	"github.com/fabbricadigitale/scimd/schemas/core"
@@ -213,12 +214,12 @@ func TestListUsers(t *testing.T) {
 	require.Equal(t, listResponseURN, list.Schemas)
 
 	respUser1 := list.Resources[0]
-	actUser1, _ := json.Marshal(respUser1)	
+	actUser1, _ := json.Marshal(respUser1)
 	expUser1, _ := ioutil.ReadFile("../../testdata/resp_user_full_attributes.json")
 	require.JSONEq(t, string(expUser1), string(actUser1))
 
 	respUser2 := list.Resources[1]
-	actUser2, _ := json.Marshal(respUser2)	
+	actUser2, _ := json.Marshal(respUser2)
 	expUser2, _ := ioutil.ReadFile("../../testdata/user_resource_2.json")
 	require.JSONEq(t, string(expUser2), string(actUser2))
 }
@@ -497,4 +498,39 @@ func TestListSchemasWrongPagination(t *testing.T) {
 		"detail": "Key: 'Search.Pagination.StartIndex' Error:Field validation for 'StartIndex' failed on the 'gt' tag"
 	}`)
 	require.JSONEq(t, string(byt), rec.Body.String()) */
+}
+
+func TestListUsersWithFilter(t *testing.T) {
+	setup()
+	defer teardown()
+
+	spc := config.ServiceProviderConfig()
+	srv := server.Get(&spc)
+	rec := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/v2/Users", nil)
+	req.Header.Add("Authorization", aaa)
+
+	q := req.URL.Query()
+	q.Add("filter", "userName eq \"tfork@example.com\"")
+	req.URL.RawQuery = q.Encode()
+
+	srv.ServeHTTP(rec, req)
+
+	require.Equal(t, 200, rec.Code)
+
+	list := &messages.ListResponse{}
+	json.Unmarshal([]byte(rec.Body.String()), list)
+
+	exp, _ := ioutil.ReadFile("../../testdata/resp_user_full_attributes.json")
+
+	require.Equal(t, 1, len(list.Resources))
+	require.Equal(t, 1, list.StartIndex)
+	require.Equal(t, 1, list.ItemsPerPage)
+	require.Equal(t, 1, list.TotalResults)
+
+	res := list.Resources[0]
+	act, _ := json.Marshal(res)
+
+	require.JSONEq(t, string(exp), string(act))
 }
