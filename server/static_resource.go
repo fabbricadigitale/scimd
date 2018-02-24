@@ -62,6 +62,15 @@ func (rs *StaticResourceService) List(c *gin.Context) {
 		return
 	}
 
+	// (Note) => Can i use MethodNotImplemented middleware instead of the next lines?
+	if params.Filter != "" {
+		err := messages.NewError(core.ScimError{
+			Msg: "Filtering static resource is not supported",
+		})
+		c.JSON(err.Status, err)
+		return
+	}
+
 	if e := validation.Validator.Struct(params); e != nil {
 		err := messages.NewError(e)
 		c.JSON(err.Status, err)
