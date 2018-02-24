@@ -6,7 +6,6 @@ import (
 	"github.com/fabbricadigitale/scimd/api"
 	"github.com/fabbricadigitale/scimd/api/attr"
 	"github.com/fabbricadigitale/scimd/api/query"
-	"github.com/fabbricadigitale/scimd/required"
 	"github.com/fabbricadigitale/scimd/schemas"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
@@ -22,11 +21,6 @@ import (
 // (with the only exception of ExternalID that if populated will be used).
 // Attributes whose mutability is "readOnly" will be ignored and removed.
 func Resource(s storage.Storer, resType *core.ResourceType, res *resource.Resource) (ret core.ResourceTyper, err error) {
-
-	err = required.ValidateRequired(res)
-	if err != nil {
-		return
-	}
 
 	// Make a new UUID
 	ID, err := uuid.NewV4()
