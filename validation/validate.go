@@ -61,6 +61,7 @@ func init() {
 	Validator.RegisterValidation("uniqueattr", uniqueAttr)
 	Validator.RegisterValidation("pathexists", pathExists)
 	Validator.RegisterValidation("isdir", isDirectory)
+	Validator.RegisterValidation("hassubdir", hasSubDirectory)
 	Validator.RegisterValidation("isfile", isFile)
 
 	// Registration of translations
