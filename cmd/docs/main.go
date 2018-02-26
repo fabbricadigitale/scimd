@@ -22,7 +22,7 @@ func main() {
 	dir, err := filepath.Abs(filepath.Join(argsWithoutProg[0], "docs/cli"))
 	check(err)
 
-	err = cobradoc.GenMarkdownTree(cmd.Get(), dir)
+	err = cobradoc.GenMarkdownTree(cmd.Root(), dir)
 	check(err)
 
 	log.Printf("CLI documentation successfully generated at \"%s\"\n", dir)

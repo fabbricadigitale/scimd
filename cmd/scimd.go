@@ -80,3 +80,8 @@ func Execute() {
 		os.Exit(1)
 	}
 }
+
+// Root returns the root command
+func Root() *cobra.Command {
+	return scimd
+}
