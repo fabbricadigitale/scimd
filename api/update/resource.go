@@ -49,7 +49,6 @@ func Resource(s storage.Storer, resType *core.ResourceType, id string, res *reso
 
 	err = s.Update(res, id, "")
 	if err != nil {
-
 		ret = nil
 	} else {
 		ret, err = query.Resource(s.(storage.Storer), resType, res.ID, &api.Attributes{})

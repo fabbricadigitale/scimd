@@ -1,11 +1,13 @@
 package mongo
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/fabbricadigitale/scimd/api/attr"
 	"github.com/fabbricadigitale/scimd/api/filter"
 	"github.com/fabbricadigitale/scimd/event"
+	"github.com/fabbricadigitale/scimd/schemas"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/storage"
@@ -101,6 +103,47 @@ func (a *Adapter) Get(resType *core.ResourceType, id, version string, fields map
 func (a *Adapter) Update(resource *resource.Resource, id string, version string) error {
 	// Emit an event and wait it has been sent successfully
 	a.Emitter().Emit("update", resource, id, version)
+
+	// We need to perform mutability validation
+	// 1. Attributes whose mutability is "readWrite" that are omitted from
+	// the request body MAY be assumed to be not asserted by the client.
+
+	// 2. (Immutable attributes) If one or more values are already set for the attribute,
+	// the input value(s) MUST match, or HTTP status code 400 SHOULD be
+	// returned with a "scimType" error code of "mutability".
+
+	// 3. (ReadOnly) Any values provided SHALL be ignored. (performed by the client)
+
+	/* storedResource, err := a.Get(resource.ResourceType(), id, version, nil)
+	if err != nil {
+		return err
+	}
+	*/
+
+	// (todo) => Test immutable attributes
+	ro, err := attr.Paths(resource.ResourceType(), func(attribute *core.Attribute) bool {
+		return attribute.Mutability == schemas.MutabilityImmutable
+
+	})
+	if err != nil {
+		return err
+	}
+
+	if len(ro) > 0 {
+		// we need to get stored value of immutable attributes
+		sr, err := a.Get(resource.ResourceType(), id, version, nil)
+		if err != nil {
+			return err
+		}
+
+		for _, p := range ro {
+			if p.Context(sr.ResourceType()).Get(sr) != p.Context(resource.ResourceType()).Get(resource) {
+				return MutabilityError{
+					msg: fmt.Sprintf("%s is immutable", p.String()),
+				}
+			}
+		}
+	}
 
 	dataResource := a.toDoc(resource)
 	return (*a.adaptee).Update(makeQuery(resource.ResourceType().GetIdentifier(), id, version), dataResource)
@@ -291,4 +334,15 @@ func toMeta(m map[string]interface{}) core.Meta {
 	}
 
 	return meta
+}
+
+// MutabilityError is ...
+// (note) => I have not yet figured out where to define the errors
+// raised in a specific context that they will be wrapped in the API to avoid import cycling.
+type MutabilityError struct {
+	msg string
+}
+
+func (e MutabilityError) Error() string {
+	return e.msg
 }
