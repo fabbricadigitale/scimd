@@ -69,3 +69,16 @@ func (e *MissingRequiredPropertyError) Error() string {
 	}
 	return fmt.Sprintf("%s", e.Detail)
 }
+
+// MutabilityError is ...
+type MutabilityError struct {
+	Path   string
+	Detail string
+}
+
+func (e *MutabilityError) Error() string {
+	if e.Path != "" {
+		return fmt.Sprintf("Attribute '%s' is immutable", e.Path)
+	}
+	return fmt.Sprintf("%s", e.Detail)
+}

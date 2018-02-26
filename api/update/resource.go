@@ -47,6 +47,51 @@ func Resource(s storage.Storer, resType *core.ResourceType, id string, res *reso
 		p.Context(resType).Delete(res)
 	}
 
+	// We need to perform mutability validation
+	// 1. Attributes whose mutability is "readWrite" that are omitted from
+	// the request body MAY be assumed to be not asserted by the client.
+
+	// 2. (Immutable attributes) If one or more values are already set for the attribute,
+	// the input value(s) MUST match, or HTTP status code 400 SHOULD be
+	// returned with a "scimType" error code of "mutability".
+
+	// 3. (ReadOnly) Any values provided SHALL be ignored. (performed by the client)
+
+	/* storedResource, err := a.Get(resource.ResourceType(), id, version, nil)
+	if err != nil {
+		return err
+	}
+	*/
+
+	// (todo) => Test immutable attributes
+	ro, err = attr.Paths(resType, func(attribute *core.Attribute) bool {
+		return attribute.Mutability == schemas.MutabilityImmutable
+
+	})
+	if err != nil {
+		return
+	}
+
+	if len(ro) > 0 {
+		// we need to get stored value of immutable attributes
+		sr, e := query.Resource(s.(storage.Storer), resType, id, nil)
+		if e != nil {
+			return
+		}
+
+		storedResource := sr.(*resource.Resource)
+
+		for _, p := range ro {
+
+			if p.Context(resType).Get(storedResource) != p.Context(resType).Get(res) {
+				err = &api.MutabilityError{
+					Path: p.String(),
+				}
+				return
+			}
+		}
+	}
+
 	err = s.Update(res, id, "")
 	if err != nil {
 		ret = nil

@@ -45,6 +45,9 @@ func NewError(e error) Error {
 	case *api.MissingRequiredPropertyError:
 		scimError.Status = 400
 		scimError.ScimType = "invalidValue"
+	case *api.MutabilityError:
+		scimError.Status = 400
+		scimError.ScimType = "mutability"
 	default:
 		scimError.Status = 500
 	}
