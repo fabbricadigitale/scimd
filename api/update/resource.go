@@ -73,10 +73,17 @@ func Resource(s storage.Storer, resType *core.ResourceType, id string, res *reso
 	}
 
 	if len(ro) > 0 {
+
+		attrs := &api.Attributes{}
+		attrs.Attributes = make([]string, 0)
+		for _, p := range ro {
+			attrs.Attributes = append(attrs.Attributes, p.String())
+		}
+
 		// we need to get stored value of immutable attributes
-		sr, e := query.Resource(s.(storage.Storer), resType, id, nil)
-		if e != nil {
-			return
+		sr, err := query.Resource(s.(storage.Storer), resType, id, attrs)
+		if err != nil {
+			return nil, err
 		}
 
 		storedResource := sr.(*resource.Resource)
@@ -87,7 +94,7 @@ func Resource(s storage.Storer, resType *core.ResourceType, id string, res *reso
 				err = &api.MutabilityError{
 					Path: p.String(),
 				}
-				return
+				return nil, err
 			}
 		}
 	}
