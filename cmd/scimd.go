@@ -35,6 +35,12 @@ Complete documentation is available at ...`,
 			fmt.Fprintln(os.Stderr, validation.Errors(config.Errors))
 			os.Exit(1)
 		}
+
+		// Ensure eventual custom config is ok and load it
+		if err := config.Custom(); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		// Start the server with the current service provider config
@@ -73,8 +79,4 @@ func Execute() {
 	if err := scimd.Execute(); err != nil {
 		os.Exit(1)
 	}
-}
-
-func Get() *cobra.Command {
-	return scimd
 }

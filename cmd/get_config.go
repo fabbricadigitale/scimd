@@ -38,7 +38,7 @@ It will generate the JSON files representing the default schemas and resource ty
 		}
 		return err
 	},
-	// Since we do not use nor care configuration values here
+	// Since we do not use nor care configuration values here ...
 	// We do not check and print configuration validation errors at pre-run time
 	Run: func(cmd *cobra.Command, args []string) {
 		if config.Values.Debug {
@@ -106,5 +106,3 @@ It will generate the JSON files representing the default schemas and resource ty
 	},
 	DisableAutoGenTag: true,
 }
-
-// (fixme) > default variables contains "meta" and "schema" fields, should not ..
