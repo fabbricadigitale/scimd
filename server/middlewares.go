@@ -10,6 +10,7 @@ import (
 	"github.com/cenk/backoff"
 	"github.com/fabbricadigitale/scimd/api/messages"
 	"github.com/fabbricadigitale/scimd/config"
+	"github.com/fabbricadigitale/scimd/schemas/attributes"
 	"github.com/fabbricadigitale/scimd/storage"
 	"github.com/fabbricadigitale/scimd/storage/listeners"
 	"github.com/fabbricadigitale/scimd/storage/mongo"
@@ -56,11 +57,20 @@ func Storage(endpoint, db, collection string) gin.HandlerFunc {
 
 		err := backoff.Retry(func() error {
 			var err error
+
 			adapter, err = mongo.New(endpoint, db, collection)
 			if err != nil {
 				return err
 			}
 			listeners.AddListeners(adapter.Emitter())
+
+			// Configuration step for ensure uniqueness attributes in the storage
+			uniqueAttrs, err := attributes.Unique()
+			if err != nil {
+				return err
+			}
+
+			adapter.SetIndexes(uniqueAttrs)
 
 			return adapter.Ping()
 		}, b)

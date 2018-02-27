@@ -48,6 +48,9 @@ func NewError(e error) Error {
 	case *api.MutabilityError:
 		scimError.Status = 400
 		scimError.ScimType = "mutability"
+	case *api.UniquenessError:
+		scimError.Status = 400
+		scimError.ScimType = "uniqueness"
 	default:
 		scimError.Status = 500
 	}

@@ -55,6 +55,26 @@ func New(url, db, collection string) (storage.Storer, error) {
 	return adapter, nil
 }
 
+// SetIndexes is ...
+func (a *Adapter) SetIndexes(keys [][]string) {
+
+	ret := make([][]string, 0)
+
+	for _, composedKeys := range keys {
+
+		escapedKey := make([]string, 0)
+
+		for _, singleKey := range composedKeys {
+
+			escapedKey = append(escapedKey, escapeAttribute(singleKey))
+		}
+
+		ret = append(ret, escapedKey)
+	}
+
+	a.adaptee.SetIndexes(ret)
+}
+
 // Ping ...
 func (a *Adapter) Ping() error {
 	return a.adaptee.session.Ping()

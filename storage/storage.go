@@ -34,6 +34,8 @@ type Storer interface {
 
 	Ping() error
 
+	SetIndexes(keys [][]string)
+
 	Create(res *resource.Resource) error
 
 	Get(resType *core.ResourceType, id, version string, fields map[attr.Path]bool) (*resource.Resource, error)

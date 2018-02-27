@@ -82,3 +82,16 @@ func (e *MutabilityError) Error() string {
 	}
 	return fmt.Sprintf("%s", e.Detail)
 }
+
+// UniquenessError is ...
+type UniquenessError struct {
+	Path   string
+	Detail string
+}
+
+func (e *UniquenessError) Error() string {
+	if e.Path != "" {
+		return fmt.Sprintf("Attribute '%s' is unique", e.Path)
+	}
+	return fmt.Sprintf("%s", e.Detail)
+}

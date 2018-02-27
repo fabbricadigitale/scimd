@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/fabbricadigitale/scimd/api/delete"
+	"github.com/globalsign/mgo"
 
 	"github.com/fabbricadigitale/scimd/api"
 	"github.com/fabbricadigitale/scimd/api/create"
@@ -126,8 +127,20 @@ func (rs *ResourceService) Post(c *gin.Context) {
 
 		res, err := create.Resource(store.(storage.Storer), &rs.rt, &contents)
 		if err != nil {
-			err := messages.NewError(err)
-			c.JSON(err.Status, err)
+			detail := err.Error()
+
+			var newError error
+
+			switch err.(type) {
+			case *mgo.LastError:
+				newError = &api.UniquenessError{
+					Detail: detail,
+				}
+			}
+
+			we := messages.NewError(newError)
+			c.JSON(we.Status, we)
+			return
 		}
 
 		c.JSON(http.StatusOK, res.(*resource.Resource))
