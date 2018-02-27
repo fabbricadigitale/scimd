@@ -52,7 +52,7 @@ func hashPassword(res *resource.Resource) {
 		panic(err)
 	}
 
-	res.SetValues("urn:ietf:params:scim:schemas:core:2.0:User", &datatype.Complex{
-		"password": datatype.String(hashedPassword),
-	})
+	(*values)["password"] = hashedPassword
+
+	res.SetValues("urn:ietf:params:scim:schemas:core:2.0:User", values)
 }
