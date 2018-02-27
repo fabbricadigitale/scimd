@@ -11,24 +11,16 @@ import (
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/storage"
 	"github.com/fabbricadigitale/scimd/version"
-	uuid "github.com/satori/go.uuid"
 )
 
 // Resource update an existing res of type resType and stores it into s.
 func Resource(s storage.Storer, resType *core.ResourceType, id string, res *resource.Resource) (ret core.ResourceTyper, err error) {
 
-	// Make a new UUID
-	ID, err := uuid.NewV4()
-	if err != nil {
-		return
-	}
-
-	// Setup commons
-	res.ID = ID.String()
+	res.ID = id
 
 	now := time.Now()
 	res.Meta.LastModified = &now
-	res.Meta.Version = version.GenerateVersion(true, res.ID, now.String())
+	res.Meta.Version = version.GenerateVersion(true, id, now.String())
 
 	// Since the ResourceType was set, we can check required
 	if err := attr.CheckRequired(res); err != nil {
@@ -103,7 +95,7 @@ func Resource(s storage.Storer, resType *core.ResourceType, id string, res *reso
 	if err != nil {
 		ret = nil
 	} else {
-		ret, err = query.Resource(s.(storage.Storer), resType, res.ID, &api.Attributes{})
+		ret, err = query.Resource(s.(storage.Storer), resType, id, &api.Attributes{})
 	}
 
 	return
