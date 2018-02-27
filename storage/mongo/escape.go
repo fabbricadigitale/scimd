@@ -1,7 +1,9 @@
 package mongo
 
-import "regexp"
-import "strings"
+import (
+	"regexp"
+	"strings"
+)
 
 const (
 	keyAllowedPattern = `[A-Za-z0-9()+,\-.:=@;$_!*']+`
@@ -56,4 +58,15 @@ func keyEscape(k string) string {
 func keyUnescape(k string) string {
 	r := strings.NewReplacer(unreplacerArgs...)
 	return r.Replace(k)
+}
+
+// escapeAttribute transform an attribute with urn, if present, in a mongodb format (with point to individuate sub-attributes)
+func escapeAttribute(k string) string {
+	index := strings.LastIndex(k, ":")
+	if index == -1 {
+		return keyEscape(k)
+	}
+	escaped := []string{keyEscape(k[:index]), k[index+1:]}
+
+	return strings.Join(escaped, ".")
 }
