@@ -127,22 +127,10 @@ func (rs *ResourceService) Post(c *gin.Context) {
 
 		res, err := create.Resource(store.(storage.Storer), &rs.rt, &contents)
 		if err != nil {
-			detail := err.Error()
-
-			var newError error
-
-			switch err.(type) {
-			case *mgo.LastError:
-				newError = &api.UniquenessError{
-					Detail: detail,
-				}
-			}
-
-			we := messages.NewError(newError)
+			we := handlingError(err)
 			c.JSON(we.Status, we)
 			return
 		}
-
 		c.JSON(http.StatusOK, res.(*resource.Resource))
 	}
 }
@@ -206,11 +194,12 @@ func (rs *ResourceService) Put(c *gin.Context) {
 	}
 	res, err := update.Resource(store.(storage.Storer), &rs.rt, id, contents)
 	if err != nil {
-		err := messages.NewError(err)
-		c.JSON(err.Status, err)
-	} else {
-		c.JSON(http.StatusOK, res.(*resource.Resource))
+		we := handlingError(err)
+		c.JSON(we.Status, we)
+		return
 	}
+	c.JSON(http.StatusOK, res.(*resource.Resource))
+
 }
 
 // Patch ...
@@ -238,5 +227,24 @@ func (rs *ResourceService) Delete(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, nil)
 	}
+}
 
+func handlingError(err error) messages.Error {
+
+	detail := err.Error()
+
+	var newError error
+
+	switch err.(type) {
+	case *mgo.LastError:
+		newError = &api.UniquenessError{
+			Detail: detail,
+		}
+	default:
+		newError = &api.InternalServerError{
+			Detail: detail,
+		}
+	}
+
+	return messages.NewError(newError)
 }
