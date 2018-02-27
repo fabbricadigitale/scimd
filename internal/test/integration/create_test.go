@@ -11,25 +11,13 @@ import (
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 )
 
+var res resource.Resource
+
 func TestCreate(t *testing.T) {
+	setup()
+	defer teardown()
 
-	res := &resource.Resource{
-		CommonAttributes: core.CommonAttributes{
-			Schemas:    []string{"urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"},
-			ExternalID: "5666",
-			Meta: core.Meta{
-				ResourceType: "User",
-			},
-		},
-	}
-	res.SetValues("urn:ietf:params:scim:schemas:core:2.0:User", &datatype.Complex{
-		"userName": datatype.String("alelb"),
-	})
-	res.SetValues("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User", &datatype.Complex{
-		"employeeNumber": "701984",
-	})
-
-	retRes, err := create.Resource(adapter, resTypeRepo.Pull("User"), res)
+	retRes, err := create.Resource(adapter, resTypeRepo.Pull("User"), &res)
 	require.Nil(t, err)
 	require.NotNil(t, retRes)
 
@@ -46,4 +34,39 @@ func TestCreate(t *testing.T) {
 
 	require.Equal(t, res.ID, r.ID)
 	require.Equal(t, res.Meta.Version, r.Meta.Version)
+}
+
+func TestUniqueness(t *testing.T) {
+	setup()
+	defer teardown()
+
+	retRes, err := create.Resource(adapter, resTypeRepo.Pull("User"), &res)
+	require.Nil(t, err)
+	require.NotNil(t, retRes)
+
+	retRes, err = create.Resource(adapter, resTypeRepo.Pull("User"), &res)
+	require.Error(t, err)
+	require.Nil(t, retRes)
+}
+
+func setup() {
+	res = resource.Resource{
+		CommonAttributes: core.CommonAttributes{
+			Schemas:    []string{"urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"},
+			ExternalID: "5666",
+			Meta: core.Meta{
+				ResourceType: "User",
+			},
+		},
+	}
+	res.SetValues("urn:ietf:params:scim:schemas:core:2.0:User", &datatype.Complex{
+		"userName": datatype.String("alelb"),
+	})
+	res.SetValues("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User", &datatype.Complex{
+		"employeeNumber": "701984",
+	})
+}
+
+func teardown() {
+	adapter.Delete(res.ResourceType(), res.ID, res.Meta.Version)
 }
