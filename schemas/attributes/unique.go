@@ -6,9 +6,9 @@ import (
 	"github.com/fabbricadigitale/scimd/schemas/core"
 )
 
-// Unique is ...
+// GetUniqueAttributes is ...
 // (todo) > add support to multi key indexes
-func Unique() ([][]string, error) {
+func GetUniqueAttributes() ([][]string, error) {
 
 	list := core.GetResourceTypeRepository().List()
 

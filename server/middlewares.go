@@ -65,7 +65,7 @@ func Storage(endpoint, db, collection string) gin.HandlerFunc {
 			listeners.AddListeners(adapter.Emitter())
 
 			// Configuration step for ensure uniqueness attributes in the storage
-			uniqueAttrs, err := attributes.Unique()
+			uniqueAttrs, err := attributes.GetUniqueAttributes()
 			if err != nil {
 				return err
 			}

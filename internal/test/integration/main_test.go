@@ -51,7 +51,7 @@ func TestMain(m *testing.M) {
 		if err != nil {
 			return err
 		}
-		uniqueAttrs, err := attributes.Unique()
+		uniqueAttrs, err := attributes.GetUniqueAttributes()
 		if err != nil {
 			return err
 		}
