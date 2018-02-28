@@ -159,3 +159,30 @@ func Paths(rt *core.ResourceType, fx func(attribute *core.Attribute) bool) ([]*P
 
 	return acc, nil
 }
+
+// GetUniqueAttributes is ...
+// (todo) > add support to multi key indexes
+func GetUniqueAttributes() ([][]string, error) {
+
+	list := core.GetResourceTypeRepository().List()
+
+	var uniqueAttrs [][]string
+	uniqueAttrs = make([][]string, 0)
+
+	for _, resType := range list {
+
+		ro, err := Paths(&resType, func(attribute *core.Attribute) bool {
+			return attribute.Uniqueness == schemas.UniquenessServer || attribute.Uniqueness == schemas.UniquenessGlobal
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		for _, p := range ro {
+			uniqueAttrs = append(uniqueAttrs, []string{p.String()})
+		}
+
+	}
+
+	return uniqueAttrs, nil
+}

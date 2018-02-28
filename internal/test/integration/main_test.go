@@ -7,7 +7,7 @@ import (
 	"path"
 	"testing"
 
-	"github.com/fabbricadigitale/scimd/schemas/attributes"
+	"github.com/fabbricadigitale/scimd/api/attr"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/storage"
 	"github.com/fabbricadigitale/scimd/storage/mongo"
@@ -51,7 +51,7 @@ func TestMain(m *testing.M) {
 		if err != nil {
 			return err
 		}
-		uniqueAttrs, err := attributes.GetUniqueAttributes()
+		uniqueAttrs, err := attr.GetUniqueAttributes()
 		if err != nil {
 			return err
 		}

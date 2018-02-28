@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/cenk/backoff"
+	"github.com/fabbricadigitale/scimd/api/attr"
 	"github.com/fabbricadigitale/scimd/api/messages"
 	"github.com/fabbricadigitale/scimd/config"
-	"github.com/fabbricadigitale/scimd/schemas/attributes"
 	"github.com/fabbricadigitale/scimd/storage"
 	"github.com/fabbricadigitale/scimd/storage/listeners"
 	"github.com/fabbricadigitale/scimd/storage/mongo"
@@ -65,7 +65,7 @@ func Storage(endpoint, db, collection string) gin.HandlerFunc {
 			listeners.AddListeners(adapter.Emitter())
 
 			// Configuration step for ensure uniqueness attributes in the storage
-			uniqueAttrs, err := attributes.GetUniqueAttributes()
+			uniqueAttrs, err := attr.GetUniqueAttributes()
 			if err != nil {
 				return err
 			}
