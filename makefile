@@ -15,7 +15,7 @@ REPO := $(word 1,$(LIST))
 SRC = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
 # Target variables
-VERSION ?=  # $(shell git name-rev --name-only --tags --no-undefined HEAD 2>/dev/null | sed -n 's/^\([^^~]\{1,\}\)\(\^0\)\{0,1\}$$/\1/p')
+VERSION = $(shell git name-rev --name-only --tags --no-undefined HEAD 2>/dev/null | sed -n 's/^\([^^~]\{1,\}\)\(\^0\)\{0,1\}$$/\1/p')
 COMMIT = $(shell git rev-parse HEAD)
 BRANCH = $(shell git rev-parse --abbrev-ref HEAD) 
 SUMMARY = $(shell git describe --tags --dirty --always)
