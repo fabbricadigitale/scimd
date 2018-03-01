@@ -4,15 +4,23 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"time"
 
+	"github.com/cenk/backoff"
 	"github.com/spf13/viper"
 	validator "gopkg.in/go-playground/validator.v9"
 
+	"github.com/fabbricadigitale/scimd/api/attr"
 	"github.com/fabbricadigitale/scimd/config"
 	"github.com/fabbricadigitale/scimd/server"
+	"github.com/fabbricadigitale/scimd/storage"
+	"github.com/fabbricadigitale/scimd/storage/listeners"
+	"github.com/fabbricadigitale/scimd/storage/mongo"
 	"github.com/fabbricadigitale/scimd/validation"
 	"github.com/spf13/cobra"
 )
+
+var adapter storage.Storer
 
 var scimd = &cobra.Command{
 	Use: "scimd",
@@ -41,6 +49,32 @@ Complete documentation is available at ...`,
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
+
+		// try to connect to storage, if not db up: notify error and os.Exit(1)
+		// (todo) manage storage switching
+		if err := dbConnect(); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+
+		// Get unique attributes from loaded schemas
+		keys, err := attr.GetUniqueAttributes()
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+
+		// when db exists and it is up and running: get collection + ensure index SYNC (we need it to be blocking)
+		// Note that the session executing EnsureIndex will be blocked for as long as it takes for the index to be built.
+		// So I think the next line will be blocking
+		if err := ensureIndexes(keys); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+
+		// verify if session needs to be closed
+		// To avoid to leave an hanging session, I'll close it
+		adapter.Close()
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		// Start the server with the current service provider config
@@ -84,4 +118,38 @@ func Execute() {
 // Root returns the root command
 func Root() *cobra.Command {
 	return scimd
+}
+
+func dbConnect() (err error) {
+	endpoint := fmt.Sprintf("%s:%d", config.Values.Storage.Host, config.Values.Storage.Port)
+
+	b := backoff.NewExponentialBackOff()
+	b.MaxElapsedTime = 1 * time.Millisecond
+
+	err = backoff.Retry(func() error {
+		var err error
+
+		adapter, err = mongo.New(endpoint, config.Values.Name, config.Values.Coll)
+		if err != nil {
+			return err
+		}
+		listeners.AddListeners(adapter.Emitter())
+
+		// Configuration step for ensure uniqueness attributes in the storage
+		uniqueAttrs, err := attr.GetUniqueAttributes()
+		if err != nil {
+			return err
+		}
+
+		adapter.SetIndexes(uniqueAttrs)
+
+		return adapter.Ping()
+	}, b)
+
+	return
+}
+
+func ensureIndexes(keys [][]string) (err error) {
+	err = adapter.SetIndexes(keys)
+	return
 }

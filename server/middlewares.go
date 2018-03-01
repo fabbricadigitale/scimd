@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/cenk/backoff"
-	"github.com/fabbricadigitale/scimd/api/attr"
 	"github.com/fabbricadigitale/scimd/api/messages"
 	"github.com/fabbricadigitale/scimd/config"
 	"github.com/fabbricadigitale/scimd/storage"
@@ -63,14 +62,6 @@ func Storage(endpoint, db, collection string) gin.HandlerFunc {
 				return err
 			}
 			listeners.AddListeners(adapter.Emitter())
-
-			// Configuration step for ensure uniqueness attributes in the storage
-			uniqueAttrs, err := attr.GetUniqueAttributes()
-			if err != nil {
-				return err
-			}
-
-			adapter.SetIndexes(uniqueAttrs)
 
 			return adapter.Ping()
 		}, b)

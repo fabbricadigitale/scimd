@@ -34,7 +34,7 @@ type Storer interface {
 
 	Ping() error
 
-	SetIndexes(keys [][]string)
+	SetIndexes(keys [][]string) error
 
 	Create(res *resource.Resource) error
 
@@ -45,4 +45,6 @@ type Storer interface {
 	Delete(resType *core.ResourceType, id, version string) error
 
 	Find(resType []*core.ResourceType, filter filter.Filter) (Querier, error)
+
+	Close()
 }

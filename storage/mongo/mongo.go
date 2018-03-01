@@ -12,12 +12,30 @@ type Driver struct {
 	db         string
 	collection string
 	session    *mgo.Session
-	keys       [][]string
 }
 
 // SetIndexes is ...
-func (d *Driver) SetIndexes(keys [][]string) {
-	d.keys = keys
+func (d *Driver) SetIndexes(keys [][]string) (err error) {
+
+	c := d.session.DB(d.db).C(d.collection)
+
+	for _, key := range keys {
+
+		index := mgo.Index{
+			Key:        key,
+			Unique:     true,
+			DropDups:   true,
+			Background: false,
+			Sparse:     true,
+		}
+
+		err = c.EnsureIndex(index)
+		if err != nil {
+			fmt.Printf("Error => %+v", err)
+			err = d.errorWrapper(err)
+		}
+	}
+	return
 }
 
 // CreateDriver factory
@@ -41,72 +59,42 @@ func CreateDriver(url, db, collection string) (*Driver, error) {
 // The new session create with Copy() will share the same cluster information and connection pool.
 // Every session created must have its Close method called at the end of its life time.
 // This pattern allows to take a full advantage of concurrency.
-func (d *Driver) getCollection() (*mgo.Collection, func(), error) {
+func (d *Driver) getCollection() (*mgo.Collection, func()) {
 	s := d.session.Copy()
-	c, err := d.ensureIndexes(s.DB(d.db).C(d.collection))
-	if err != nil {
-		return nil, nil, err
-	}
-	return c, s.Close, nil
-}
-
-func (d *Driver) ensureIndexes(c *mgo.Collection) (*mgo.Collection, error) {
-
-	for _, key := range d.keys {
-
-		index := mgo.Index{
-			Key:        key,
-			Unique:     true,
-			DropDups:   true,
-			Background: true,
-			Sparse:     true,
-		}
-
-		err := c.EnsureIndex(index)
-		if err != nil {
-			fmt.Printf("Error => %+v", err)
-
-			return nil, d.errorWrapper(err)
-		}
-	}
-
-	return c, nil
+	c := s.DB(d.db).C(d.collection)
+	return c, s.Close
 }
 
 // Create is the driver method for Create
 func (d *Driver) Create(doc *document) error {
 	// Not yet implemented
-	c, close, err := d.getCollection()
-	if err != nil {
-		return err
-	}
+	c, close := d.getCollection()
 	defer close()
 
 	return d.errorWrapper(c.Insert(doc))
 }
 
+// Close is the method to explicitly call to close the session
+func (d *Driver) Close() {
+	d.session.Close()
+}
+
 // Update is the driver method for Update
 func (d *Driver) Update(query bson.M, doc *document) error {
-	c, close, err := d.getCollection()
-	if err != nil {
-		return err
-	}
+	c, close := d.getCollection()
 	defer close()
 
-	err = c.Update(query, doc)
+	err := c.Update(query, doc)
 	return d.errorWrapper(err, (*doc)["id"])
 }
 
 // Delete is the driver method for Delete
 func (d *Driver) Delete(query bson.M) error {
 
-	c, close, err := d.getCollection()
-	if err != nil {
-		return err
-	}
+	c, close := d.getCollection()
 	defer close()
 
-	err = c.Remove(query)
+	err := c.Remove(query)
 	if err != nil {
 		return d.errorWrapper(err)
 	}
@@ -116,10 +104,7 @@ func (d *Driver) Delete(query bson.M) error {
 
 // Find is the driver method for Find
 func (d *Driver) Find(q bson.M) (*mgo.Query, func(), error) {
-	c, close, err := d.getCollection()
-	if err != nil {
-		return nil, nil, err
-	}
+	c, close := d.getCollection()
 
 	query := c.Find(q)
 	return query, close, nil

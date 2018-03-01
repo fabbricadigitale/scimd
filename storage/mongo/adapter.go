@@ -56,7 +56,7 @@ func New(url, db, collection string) (storage.Storer, error) {
 }
 
 // SetIndexes is ...
-func (a *Adapter) SetIndexes(keys [][]string) {
+func (a *Adapter) SetIndexes(keys [][]string) error {
 
 	ret := make([][]string, 0)
 
@@ -72,7 +72,8 @@ func (a *Adapter) SetIndexes(keys [][]string) {
 		ret = append(ret, escapedKey)
 	}
 
-	a.adaptee.SetIndexes(ret)
+	return a.adaptee.SetIndexes(ret)
+
 }
 
 // Ping ...
@@ -87,6 +88,11 @@ func (a *Adapter) Create(res *resource.Resource) error {
 
 	dataResource := a.toDoc(res)
 	return (*a.adaptee).Create(dataResource)
+}
+
+// Close is the method to explicitly call to close the session
+func (a *Adapter) Close() {
+	a.adaptee.Close()
 }
 
 // Get is ...

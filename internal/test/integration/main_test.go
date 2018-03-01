@@ -7,7 +7,6 @@ import (
 	"path"
 	"testing"
 
-	"github.com/fabbricadigitale/scimd/api/attr"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/storage"
 	"github.com/fabbricadigitale/scimd/storage/mongo"
@@ -51,11 +50,6 @@ func TestMain(m *testing.M) {
 		if err != nil {
 			return err
 		}
-		uniqueAttrs, err := attr.GetUniqueAttributes()
-		if err != nil {
-			return err
-		}
-		adapter.SetIndexes(uniqueAttrs)
 
 		return adapter.Ping()
 	}); err != nil {
