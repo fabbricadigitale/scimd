@@ -805,7 +805,7 @@ func init() {
 	}
 
 	x509certificatesAttr := &core.Attribute{
-		Name: "x509Cerficates",
+		Name: "x509Certificates",
 		Type: "complex",
 		SubAttributes: []*core.Attribute{
 			{
