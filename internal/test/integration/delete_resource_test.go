@@ -13,6 +13,8 @@ import (
 )
 
 func TestDeleteResource(t *testing.T) {
+	setupDB()
+	defer teardownDB()
 
 	// Delete a not-existing resource
 	notExistingID := "fake-id-doesnt-exist"

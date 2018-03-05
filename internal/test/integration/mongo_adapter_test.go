@@ -17,18 +17,14 @@ import (
 )
 
 func TestMongoCreate(t *testing.T) {
+	log.Println("TestMongoCreate")
+	setupDB()
+	setup()
+	defer teardownDB()
+
 	require.NotNil(t, resTypeRepo)
 	require.NotNil(t, schemaRepo)
 	require.NotNil(t, adapter)
-
-	// Non-normative of SCIM user resource type [https://tools.ietf.org/html/rfc7643#section-8.2]
-	dat, err := ioutil.ReadFile("../../testdata/enterprise_user_resource_1.json")
-	require.NoError(t, err)
-	require.NotNil(t, dat)
-
-	res := &resource.Resource{}
-	err = json.Unmarshal(dat, res)
-	require.NoError(t, err)
 
 	var called bool
 	em := adapter.Emitter()
@@ -38,7 +34,7 @@ func TestMongoCreate(t *testing.T) {
 		assert.IsType(t, (*resource.Resource)(nil), evt.Args[0])
 	})
 
-	err = adapter.Create(res)
+	err := adapter.Create(&res)
 
 	assert.True(t, called)
 
@@ -46,6 +42,9 @@ func TestMongoCreate(t *testing.T) {
 }
 
 func TestMongoGet(t *testing.T) {
+	log.Println("TestMongoGet")
+	setupDB()
+	defer teardownDB()
 	require.NotNil(t, resTypeRepo)
 	require.NotNil(t, schemaRepo)
 	require.NotNil(t, adapter)
@@ -92,6 +91,9 @@ func TestMongoGet(t *testing.T) {
 }
 
 func TestMongoGetOmitEmpty(t *testing.T) {
+	log.Println("TestMongoGetOmitEmpty")
+	setupDB()
+	defer teardownDB()
 	require.NotNil(t, resTypeRepo)
 	require.NotNil(t, schemaRepo)
 	require.NotNil(t, adapter)
@@ -121,6 +123,9 @@ func TestMongoGetOmitEmpty(t *testing.T) {
 
 func TestMongoUpdate(t *testing.T) {
 	log.Println("TestMongoUpdate")
+	setupDB()
+	defer teardownDB()
+
 	require.NotNil(t, resTypeRepo)
 	require.NotNil(t, schemaRepo)
 	require.NotNil(t, adapter)
@@ -145,6 +150,8 @@ func TestMongoUpdate(t *testing.T) {
 }
 
 func TestMongoFind(t *testing.T) {
+	setupDB()
+	defer teardownDB()
 	log.Println("TestMongoFind")
 	require.NotNil(t, resTypeRepo)
 	require.NotNil(t, schemaRepo)
@@ -204,13 +211,16 @@ func TestMongoFind(t *testing.T) {
 }
 
 func TestMongoDelete(t *testing.T) {
+	setupDB()
+	defer teardownDB()
+
 	log.Println("TestMongoDelete")
 	require.NotNil(t, resTypeRepo)
 	require.NotNil(t, schemaRepo)
 	require.NotNil(t, adapter)
 
 	// Delete object with specified id
-	id := "2819c223-7f76-453a-919d-ab1234567891"
+	id := "2819c223-7f76-453a-919d-ab1234567892"
 	err := adapter.Delete(resTypeRepo.Pull("User"), id, "")
 	require.NoError(t, err)
 

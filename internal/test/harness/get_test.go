@@ -9,6 +9,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/thoas/go-funk"
+
 	"github.com/fabbricadigitale/scimd/api/messages"
 
 	"github.com/fabbricadigitale/scimd/config"
@@ -61,10 +63,18 @@ func TestListSchemas(t *testing.T) {
 	require.Equal(t, 2, len(list.Resources))
 	require.Equal(t, listResponseURN, list.Schemas)
 
-	respUsrSchema := list.Resources[0]
+	respUsrArr := funk.Filter(list.Resources, func(elem interface{}) bool {
+		return elem.(map[string]interface{})["id"] == "urn:ietf:params:scim:schemas:core:2.0:User"
+	})
+
+	respGroupArr := funk.Filter(list.Resources, func(elem interface{}) bool {
+		return elem.(map[string]interface{})["id"] == "urn:ietf:params:scim:schemas:core:2.0:Group"
+	})
+
+	respUsrSchema := respUsrArr.([]interface{})[0]
 	actSchema, _ := json.Marshal(respUsrSchema)
 
-	respGroupSchema := list.Resources[1]
+	respGroupSchema := respGroupArr.([]interface{})[0]
 	actGroup, _ := json.Marshal(respGroupSchema)
 
 	expUserSchema := core.GetSchemaRepository().Pull("urn:ietf:params:scim:schemas:core:2.0:User")
@@ -120,12 +130,21 @@ func TestListResourceTypes(t *testing.T) {
 	require.Equal(t, 2, list.TotalResults)
 	require.Equal(t, 1, list.StartIndex)
 	require.Equal(t, 2, len(list.Resources))
+
 	require.Equal(t, listResponseURN, list.Schemas)
 
-	respUserResType := list.Resources[0]
+	respUserArr := funk.Filter(list.Resources, func(elem interface{}) bool {
+		return elem.(map[string]interface{})["id"] == "User"
+	})
+
+	respGroupArr := funk.Filter(list.Resources, func(elem interface{}) bool {
+		return elem.(map[string]interface{})["id"] == "Group"
+	})
+
+	respUserResType := respUserArr.([]interface{})[0]
 	actUserResType, _ := json.Marshal(respUserResType)
 
-	respGroupResType := list.Resources[1]
+	respGroupResType := respGroupArr.([]interface{})[0]
 	actGroupResType, _ := json.Marshal(respGroupResType)
 
 	expectedUserResType := core.GetResourceTypeRepository().Pull("User")
@@ -350,7 +369,7 @@ func TestListUsersWithABiggerLimit(t *testing.T) {
 	list := &messages.ListResponse{}
 	json.Unmarshal([]byte(rec.Body.String()), list)
 
-	exp, _ := ioutil.ReadFile("../../testdata/user_resource_3.json")
+	exp, _ := ioutil.ReadFile("../../testdata/user_resource_2.json")
 
 	require.Equal(t, 1, len(list.Resources))
 	require.Equal(t, 2, list.StartIndex)
@@ -423,13 +442,32 @@ func TestListSchemasWithPagination(t *testing.T) {
 	require.Equal(t, 1, list.ItemsPerPage)
 	require.Equal(t, 2, list.TotalResults)
 
-	repoGroupSchema := list.Resources[0]
-	act, _ := json.Marshal(repoGroupSchema)
+	respUsrArr := funk.Filter(list.Resources, func(elem interface{}) bool {
+		return elem.(map[string]interface{})["id"] == "urn:ietf:params:scim:schemas:core:2.0:User"
+	})
 
-	expGroupSchema := core.GetSchemaRepository().Pull("urn:ietf:params:scim:schemas:core:2.0:Group")
-	expGroup, _ := json.Marshal(expGroupSchema)
+	respGroupArr := funk.Filter(list.Resources, func(elem interface{}) bool {
+		return elem.(map[string]interface{})["id"] == "urn:ietf:params:scim:schemas:core:2.0:Group"
+	})
 
-	require.JSONEq(t, string(expGroup), string(act))
+	if len(respUsrArr.([]interface{})) > 0 {
+		repoUserSchema := respUsrArr.([]interface{})[0]
+		act, _ := json.Marshal(repoUserSchema)
+
+		expUserSchema := core.GetSchemaRepository().Pull("urn:ietf:params:scim:schemas:core:2.0:User")
+		expUser, _ := json.Marshal(expUserSchema)
+
+		require.JSONEq(t, string(expUser), string(act))
+
+	} else {
+		repoGroupSchema := respGroupArr.([]interface{})[0]
+		act, _ := json.Marshal(repoGroupSchema)
+
+		expGroupSchema := core.GetSchemaRepository().Pull("urn:ietf:params:scim:schemas:core:2.0:Group")
+		expGroup, _ := json.Marshal(expGroupSchema)
+
+		require.JSONEq(t, string(expGroup), string(act))
+	}
 }
 
 func TestListSchemasWithStartIndexAndCount(t *testing.T) {
@@ -460,13 +498,33 @@ func TestListSchemasWithStartIndexAndCount(t *testing.T) {
 	require.Equal(t, 1, list.ItemsPerPage)
 	require.Equal(t, 2, list.TotalResults)
 
-	repoUserSchema := list.Resources[0]
-	act, _ := json.Marshal(repoUserSchema)
+	respUsrArr := funk.Filter(list.Resources, func(elem interface{}) bool {
+		return elem.(map[string]interface{})["id"] == "urn:ietf:params:scim:schemas:core:2.0:User"
+	})
 
-	expUserSchema := core.GetSchemaRepository().Pull("urn:ietf:params:scim:schemas:core:2.0:User")
-	expUser, _ := json.Marshal(expUserSchema)
+	respGroupArr := funk.Filter(list.Resources, func(elem interface{}) bool {
+		return elem.(map[string]interface{})["id"] == "urn:ietf:params:scim:schemas:core:2.0:Group"
+	})
 
-	require.JSONEq(t, string(expUser), string(act))
+	if len(respUsrArr.([]interface{})) > 0 {
+		repoUserSchema := respUsrArr.([]interface{})[0]
+		act, _ := json.Marshal(repoUserSchema)
+
+		expUserSchema := core.GetSchemaRepository().Pull("urn:ietf:params:scim:schemas:core:2.0:User")
+		expUser, _ := json.Marshal(expUserSchema)
+
+		require.JSONEq(t, string(expUser), string(act))
+
+	} else {
+		repoGroupSchema := respGroupArr.([]interface{})[0]
+		act, _ := json.Marshal(repoGroupSchema)
+
+		expGroupSchema := core.GetSchemaRepository().Pull("urn:ietf:params:scim:schemas:core:2.0:Group")
+		expGroup, _ := json.Marshal(expGroupSchema)
+
+		require.JSONEq(t, string(expGroup), string(act))
+	}
+
 }
 
 func TestListSchemasWrongPagination(t *testing.T) {

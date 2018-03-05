@@ -7,15 +7,13 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/fabbricadigitale/scimd/api/create"
-	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 )
 
-var res resource.Resource
-
 func TestCreate(t *testing.T) {
+	setupDB()
 	setup()
-	defer teardown()
+	defer teardownDB()
 
 	retRes, err := create.Resource(adapter, resTypeRepo.Pull("User"), &res)
 	require.Nil(t, err)
@@ -25,7 +23,11 @@ func TestCreate(t *testing.T) {
 	r := retRes.(*resource.Resource)
 	values := r.Values("urn:ietf:params:scim:schemas:core:2.0:User")
 	userName := (*values)["userName"]
-	require.Equal(t, datatype.String("alelb"), userName)
+
+	expValues := res.Values("urn:ietf:params:scim:schemas:core:2.0:User")
+	expUserName := (*expValues)["userName"]
+
+	require.Equal(t, expUserName, userName)
 
 	// check urn:ietf:params:scim:schemas:extension:enterprise:2.0:User.employeeNumber
 	extensionValues := r.Values("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User")
@@ -37,8 +39,9 @@ func TestCreate(t *testing.T) {
 }
 
 func TestUniqueness(t *testing.T) {
+	setupDB()
 	setup()
-	defer teardown()
+	defer teardownDB()
 
 	retRes, err := create.Resource(adapter, resTypeRepo.Pull("User"), &res)
 	require.Nil(t, err)
@@ -47,26 +50,4 @@ func TestUniqueness(t *testing.T) {
 	retRes, err = create.Resource(adapter, resTypeRepo.Pull("User"), &res)
 	require.Error(t, err)
 	require.Nil(t, retRes)
-}
-
-func setup() {
-	res = resource.Resource{
-		CommonAttributes: core.CommonAttributes{
-			Schemas:    []string{"urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"},
-			ExternalID: "5666",
-			Meta: core.Meta{
-				ResourceType: "User",
-			},
-		},
-	}
-	res.SetValues("urn:ietf:params:scim:schemas:core:2.0:User", &datatype.Complex{
-		"userName": datatype.String("alelb"),
-	})
-	res.SetValues("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User", &datatype.Complex{
-		"employeeNumber": "701984",
-	})
-}
-
-func teardown() {
-	adapter.Delete(res.ResourceType(), res.ID, res.Meta.Version)
 }

@@ -3,6 +3,7 @@ package integration
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"testing"
 
 	"github.com/fabbricadigitale/scimd/api"
@@ -15,6 +16,9 @@ import (
 )
 
 func TestResource(t *testing.T) {
+	setupDB()
+	defer teardownDB()
+
 	require.NotNil(t, resTypeRepo)
 	require.NotNil(t, schemaRepo)
 	require.NotNil(t, adapter)
@@ -87,6 +91,9 @@ func TestResource(t *testing.T) {
 }
 
 func TestResources(t *testing.T) {
+	log.Println("TestResources")
+	setupDB()
+	defer teardownDB()
 	require.NotNil(t, resTypeRepo)
 	require.NotNil(t, schemaRepo)
 	require.NotNil(t, adapter)

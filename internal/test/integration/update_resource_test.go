@@ -3,6 +3,7 @@ package integration
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"testing"
 
 	"github.com/fabbricadigitale/scimd/api/update"
@@ -11,6 +12,9 @@ import (
 )
 
 func TestUpdate(t *testing.T) {
+	log.Println("TestUpdate")
+	setupDB()
+	defer teardownDB()
 
 	notExistingID := "abcdefgh-xxxx-yyyy-zzzz-jkilmnopqrst"
 
