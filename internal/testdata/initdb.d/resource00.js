@@ -1,3 +1,6 @@
+// t1meMa$heen
+// 3d$h33ran
+
 cname = "resources"
 
 print(" ")
@@ -94,7 +97,7 @@ if (res0.ok) {
                 ],
                 "displayName": "Tiffany Fork",
                 "userType": "Employee",
-                "password": "t1meMa$heen",
+                "password": "$2a$10$5BxNICIsQHcJpCpK8OR9OeMSjVBvU4MCdT46CvBDzXp8VA4uuX6wO",
                 "phoneNumbers": [
                     {
                         "value": "336-485-7643",
@@ -212,7 +215,7 @@ if (res0.ok) {
                 ],
                 "displayName": "Alexandra James",
                 "userType": "Employee",
-                "password": "3d$h33ran",
+                "password": "$2a$10$TPfDp8mAmfrAkIWTDrEuK.lSs75wsh1pdGrvPaRwxgvzpNbiPNBPm",
                 "phoneNumbers": [
                     {
                         "value": "336-485-6543",
