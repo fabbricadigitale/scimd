@@ -138,5 +138,24 @@ func TestResources(t *testing.T) {
 	require.NoError(t, err)
 	require.Empty(t, r.TotalResults)
 
-	//
+	// Filtering by username and password and testing custom logic for password comparison
+	search2 := &api.Search{}
+	search2.SortOrder = api.AscendingOrder
+	search2.StartIndex = 1
+
+	search2.Filter = `(userName eq "tfork@example.com") and (password eq "t1meMa$heen")`
+	r2, err2 := query.Resources(adapter, resTypes, search2)
+	require.NoError(t, err2)
+	require.NotEmpty(t, r2.TotalResults)
+
+	listResponseURN := []string{"urn:ietf:params:scim:api:messages:2.0:ListResponse"}
+	require.Equal(t, 1, r2.ItemsPerPage)
+	require.Equal(t, 1, r2.TotalResults)
+	require.Equal(t, 1, r2.StartIndex)
+	require.Equal(t, 1, len(r2.Resources))
+	require.Equal(t, listResponseURN, r2.Schemas)
+
+	res, _ := json.Marshal(r2.Resources[0])
+	exp, _ := ioutil.ReadFile("../../testdata/resp_user_full_attributes_with_extension.json")
+	require.JSONEq(t, string(exp), string(res))
 }
