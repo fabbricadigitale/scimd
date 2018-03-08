@@ -41,6 +41,7 @@ func makeAttr(a string) (*attr.Path, error) {
 	}
 }
 
+// Attributes retrieves a map of the fields to realize the projection
 func Attributes(resTypes []*core.ResourceType, attrs *api.Attributes) (fields map[attr.Path]bool, err error) {
 	var in, ex []*attr.Path
 	fields = make(map[attr.Path]bool)
@@ -83,6 +84,8 @@ func Attributes(resTypes []*core.ResourceType, attrs *api.Attributes) (fields ma
 	return
 }
 
+// Resource retrieves a resource filtering by id and resourceType.
+// The 'attrs' parameter allows a projection of the attributes of the resource that is returned to the client.
 func Resource(s storage.Storer, resType *core.ResourceType, id string, attrs *api.Attributes) (res core.ResourceTyper, err error) {
 	fields, err := Attributes([]*core.ResourceType{resType}, attrs)
 	if err != nil {
@@ -100,6 +103,7 @@ func Resource(s storage.Storer, resType *core.ResourceType, id string, attrs *ap
 	return res, nil
 }
 
+// Resources retrieves a list of resources filtering by the search.Filter and the resourceTypes' array.
 func Resources(s storage.Storer, resTypes []*core.ResourceType, search *api.Search) (list *messages.ListResponse, err error) {
 
 	// (TODO) > wrap errors here
@@ -115,27 +119,39 @@ func Resources(s storage.Storer, resTypes []*core.ResourceType, search *api.Sear
 		return
 	}
 
+	filterString := string(search.Filter)
+
+	hasher := hasher.NewBCrypt()
+	var exclude []string
+	exclude = make([]string, 0)
+
 	// Make filter
 	var f filter.Filter
 	if len(search.Filter) > 0 {
-		f, err = filter.CompileString(string(search.Filter))
+		f, err = filter.CompileString(filterString)
 		if err != nil {
 			return
 		}
 	}
 
-	/// CUSTOM LOGIC to detect if filter contains a password comparison (eq, ne)
 	var passwords map[string]passwordInfo
 	var cs customizer
 	pwd := &passwordInfo{
 		not: false,
 	}
-	passwords = make(map[string]passwordInfo)
-	for _, resType := range resTypes {
-		cs.customize(resType, &f, pwd)
-		passwords[resType.ID] = *pwd
+
+	// If there is a filter with a password, next lines change the filter
+	// The new filter will be more inclusive.
+	if len(search.Filter) > 0 {
+		passwords = make(map[string]passwordInfo)
+		for _, resType := range resTypes {
+			cs.customize(resType, &f, pwd)
+
+			if f.String() != filterString {
+				passwords[resType.ID] = *pwd
+			}
+		}
 	}
-	/// CUSTOM LOGIC
 
 	// Make query
 	var q storage.Querier
@@ -145,10 +161,8 @@ func Resources(s storage.Storer, resTypes []*core.ResourceType, search *api.Sear
 		return
 	}
 
-	hasher := hasher.NewBCrypt()
-	var exclude []string
-	exclude = make([]string, 0)
 	// compare plain password with the stored hashed password
+	// and exclude item that do not match the logic of the filter query.
 	if len(passwords) > 0 {
 
 		var res *resource.Resource
@@ -157,6 +171,7 @@ func Resources(s storage.Storer, resTypes []*core.ResourceType, search *api.Sear
 
 			resourceType := res.Meta.ResourceType
 
+			// (FIXME) => make this urn configurable
 			values := res.Values("urn:ietf:params:scim:schemas:core:2.0:User")
 
 			hashedPassword := (*values)["password"].(datatype.String)
