@@ -1,6 +1,7 @@
 package create
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/fabbricadigitale/scimd/api"
@@ -54,6 +55,7 @@ func Resource(s storage.Storer, resType *core.ResourceType, res *resource.Resour
 		Created:      &now,
 		LastModified: &now,
 		Version:      version.GenerateVersion(true, ID.String(), now.String()),
+		Location:     fmt.Sprintf("/v2%s/%s", resType.Endpoint, ID.String()),
 	}
 
 	// Since the ResourceType was set, we can check required
