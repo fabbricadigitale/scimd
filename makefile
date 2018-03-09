@@ -22,7 +22,7 @@ SUMMARY = $(shell git describe --tags --dirty --always)
 ISO8601DATE = $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 LDFLAGS =-ldflags "-X=$(REPO)/cmd.version=$(VERSION) -X=$(REPO)/cmd.commit=$(COMMIT) -X=$(REPO)/cmd.branch=$(BRANCH) -X=$(REPO)/cmd.summary=$(SUMMARY) -X=$(REPO)/cmd.date=$(ISO8601DATE)"
 
-.PHONY: all build clean install uninstall format simplify check docs sam
+.PHONY: all build clean install uninstall format simplify check docs
 
 all: check install
 
