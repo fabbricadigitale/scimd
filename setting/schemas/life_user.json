@@ -1,0 +1,69 @@
+{
+    "id": "urn:ietf:params:scim:schemas:extension:life:2.0:User",
+    "name": "LifeUser",
+    "description": "Life User",
+    "attributes": [
+      {
+        "name": "taxCode",
+        "type": "string",
+        "multiValued": false,
+        "description": "Alphanumeric code that identifies natural and legal person for tax purpose.",
+        "required": true,
+        "caseExact": false,
+        "mutability": "readWrite",
+        "returned": "default",
+        "uniqueness": "server"
+      },
+      {
+        "name": "associations",
+        "type": "complex",
+        "subAttributes": [
+          {
+            "name": "role",
+            "type": "string",
+            "multiValued": false,
+            "description": "The identifiers of the corresponding 'Role' of the user",
+            "required": false,
+            "mutability": "immutable",
+            "returned": "default",
+            "uniqueness": "none",
+            "referenceTypes": [
+              "Role"
+            ]
+          },
+          {
+            "name": "organization",
+            "type": "string",
+            "multiValued": false,
+            "description": "The identifiers of the corresponding 'Organization' of the user",
+            "required": false,
+            "mutability": "immutable",
+            "returned": "default",
+            "uniqueness": "none",
+            "referenceTypes": [
+              "Organization"
+            ]
+          },
+          {
+            "name": "department",
+            "type": "string",
+            "multiValued": false,
+            "description": "The identifiers of the corresponding 'Department' of the user",
+            "required": false,
+            "mutability": "immutable",
+            "returned": "default",
+            "uniqueness": "none",
+            "referenceTypes": [
+              "Department"
+            ]
+          }
+        ],
+        "multiValued": true,
+        "description": "A list of associations",
+        "required": false,
+        "mutability": "readWrite",
+        "returned": "default",
+        "uniqueness": "none"
+      }
+    ]
+}

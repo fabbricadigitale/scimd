@@ -1,0 +1,14 @@
+{
+    "schemas": [
+      "urn:ietf:params:scim:schemas:core:2.0:ResourceType"
+    ],
+    "id": "Organization",
+    "meta": {
+      "location": "/v2/ResourceTypes/Organization",
+      "resourceType": "ResourceType"
+    },
+    "name": "Organization",
+    "endpoint": "/Organizations",
+    "description": "Organization",
+    "schema": "urn:ietf:params:scim:schemas:core:2.0:Organization"
+  }

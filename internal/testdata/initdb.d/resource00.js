@@ -117,11 +117,6 @@ if (res0.ok) {
                 "nickName": "Tiffy",
                 "timezone": "America/Los_Angeles",
                 "groups": [
-                    {
-                        "display": "Employees",
-                        "value": "fc348aa8-3835-40eb-a20b-c726e15c55b5",
-                        "§ref": "/v2/Groups/fc348aa8-3835-40eb-a20b-c726e15c55b5"
-                    }
                 ]
             },
             "schemas": [
@@ -257,8 +252,7 @@ if (res0.ok) {
                 "members": [
                     {
                         "value": "2819c223-7f76-453a-919d-ab1234567892",
-                        "§ref": "/v2/Users/2819c223-7f76-453a-919d-ab1234567892",
-                        "display": "Alexandra James"
+                        "§ref": "/v2/Users/2819c223-7f76-453a-919d-ab1234567892"
                     },
                 ],
             },

@@ -1,0 +1,60 @@
+{
+    "schemas": [
+      "urn:ietf:params:scim:schemas:core:2.0:Schema"
+    ],
+    "id": "urn:ietf:params:scim:schemas:core:2.0:Department",
+    "meta": {
+      "location": "/v2/Schemas/urn:ietf:params:scim:schemas:core:2.0:Department",
+      "resourceType": "Schema",
+      "version": "W/\"kLxx5jG6HbxEOK+zShiKLCN/BXc=\""
+    },
+    "name": "Department",
+    "description": "Department",
+    "attributes": [
+      {
+        "name": "displayName",
+        "type": "string",
+        "multiValued": false,
+        "description": "A human-readable name for the Department.",
+        "required": false,
+        "mutability": "readWrite",
+        "returned": "default",
+        "uniqueness": "none"
+      },
+      {
+        "name": "organization",
+        "type": "complex",
+        "subAttributes": [
+          {
+            "name": "value",
+            "type": "string",
+            "multiValued": false,
+            "description": "Identifier of the member of this Department.",
+            "required": false,
+            "mutability": "immutable",
+            "returned": "default",
+            "uniqueness": "none"
+          },
+          {
+            "name": "$ref",
+            "type": "reference",
+            "multiValued": false,
+            "description": "The URI corresponding to a SCIM resource that is a member of this Department.",
+            "required": false,
+            "mutability": "immutable",
+            "returned": "default",
+            "uniqueness": "none",
+            "referenceTypes": [
+              "Organization"
+            ]
+          }
+        ],
+        "multiValued": false,
+        "description": "An object that refers to the organization to which the department belongs",
+        "required": false,
+        "mutability": "readOnly",
+        "returned": "default",
+        "uniqueness": "none"
+      }
+    ]
+  }

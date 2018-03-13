@@ -61,19 +61,13 @@ func (a *Adapter) SetIndexes(keys [][]string) error {
 	ret := make([][]string, 0)
 
 	for _, composedKeys := range keys {
-
 		escapedKey := make([]string, 0)
-
 		for _, singleKey := range composedKeys {
-
 			escapedKey = append(escapedKey, escapeAttribute(singleKey))
 		}
-
 		ret = append(ret, escapedKey)
 	}
-
 	return a.adaptee.SetIndexes(ret)
-
 }
 
 // Ping ...
@@ -84,8 +78,14 @@ func (a *Adapter) Ping() error {
 // Create is ...
 func (a *Adapter) Create(res *resource.Resource) error {
 	// Emit an event and wait it has been sent successfully
-	a.Emitter().Emit("create", res)
+	a.Emitter().Emit("create", res, a)
 
+	return a.DoCreate(res)
+
+}
+
+// DoCreate is ...
+func (a *Adapter) DoCreate(res *resource.Resource) error {
 	dataResource := a.toDoc(res)
 	return (*a.adaptee).Create(dataResource)
 }
@@ -99,6 +99,12 @@ func (a *Adapter) Close() {
 func (a *Adapter) Get(resType *core.ResourceType, id, version string, fields map[attr.Path]bool) (*resource.Resource, error) {
 	// Emit an event and wait it has been sent successfully
 	a.Emitter().Emit("get", resType, id, version, fields)
+
+	return a.DoGet(resType, id, version, fields)
+}
+
+// DoGet is ...
+func (a *Adapter) DoGet(resType *core.ResourceType, id, version string, fields map[attr.Path]bool) (*resource.Resource, error) {
 
 	// Setup query
 	q, close, err := (*a.adaptee).Find(makeQuery(resType.GetIdentifier(), id, version))
@@ -126,8 +132,13 @@ func (a *Adapter) Get(resType *core.ResourceType, id, version string, fields map
 // Update is ...
 func (a *Adapter) Update(resource *resource.Resource, id string, version string) error {
 	// Emit an event and wait it has been sent successfully
-	a.Emitter().Emit("update", resource, id, version)
+	a.Emitter().Emit("update", resource, a)
 
+	return a.DoUpdate(resource, id, version)
+}
+
+// DoUpdate is ...
+func (a *Adapter) DoUpdate(resource *resource.Resource, id, version string) error {
 	dataResource := a.toDoc(resource)
 	return (*a.adaptee).Update(makeQuery(resource.ResourceType().GetIdentifier(), id, version), dataResource)
 }
@@ -148,8 +159,13 @@ func (a *Adapter) Patch(resType *core.ResourceType, id string, version string, o
 // Delete is ...
 func (a *Adapter) Delete(resType *core.ResourceType, id, version string) error {
 	// Emit an event and wait it has been sent successfully
-	a.Emitter().Emit("delete", resType, id, version)
+	a.Emitter().Emit("delete", resType, id, version, a)
 
+	return a.DoDelete(resType, id, version)
+}
+
+// DoDelete is ...
+func (a *Adapter) DoDelete(resType *core.ResourceType, id, version string) error {
 	return (*a.adaptee).Delete(makeQuery(resType.GetIdentifier(), id, version))
 }
 

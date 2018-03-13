@@ -40,7 +40,7 @@ type Storer interface {
 
 	Get(resType *core.ResourceType, id, version string, fields map[attr.Path]bool) (*resource.Resource, error)
 
-	Update(resType *resource.Resource, id, version string) error
+	Update(res *resource.Resource, id, version string) error
 
 	Patch(resType *core.ResourceType, id string, version string, op string, path attr.Path, values interface{}) error
 
