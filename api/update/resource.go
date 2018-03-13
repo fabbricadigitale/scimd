@@ -72,7 +72,10 @@ func Resource(s storage.Storer, resType *core.ResourceType, id string, res *reso
 		return
 	}
 
-	if len(ro) > 0 {
+	// (FIXME) => immutable attribute cannot change but if they are defined in a parent complex attribute,
+	// the parent attribute can be deleted or added to its parent.
+
+	/* if len(ro) > 0 {
 
 		attrs := &api.Attributes{}
 		attrs.Attributes = make([]string, 0)

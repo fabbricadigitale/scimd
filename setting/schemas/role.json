@@ -1,0 +1,60 @@
+{
+    "schemas": [
+      "urn:ietf:params:scim:schemas:core:2.0:Schema"
+    ],
+    "id": "urn:ietf:params:scim:schemas:core:2.0:Role",
+    "meta": {
+      "location": "/v2/Schemas/urn:ietf:params:scim:schemas:core:2.0:Role",
+      "resourceType": "Schema",
+      "version": "W/\"kLxx5jG6HbxEOK+zShiKLCN/BXc=\""
+    },
+    "name": "Role",
+    "description": "Role",
+    "attributes": [
+      {
+        "name": "displayName",
+        "type": "string",
+        "multiValued": false,
+        "description": "A human-readable name for the Role.",
+        "required": false,
+        "mutability": "readWrite",
+        "returned": "default",
+        "uniqueness": "none"
+      },
+      {
+        "name": "users",
+        "type": "complex",
+        "subAttributes": [
+          {
+            "name": "value",
+            "type": "string",
+            "multiValued": false,
+            "description": "Identifier of User.",
+            "required": false,
+            "mutability": "immutable",
+            "returned": "default",
+            "uniqueness": "none"
+          },
+          {
+            "name": "$ref",
+            "type": "reference",
+            "multiValued": false,
+            "description": "The URI corresponding to a SCIM resource that has this role.",
+            "required": false,
+            "mutability": "immutable",
+            "returned": "default",
+            "uniqueness": "none",
+            "referenceTypes": [
+              "User"
+            ]
+          }
+        ],
+        "multiValued": true,
+        "description": "A list of members of the Group.",
+        "required": false,
+        "mutability": "readWrite",
+        "returned": "default",
+        "uniqueness": "none"
+      }
+    ]
+  }
