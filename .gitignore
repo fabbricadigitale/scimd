@@ -17,3 +17,5 @@ debug
 *-packr.go
 
 scimd*
+
+vendor
