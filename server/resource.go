@@ -4,6 +4,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gin-gonic/gin/binding"
+
 	"github.com/fabbricadigitale/scimd/api/delete"
 	"github.com/globalsign/mgo"
 
@@ -46,7 +48,7 @@ func (rs *ResourceService) Path() string {
 func (rs *ResourceService) List(c *gin.Context) {
 	params := api.NewSearch()
 	// Using the form binding engine (query)
-	if err := c.ShouldBindQuery(params); err != nil {
+	if err := c.ShouldBindWith(params, binding.Form); err != nil {
 		err := messages.NewError(err)
 		c.JSON(err.Status, err)
 	}
@@ -80,7 +82,7 @@ func (rs *ResourceService) List(c *gin.Context) {
 func (rs *ResourceService) Get(c *gin.Context) {
 	var attrs api.Attributes
 	// Using the form binding engine (query)
-	if err := c.ShouldBindQuery(&attrs); err != nil {
+	if err := c.ShouldBindWith(&attrs, binding.Form); err != nil {
 		err := messages.NewError(err)
 		c.JSON(err.Status, err)
 	}
@@ -112,7 +114,7 @@ func (rs *ResourceService) Get(c *gin.Context) {
 // Post ...
 func (rs *ResourceService) Post(c *gin.Context) {
 	var contents resource.Resource
-	if err := c.ShouldBindJSON(&contents); err != nil {
+	if err := c.ShouldBindWith(&contents, binding.JSON); err != nil {
 		err := messages.NewError(err)
 		c.JSON(err.Status, err)
 	} else {
@@ -138,7 +140,7 @@ func (rs *ResourceService) Post(c *gin.Context) {
 // Search ...
 func (rs *ResourceService) Search(c *gin.Context) {
 	contents := &messages.SearchRequest{}
-	if err := c.ShouldBindJSON(contents); err != nil {
+	if err := c.ShouldBindWith(contents, binding.JSON); err != nil {
 		err := messages.NewError(err)
 		c.JSON(err.Status, err)
 	}
@@ -168,7 +170,7 @@ func (rs *ResourceService) Search(c *gin.Context) {
 func (rs *ResourceService) Put(c *gin.Context) {
 	var attrs api.Attributes
 	// Using the form binding engine (query)
-	if err := c.ShouldBindQuery(&attrs); err != nil {
+	if err := c.ShouldBindWith(&attrs, binding.Form); err != nil {
 		err := messages.NewError(err)
 		c.JSON(err.Status, err)
 	}
@@ -179,7 +181,7 @@ func (rs *ResourceService) Put(c *gin.Context) {
 	id := c.Param("id")
 
 	contents := &resource.Resource{}
-	if err := c.ShouldBindJSON(contents); err != nil {
+	if err := c.ShouldBindWith(contents, binding.JSON); err != nil {
 		err := messages.NewError(err)
 		c.JSON(err.Status, err)
 	}

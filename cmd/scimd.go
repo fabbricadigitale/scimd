@@ -79,6 +79,9 @@ Complete documentation is available at ...`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Start the server with the current service provider config
 		spc := config.ServiceProviderConfig()
+		if !config.Values.Debug {
+			fmt.Printf("Serving on port %d ...\n", config.Values.Port)
+		}
 		server.Get(&spc).Run(":" + strconv.Itoa(config.Values.Port))
 	},
 	DisableAutoGenTag: true,
@@ -127,6 +130,7 @@ func dbConnect() (err error) {
 	b.MaxElapsedTime = 1 * time.Millisecond
 
 	err = backoff.Retry(func() error {
+		fmt.Printf("Trying to reach storage at %s ...\n", endpoint)
 		var err error
 
 		adapter, err = mongo.New(endpoint, config.Values.Name, config.Values.Coll)

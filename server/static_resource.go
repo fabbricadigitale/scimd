@@ -13,6 +13,7 @@ import (
 	"github.com/fabbricadigitale/scimd/api/messages"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 )
 
 // StaticResourceService describers ...
@@ -56,7 +57,7 @@ func (rs *StaticResourceService) List(c *gin.Context) {
 
 	params := api.NewSearch()
 	// Using the form binding engine (query)
-	if err := c.ShouldBindQuery(params); err != nil {
+	if err := c.ShouldBindWith(params, binding.Form); err != nil {
 		err := messages.NewError(err)
 		c.JSON(err.Status, err)
 		return

@@ -43,10 +43,7 @@ func Resource(s storage.Storer, resType *core.ResourceType, res *resource.Resour
 	}
 
 	// ID, ResourceType and other stuff that can be only asserted by the service provider
-	ID, err := uuid.NewV4()
-	if err != nil {
-		return nil, err
-	}
+	ID := uuid.NewV4()
 	res.ID = ID.String()
 
 	now := time.Now()
