@@ -22,6 +22,10 @@ func Get(spc *core.ServiceProviderConfig) *gin.Engine {
 		searchAction    = ".search"
 	)
 
+	if !config.Values.Debug {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	// Obtain an engine
 	router := gin.Default()
 
