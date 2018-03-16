@@ -1,0 +1,19 @@
+version: "3"
+services:
+
+  storage:
+    image: mongo:latest
+    expose:
+      - "27017"
+    volumes:
+      - ./internal/testdata/initdb.d:/docker-entrypoint-initdb.d
+    environment:
+      - MONGO_INITDB_DATABASE=scimd
+
+  scimd:
+    build: .
+    ports:
+      - "8787:8787"
+    depends_on:
+      - storage
+    command: --storage-host storage
