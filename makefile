@@ -20,14 +20,17 @@ COMMIT = $(shell git rev-parse HEAD)
 BRANCH = $(shell git rev-parse --abbrev-ref HEAD) 
 SUMMARY = $(shell git describe --tags --dirty --always)
 ISO8601DATE = $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
-LDFLAGS =-ldflags "-X=$(REPO)/cmd.version=$(VERSION) -X=$(REPO)/cmd.commit=$(COMMIT) -X=$(REPO)/cmd.branch=$(BRANCH) -X=$(REPO)/cmd.summary=$(SUMMARY) -X=$(REPO)/cmd.date=$(ISO8601DATE)"
+LDFLAGS = "-X=$(REPO)/cmd.version=$(VERSION) -X=$(REPO)/cmd.commit=$(COMMIT) -X=$(REPO)/cmd.branch=$(BRANCH) -X=$(REPO)/cmd.summary=$(SUMMARY) -X=$(REPO)/cmd.date=$(ISO8601DATE)"
 
-.PHONY: all build clean install uninstall format simplify check docs
+CLEANBRANCH := $(shell echo $(BRANCH) | sed -e "s/[^[:alnum:]]/-/g")
+tag ?= $(CLEANBRANCH)
+
+.PHONY: all build clean install uninstall format simplify check docs image
 
 all: check install
 
 $(TARGET): $(SRC)
-	@go build $(LDFLAGS) -o $(TARGET)
+	@go build -ldflags $(LDFLAGS) -o $(TARGET)
 
 build: $(TARGET)
 	@true
@@ -36,7 +39,7 @@ clean:
 	@rm -f $(TARGET)
 
 install:
-	@go install $(LDFLAGS)
+	@go install -ldflags $(LDFLAGS)
 
 uninstall: clean
 	@rm -f $$(which ${TARGET})
@@ -57,3 +60,6 @@ docs/cli:
 
 docs: docs/cli
 	@go run $(addprefix $(ROOT_DIR),cmd/docs/main.go) $(ROOT_DIR)
+
+image:
+	docker build --build-arg LDFLAGS=$(LDFLAGS) -t "$(REPO:github.com/%=%):$(tag)" .
