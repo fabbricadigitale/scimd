@@ -55,6 +55,42 @@
         "mutability": "readOnly",
         "returned": "default",
         "uniqueness": "none"
+      },
+      {
+        "name": "units",
+        "type": "complex",
+        "subAttributes": [
+          {
+            "name": "value",
+            "type": "string",
+            "multiValued": false,
+            "description": "Identifier of the unit of this Department.",
+            "required": false,
+            "mutability": "immutable",
+            "returned": "default",
+            "uniqueness": "none"
+          },
+          {
+            "name": "$ref",
+            "type": "reference",
+            "multiValued": false,
+            "description": "The URI corresponding to a SCIM resource that is a unit of this Department.",
+            "required": false,
+            "mutability": "immutable",
+            "returned": "default",
+            "uniqueness": "none",
+            "referenceTypes": [
+              "User",
+              "Group"
+            ]
+          }
+        ],
+        "multiValued": true,
+        "description": "A list of unit of the Department.",
+        "required": false,
+        "mutability": "readWrite",
+        "returned": "default",
+        "uniqueness": "none"
       }
     ]
   }

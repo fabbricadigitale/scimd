@@ -22,39 +22,29 @@
         "uniqueness": "none"
       },
       {
-        "name": "users",
-        "type": "complex",
-        "subAttributes": [
-          {
-            "name": "value",
-            "type": "string",
-            "multiValued": false,
-            "description": "Identifier of User.",
-            "required": false,
-            "mutability": "immutable",
-            "returned": "default",
-            "uniqueness": "none"
-          },
-          {
-            "name": "$ref",
-            "type": "reference",
-            "multiValued": false,
-            "description": "The URI corresponding to a SCIM resource that has this role.",
-            "required": false,
-            "mutability": "immutable",
-            "returned": "default",
-            "uniqueness": "none",
-            "referenceTypes": [
-              "User"
-            ]
-          }
-        ],
-        "multiValued": true,
-        "description": "A list of members of the Group.",
-        "required": false,
+        "name": "organization",
+        "type": "string",
+        "multiValued": false,
+        "description": "Organization for which the role is defined",
+        "required": true,
         "mutability": "readWrite",
         "returned": "default",
         "uniqueness": "none"
+      },
+      {
+        "name": "permissions",
+        "type": "string",
+        "multiValued": true,
+        "description": "A list of permissions defined for this role",
+        "required": true,
+        "mutability": "readWrite",
+        "returned": "default",
+        "uniqueness": "none",
+        "canonicalValues": [
+          "start session",
+          "stop session",
+          "list session"
+        ]
       }
     ]
   }

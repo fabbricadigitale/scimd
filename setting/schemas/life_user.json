@@ -4,6 +4,88 @@
     "description": "Life User",
     "attributes": [
       {
+        "name": "birthdate",
+        "type": "dateTime",
+        "multiValued": false,
+        "description": "User's birthdate",
+        "required": false,
+        "caseExact": false,
+        "mutability": "readWrite",
+        "returned": "default",
+        "uniqueness": "none"
+      },
+      {
+        "name": "birthplace",
+        "type": "string",
+        "multiValued": false,
+        "description": "User's birthplace",
+        "required": false,
+        "caseExact": false,
+        "mutability": "readWrite",
+        "returned": "default",
+        "uniqueness": "none"
+      },
+      {
+        "name": "gender",
+        "type": "string",
+        "multiValued": false,
+        "description": "User's gender",
+        "required": true,
+        "caseExact": false,
+        "mutability": "readWrite",
+        "returned": "default",
+        "uniqueness": "none",
+        "canonicalValues": [
+          "male",
+          "female",
+          "other"
+        ]
+      },
+      {
+        "name": "height",
+        "type": "integer",
+        "multiValued": false,
+        "description": "User's height",
+        "required": false,
+        "caseExact": false,
+        "mutability": "readWrite",
+        "returned": "default",
+        "uniqueness": "none"
+      },
+      {
+        "name": "mobile",
+        "type": "string",
+        "multiValued": false,
+        "description": "User's mobile",
+        "required": false,
+        "caseExact": false,
+        "mutability": "readWrite",
+        "returned": "default",
+        "uniqueness": "none"
+      },
+      {
+        "name": "notes",
+        "type": "string",
+        "multiValued": false,
+        "description": "Notes",
+        "required": false,
+        "caseExact": false,
+        "mutability": "readWrite",
+        "returned": "default",
+        "uniqueness": "none"
+      },
+      {
+        "name": "pacemaker",
+        "type": "boolean",
+        "multiValued": false,
+        "description": "Pacemaker",
+        "required": false,
+        "caseExact": false,
+        "mutability": "readWrite",
+        "returned": "default",
+        "uniqueness": "none"
+      },
+      {
         "name": "taxCode",
         "type": "string",
         "multiValued": false,
@@ -15,52 +97,12 @@
         "uniqueness": "server"
       },
       {
-        "name": "associations",
-        "type": "complex",
-        "subAttributes": [
-          {
-            "name": "role",
-            "type": "string",
-            "multiValued": false,
-            "description": "The identifiers of the corresponding 'Role' of the user",
-            "required": false,
-            "mutability": "immutable",
-            "returned": "default",
-            "uniqueness": "none",
-            "referenceTypes": [
-              "Role"
-            ]
-          },
-          {
-            "name": "organization",
-            "type": "string",
-            "multiValued": false,
-            "description": "The identifiers of the corresponding 'Organization' of the user",
-            "required": false,
-            "mutability": "immutable",
-            "returned": "default",
-            "uniqueness": "none",
-            "referenceTypes": [
-              "Organization"
-            ]
-          },
-          {
-            "name": "department",
-            "type": "string",
-            "multiValued": false,
-            "description": "The identifiers of the corresponding 'Department' of the user",
-            "required": false,
-            "mutability": "immutable",
-            "returned": "default",
-            "uniqueness": "none",
-            "referenceTypes": [
-              "Department"
-            ]
-          }
-        ],
-        "multiValued": true,
-        "description": "A list of associations",
+        "name": "weight",
+        "type": "integer",
+        "multiValued": false,
+        "description": "User's weight",
         "required": false,
+        "caseExact": false,
         "mutability": "readWrite",
         "returned": "default",
         "uniqueness": "none"

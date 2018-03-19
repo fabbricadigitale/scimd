@@ -1,0 +1,14 @@
+{
+    "schemas": [
+      "urn:ietf:params:scim:schemas:core:2.0:ResourceType"
+    ],
+    "id": "Unit",
+    "meta": {
+      "location": "/v2/ResourceTypes/Unit",
+      "resourceType": "ResourceType"
+    },
+    "name": "Unit",
+    "endpoint": "/Units",
+    "description": "Unit",
+    "schema": "urn:ietf:params:scim:schemas:core:2.0:Unit"
+  }
