@@ -6,7 +6,7 @@ services:
     volumes:
       - ./internal/testdata/initdb.d:/docker-entrypoint-initdb.d
     environment:
-      - MONGO_INITDB_DATABASE=scim2
+      - MONGO_INITDB_DATABASE=scimd
 
   scimd:
     build: .
@@ -14,7 +14,11 @@ services:
       - "8787:8787"
     depends_on:
       - storage
+    volumes:
+      - ./setting:/setting
     environment:
       - SCIMD_PORT=8787
       - SCIMD_STORAGE_HOST=storage
-      - SCIMD_STORAGE_NAME=scim2
+      - SCIMD_STORAGE_NAME=scimd
+      - SCIMD_CONFIG=setting
+    command: --debug --service-provider-config=setting/service_provider_config.json

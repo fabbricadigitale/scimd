@@ -167,6 +167,11 @@ func hashPassword(res *resource.Resource) {
 func addMembership(rw attr.Path, ro attr.Path, res *resource.Resource, roResType *core.ResourceType, adapter mongo.Adapter) error {
 
 	rwValues := res.Values(rw.URI)
+
+	if _, ok := (*rwValues)[rw.Name]; !ok {
+		return nil
+	}
+
 	members := (*rwValues)[rw.Name].([]datatype.DataTyper)
 	displayName := (*rwValues)["displayName"]
 

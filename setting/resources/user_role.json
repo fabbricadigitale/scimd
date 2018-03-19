@@ -1,0 +1,14 @@
+{
+    "schemas": [
+      "urn:ietf:params:scim:schemas:core:2.0:ResourceType"
+    ],
+    "id": "UserRole",
+    "meta": {
+      "location": "/v2/ResourceTypes/UserRole",
+      "resourceType": "ResourceType"
+    },
+    "name": "UserRole",
+    "endpoint": "/UserRoles",
+    "description": "UserRole",
+    "schema": "urn:ietf:params:scim:schemas:core:2.0:UserRole"
+  }
