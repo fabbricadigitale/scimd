@@ -22,6 +22,9 @@ func TestMain(m *testing.M) {
 	schemaRepo.PushFromFile("../../internal/testdata/user_schema.json")
 	schemaRepo.PushFromFile("../../internal/testdata/enterprise_user_schema.json")
 
+	resTypeRepo.PushFromFile("../../internal/testdata/group.json")
+	schemaRepo.PushFromFile("../../internal/testdata/group_schema.json")
+
 	userData, err := ioutil.ReadFile("../../internal/testdata/enterprise_user_resource_1.json")
 	if err != nil {
 		panic(err)

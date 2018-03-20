@@ -45,7 +45,7 @@
             "returned": "default",
             "uniqueness": "none",
             "referenceTypes": [
-              "Organization"
+              "Department"
             ]
           }
         ],

@@ -556,7 +556,6 @@
           "returned": "default",
           "uniqueness": "none",
           "referenceTypes": [
-            "User",
             "Group"
           ]
         },

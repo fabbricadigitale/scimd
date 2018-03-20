@@ -105,7 +105,7 @@ func AddListeners(e *emitter.Emitter) {
 
 		if res.Meta.ResourceType == "Department" {
 			resTypeRepo := core.GetResourceTypeRepository()
-			depResType := resTypeRepo.Pull("Department")
+			depResType := resTypeRepo.Pull("Unit")
 
 			updateMembership(attr.Path{
 				URI:  "urn:ietf:params:scim:schemas:core:2.0:Department",
@@ -158,7 +158,7 @@ func AddListeners(e *emitter.Emitter) {
 
 		if resType.ID == "Department" {
 			resTypeRepo := core.GetResourceTypeRepository()
-			depResType := resTypeRepo.Pull("Department")
+			depResType := resTypeRepo.Pull("Unit")
 
 			deleteMembership(attr.Path{
 				URI:  "urn:ietf:params:scim:schemas:core:2.0:Department",
@@ -375,6 +375,7 @@ func addReferenceToList(parent interface{}, ID, location, display string) interf
 	}
 
 	if !found {
+
 		membership := datatype.Complex{}
 		membership["value"] = ID
 		membership["$ref"] = location

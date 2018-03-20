@@ -14,7 +14,6 @@ import (
 	"github.com/fabbricadigitale/scimd/config"
 	"github.com/fabbricadigitale/scimd/server"
 	"github.com/fabbricadigitale/scimd/storage"
-	"github.com/fabbricadigitale/scimd/storage/listeners"
 	"github.com/fabbricadigitale/scimd/storage/mongo"
 	"github.com/fabbricadigitale/scimd/validation"
 	"github.com/spf13/cobra"
@@ -137,7 +136,6 @@ func dbConnect() (err error) {
 		if err != nil {
 			return err
 		}
-		listeners.AddListeners(adapter.Emitter())
 
 		// Configuration step for ensure uniqueness attributes in the storage
 		uniqueAttrs, err := attr.GetUniqueAttributes()
