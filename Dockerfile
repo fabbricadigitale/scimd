@@ -6,7 +6,7 @@ ADD . /go/src/github.com/fabbricadigitale/scimd
 WORKDIR /go/src/github.com/fabbricadigitale/scimd
 
 RUN go get -u github.com/golang/dep/cmd/dep
-RUN dep ensure
+RUN dep ensure -vendor-only
 
 ARG LDFLAGS
 RUN GOOS=linux go build -ldflags "${LDFLAGS} -extldflags -static" -a  -o /tmp/scimd .
