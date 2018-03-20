@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/thoas/go-funk"
+
 	"github.com/fabbricadigitale/scimd/schemas/datatype"
 )
 
@@ -74,6 +76,15 @@ func unmarshalSingular(attr *Attribute, data json.RawMessage) (datatype.DataType
 	if err = json.Unmarshal(data, p); err != nil {
 		return nil, err
 	}
+
+	if attr.Type == datatype.StringType && len(attr.CanonicalValues) > 0 {
+		if !funk.Contains(attr.CanonicalValues, string(p.Value().(datatype.String))) {
+			return nil, &datatype.InvalidValueError{
+				V: string(p.Value().(datatype.String)),
+			}
+		}
+	}
+
 	return p.Value(), nil
 }
 
@@ -86,7 +97,17 @@ func unmarshalMulti(attr *Attribute, data json.RawMessage) ([]datatype.DataTyper
 	ret := make([]datatype.DataTyper, len(parts))
 
 	for i, p := range parts {
+
 		value, err := unmarshalSingular(attr, p)
+
+		if attr.Type == datatype.StringType && len(attr.CanonicalValues) > 0 {
+			if !funk.Contains(attr.CanonicalValues, string(value.(datatype.String))) {
+				return nil, &datatype.InvalidValueError{
+					V: string(value.(datatype.String)),
+				}
+			}
+		}
+
 		if err != nil {
 			return nil, err
 		}

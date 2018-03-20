@@ -41,9 +41,9 @@ func CheckRequired(res *resource.Resource) (err error) {
 		v := ctx.Get(res)
 
 		if datatype.IsNull(v) {
-			err = messages.NewError(&api.MissingRequiredPropertyError{
+			err = &api.MissingRequiredPropertyError{
 				Path: a.String(),
-			})
+			}
 		}
 
 	}

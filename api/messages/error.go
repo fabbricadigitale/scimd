@@ -28,29 +28,42 @@ func NewError(e error) Error {
 	case *json.SyntaxError:
 		scimError.Status = 400
 		scimError.ScimType = "invalidSyntax"
+		break
 	case *datatype.InvalidDataTypeError:
 		scimError.Status = 400
 		scimError.ScimType = "invalidValue"
+		break
+	case *datatype.InvalidValueError:
+		scimError.Status = 400
+		scimError.ScimType = "invalidValue"
+		break
 	case *json.UnmarshalTypeError:
 		scimError.Status = 400
 		scimError.ScimType = "invalidValue"
+		break
 	case *api.InvalidPathError:
 		scimError.Status = 400
 		scimError.ScimType = "invalidPath"
+		break
 	case *api.InvalidFilterError:
 		scimError.Status = 400
 		scimError.ScimType = "invalidFilter"
+		break
 	case *api.ResourceNotFoundError:
 		scimError.Status = 404
+		break
 	case *api.MissingRequiredPropertyError:
 		scimError.Status = 400
 		scimError.ScimType = "invalidValue"
+		break
 	case *api.MutabilityError:
 		scimError.Status = 400
 		scimError.ScimType = "mutability"
+		break
 	case *api.UniquenessError:
 		scimError.Status = 400
 		scimError.ScimType = "uniqueness"
+		break
 	default:
 		scimError.Status = 500
 	}

@@ -39,7 +39,6 @@ func AddListeners(e *emitter.Emitter) {
 		}
 
 		if res.Meta.ResourceType == "Organization" {
-
 			resTypeRepo := core.GetResourceTypeRepository()
 			depResType := resTypeRepo.Pull("Department")
 
@@ -50,7 +49,19 @@ func AddListeners(e *emitter.Emitter) {
 				URI:  "urn:ietf:params:scim:schemas:core:2.0:Department",
 				Name: "organization",
 			}, res, depResType, *adapter)
+		}
 
+		if res.Meta.ResourceType == "Department" {
+			resTypeRepo := core.GetResourceTypeRepository()
+			depResType := resTypeRepo.Pull("Department")
+
+			addMembership(attr.Path{
+				URI:  "urn:ietf:params:scim:schemas:core:2.0:Department",
+				Name: "units",
+			}, attr.Path{
+				URI:  "urn:ietf:params:scim:schemas:core:2.0:Unit",
+				Name: "department",
+			}, res, depResType, *adapter)
 		}
 
 		hashPassword(res)
@@ -80,7 +91,6 @@ func AddListeners(e *emitter.Emitter) {
 		}
 
 		if res.Meta.ResourceType == "Organization" {
-
 			resTypeRepo := core.GetResourceTypeRepository()
 			depResType := resTypeRepo.Pull("Department")
 
@@ -91,7 +101,19 @@ func AddListeners(e *emitter.Emitter) {
 				URI:  "urn:ietf:params:scim:schemas:core:2.0:Department",
 				Name: "organization",
 			}, res, depResType, *adapter)
+		}
 
+		if res.Meta.ResourceType == "Department" {
+			resTypeRepo := core.GetResourceTypeRepository()
+			depResType := resTypeRepo.Pull("Department")
+
+			updateMembership(attr.Path{
+				URI:  "urn:ietf:params:scim:schemas:core:2.0:Department",
+				Name: "units",
+			}, attr.Path{
+				URI:  "urn:ietf:params:scim:schemas:core:2.0:Unit",
+				Name: "department",
+			}, res, depResType, *adapter)
 		}
 
 		hashPassword(res)
@@ -122,7 +144,6 @@ func AddListeners(e *emitter.Emitter) {
 		}
 
 		if resType.ID == "Organization" {
-
 			resTypeRepo := core.GetResourceTypeRepository()
 			depResType := resTypeRepo.Pull("Department")
 
@@ -133,7 +154,19 @@ func AddListeners(e *emitter.Emitter) {
 				URI:  "urn:ietf:params:scim:schemas:core:2.0:Department",
 				Name: "organization",
 			}, id, resType, depResType, *adapter)
+		}
 
+		if resType.ID == "Department" {
+			resTypeRepo := core.GetResourceTypeRepository()
+			depResType := resTypeRepo.Pull("Department")
+
+			deleteMembership(attr.Path{
+				URI:  "urn:ietf:params:scim:schemas:core:2.0:Department",
+				Name: "units",
+			}, attr.Path{
+				URI:  "urn:ietf:params:scim:schemas:core:2.0:Unit",
+				Name: "department",
+			}, id, resType, depResType, *adapter)
 		}
 
 	})

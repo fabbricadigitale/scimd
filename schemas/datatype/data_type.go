@@ -180,6 +180,15 @@ func (e *InvalidDataTypeError) Error() string {
 	return fmt.Sprintf("Invalid type %s", e.t)
 }
 
+// InvalidValueError is a generic invalid type error
+type InvalidValueError struct {
+	V string
+}
+
+func (e *InvalidValueError) Error() string {
+	return fmt.Sprintf("Invalid value \"%s\". Is not a canonical value", e.V)
+}
+
 // IsSingleValue hecks if v holds a Data Type value
 func IsSingleValue(v interface{}) bool {
 	_, ok := v.(DataTyper)
