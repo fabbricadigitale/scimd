@@ -257,7 +257,7 @@ if (res0.ok) {
                 "members": [
                     {
                         "value": "2819c223-7f76-453a-919d-ab1234567892",
-                        "$ref": "/v2/Users/2819c223-7f76-453a-919d-ab1234567892",
+                        "§ref": "/v2/Users/2819c223-7f76-453a-919d-ab1234567892",
                         "display": "Alexandra James"
                     },
                 ],

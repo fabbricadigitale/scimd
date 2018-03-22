@@ -16,12 +16,6 @@ import (
 // Resource update an existing res of type resType and stores it into s.
 func Resource(s storage.Storer, resType *core.ResourceType, id string, res *resource.Resource) (ret core.ResourceTyper, err error) {
 
-	res.ID = id
-
-	now := time.Now()
-	res.Meta.LastModified = &now
-	res.Meta.Version = version.GenerateVersion(true, id, now.String())
-
 	// Since the ResourceType was set, we can check required
 	if err := attr.CheckRequired(res); err != nil {
 		return nil, err
@@ -39,6 +33,24 @@ func Resource(s storage.Storer, resType *core.ResourceType, id string, res *reso
 		p.Context(resType).Delete(res)
 	}
 
+	// Fetch stored resource to retrieve readOnly attributes
+	storedResource, err := query.Resource(s.(storage.Storer), resType, id, &api.Attributes{})
+	if err != nil {
+		return nil, err
+	}
+
+	// Add ro attributes of the stored resource to the current resource
+	for _, p := range ro {
+		a := p.Context(resType).Get(storedResource.(*resource.Resource))
+		p.Context(resType).Set(a, res)
+	}
+
+	res.ID = id
+
+	now := time.Now()
+	res.Meta.LastModified = &now
+	res.Meta.Version = version.GenerateVersion(true, id, now.String())
+
 	// We need to perform mutability validation
 	// 1. Attributes whose mutability is "readWrite" that are omitted from
 	// the request body MAY be assumed to be not asserted by the client.
@@ -48,15 +60,11 @@ func Resource(s storage.Storer, resType *core.ResourceType, id string, res *reso
 	// returned with a "scimType" error code of "mutability".
 
 	// 3. (ReadOnly) Any values provided SHALL be ignored. (performed by the client)
+	// (Note) To avoid to overwrite an ro attribute already valued, I'll fetch it from the stored resource
+	// and I'll add it to the current resource.
 
-	/* storedResource, err := a.Get(resource.ResourceType(), id, version, nil)
-	if err != nil {
-		return err
-	}
-	*/
-
-	// (todo) => Test immutable attributes
-	ro, err = attr.Paths(resType, func(attribute *core.Attribute) bool {
+	// (fixme) => Test immutable attributes
+	/* ro, err = attr.Paths(resType, func(attribute *core.Attribute) bool {
 		return attribute.Mutability == schemas.MutabilityImmutable
 
 	})
@@ -72,24 +80,16 @@ func Resource(s storage.Storer, resType *core.ResourceType, id string, res *reso
 			attrs.Attributes = append(attrs.Attributes, p.String())
 		}
 
-		// we need to get stored value of immutable attributes
-		sr, err := query.Resource(s.(storage.Storer), resType, id, attrs)
-		if err != nil {
-			return nil, err
-		}
-
-		storedResource := sr.(*resource.Resource)
-
 		for _, p := range ro {
 
-			if p.Context(resType).Get(storedResource) != p.Context(resType).Get(res) {
+			if p.Context(resType).Get(storedResource.(*resource.Resource)) != p.Context(resType).Get(res) {
 				err = &api.MutabilityError{
 					Path: p.String(),
 				}
 				return nil, err
 			}
 		}
-	}
+	} */
 
 	err = s.Update(res, id, "")
 	if err != nil {
