@@ -80,14 +80,9 @@ func (a *Adapter) Create(res *resource.Resource) error {
 	// Emit an event and wait it has been sent successfully
 	a.Emitter().Emit("create", res, a)
 
-	return a.DoCreate(res)
-
-}
-
-// DoCreate is ...
-func (a *Adapter) DoCreate(res *resource.Resource) error {
 	dataResource := a.toDoc(res)
 	return (*a.adaptee).Create(dataResource)
+
 }
 
 // Close is the method to explicitly call to close the session
@@ -103,7 +98,8 @@ func (a *Adapter) Get(resType *core.ResourceType, id, version string, fields map
 	return a.DoGet(resType, id, version, fields)
 }
 
-// DoGet is ...
+// DoGet is ... Does not emit any event.
+// Is used internally to fetch referenced documents.
 func (a *Adapter) DoGet(resType *core.ResourceType, id, version string, fields map[attr.Path]bool) (*resource.Resource, error) {
 
 	// Setup query
@@ -137,7 +133,8 @@ func (a *Adapter) Update(resource *resource.Resource, id string, version string)
 	return a.DoUpdate(resource, id, version)
 }
 
-// DoUpdate is ...
+// DoUpdate is the method that permforms update operations. Does not emit any event.
+// Is used internally to perform update to referenced documents.
 func (a *Adapter) DoUpdate(resource *resource.Resource, id, version string) error {
 	dataResource := a.toDoc(resource)
 	return (*a.adaptee).Update(makeQuery(resource.ResourceType().GetIdentifier(), id, version), dataResource)
@@ -161,11 +158,6 @@ func (a *Adapter) Delete(resType *core.ResourceType, id, version string) error {
 	// Emit an event and wait it has been sent successfully
 	a.Emitter().Emit("delete", resType, id, version, a)
 
-	return a.DoDelete(resType, id, version)
-}
-
-// DoDelete is ...
-func (a *Adapter) DoDelete(resType *core.ResourceType, id, version string) error {
 	return (*a.adaptee).Delete(makeQuery(resType.GetIdentifier(), id, version))
 }
 
