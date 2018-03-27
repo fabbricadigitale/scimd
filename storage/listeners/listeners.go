@@ -14,6 +14,8 @@ import (
 // AddListeners for the emitted events
 func AddListeners(e *emitter.Emitter) {
 
+	resTypeRepo := core.GetResourceTypeRepository()
+
 	// Create event handler
 	e.On("create", func(event *emitter.Event) {
 		res, ok := event.Args[0].(*resource.Resource)
@@ -23,45 +25,14 @@ func AddListeners(e *emitter.Emitter) {
 			return
 		}
 
-		if res.Meta.ResourceType == "Group" {
+		resType := resTypeRepo.Pull(res.Meta.ResourceType)
 
-			resTypeRepo := core.GetResourceTypeRepository()
-			userResType := resTypeRepo.Pull("User")
-
-			addMembership(attr.Path{
-				URI:  "urn:ietf:params:scim:schemas:core:2.0:Group",
-				Name: "members",
-			}, attr.Path{
-				URI:  "urn:ietf:params:scim:schemas:core:2.0:User",
-				Name: "groups",
-			}, res, userResType, *adapter)
-
+		relations, err := attr.GetRelationships(resType.Schema, resType.ID)
+		if err != nil {
+			return
 		}
-
-		if res.Meta.ResourceType == "Organization" {
-			resTypeRepo := core.GetResourceTypeRepository()
-			depResType := resTypeRepo.Pull("Department")
-
-			addMembership(attr.Path{
-				URI:  "urn:ietf:params:scim:schemas:core:2.0:Organization",
-				Name: "departments",
-			}, attr.Path{
-				URI:  "urn:ietf:params:scim:schemas:core:2.0:Department",
-				Name: "organization",
-			}, res, depResType, *adapter)
-		}
-
-		if res.Meta.ResourceType == "Department" {
-			resTypeRepo := core.GetResourceTypeRepository()
-			depResType := resTypeRepo.Pull("Department")
-
-			addMembership(attr.Path{
-				URI:  "urn:ietf:params:scim:schemas:core:2.0:Department",
-				Name: "units",
-			}, attr.Path{
-				URI:  "urn:ietf:params:scim:schemas:core:2.0:Unit",
-				Name: "department",
-			}, res, depResType, *adapter)
+		for _, relation := range relations {
+			addMembership(relation.RWAttribute, relation.ROAttribute, res, &relation.ROResourceType, *adapter)
 		}
 
 		hashPassword(res)
@@ -76,51 +47,21 @@ func AddListeners(e *emitter.Emitter) {
 			return
 		}
 
-		if res.Meta.ResourceType == "Group" {
+		resType := resTypeRepo.Pull(res.Meta.ResourceType)
 
-			resTypeRepo := core.GetResourceTypeRepository()
-			userResType := resTypeRepo.Pull("User")
-
-			updateMembership(attr.Path{
-				URI:  "urn:ietf:params:scim:schemas:core:2.0:Group",
-				Name: "members",
-			}, attr.Path{
-				URI:  "urn:ietf:params:scim:schemas:core:2.0:User",
-				Name: "groups",
-			}, res, userResType, *adapter)
+		relations, err := attr.GetRelationships(resType.Schema, resType.ID)
+		if err != nil {
+			return
 		}
-
-		if res.Meta.ResourceType == "Organization" {
-			resTypeRepo := core.GetResourceTypeRepository()
-			depResType := resTypeRepo.Pull("Department")
-
-			updateMembership(attr.Path{
-				URI:  "urn:ietf:params:scim:schemas:core:2.0:Organization",
-				Name: "departments",
-			}, attr.Path{
-				URI:  "urn:ietf:params:scim:schemas:core:2.0:Department",
-				Name: "organization",
-			}, res, depResType, *adapter)
-		}
-
-		if res.Meta.ResourceType == "Department" {
-			resTypeRepo := core.GetResourceTypeRepository()
-			depResType := resTypeRepo.Pull("Unit")
-
-			updateMembership(attr.Path{
-				URI:  "urn:ietf:params:scim:schemas:core:2.0:Department",
-				Name: "units",
-			}, attr.Path{
-				URI:  "urn:ietf:params:scim:schemas:core:2.0:Unit",
-				Name: "department",
-			}, res, depResType, *adapter)
+		for _, relation := range relations {
+			updateMembership(relation.RWAttribute, relation.ROAttribute, res, &relation.ROResourceType, *adapter)
 		}
 
 		hashPassword(res)
 	})
 
 	e.On("delete", func(event *emitter.Event) {
-		resType, ok := event.Args[0].(*core.ResourceType)
+		rt, ok := event.Args[0].(*core.ResourceType)
 		id, ok := event.Args[1].(string)
 		adapter, ok := event.Args[3].(*mongo.Adapter)
 
@@ -128,45 +69,14 @@ func AddListeners(e *emitter.Emitter) {
 			return
 		}
 
-		if resType.ID == "Group" {
+		resType := resTypeRepo.Pull(rt.ID)
 
-			resTypeRepo := core.GetResourceTypeRepository()
-			userResType := resTypeRepo.Pull("User")
-
-			deleteMembership(attr.Path{
-				URI:  "urn:ietf:params:scim:schemas:core:2.0:Group",
-				Name: "members",
-			}, attr.Path{
-				URI:  "urn:ietf:params:scim:schemas:core:2.0:User",
-				Name: "groups",
-			}, id, resType, userResType, *adapter)
-
+		relations, err := attr.GetRelationships(resType.Schema, resType.ID)
+		if err != nil {
+			return
 		}
-
-		if resType.ID == "Organization" {
-			resTypeRepo := core.GetResourceTypeRepository()
-			depResType := resTypeRepo.Pull("Department")
-
-			deleteMembership(attr.Path{
-				URI:  "urn:ietf:params:scim:schemas:core:2.0:Organization",
-				Name: "departments",
-			}, attr.Path{
-				URI:  "urn:ietf:params:scim:schemas:core:2.0:Department",
-				Name: "organization",
-			}, id, resType, depResType, *adapter)
-		}
-
-		if resType.ID == "Department" {
-			resTypeRepo := core.GetResourceTypeRepository()
-			depResType := resTypeRepo.Pull("Unit")
-
-			deleteMembership(attr.Path{
-				URI:  "urn:ietf:params:scim:schemas:core:2.0:Department",
-				Name: "units",
-			}, attr.Path{
-				URI:  "urn:ietf:params:scim:schemas:core:2.0:Unit",
-				Name: "department",
-			}, id, resType, depResType, *adapter)
+		for _, relation := range relations {
+			deleteMembership(relation.RWAttribute, relation.ROAttribute, id, rt, &relation.ROResourceType, *adapter)
 		}
 
 	})
