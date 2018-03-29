@@ -21,6 +21,10 @@ if (res0.ok) {
                 "location": "/v2/Users/2819c223-7f76-453a-919d-ab1234567891",
                 "resourceType": "User"
             },
+            "urn:ietf:params:scim:schemas:extension:life:2°0:User" : {
+                "taxCode": "1234567890",
+                "gender": "female"
+            },
             "urn:ietf:params:scim:schemas:extension:enterprise:2°0:User": {
                 "division": "Theme Park",
                 "department": "Tour Operations",
@@ -121,7 +125,7 @@ if (res0.ok) {
             },
             "schemas": [
                 "urn:ietf:params:scim:schemas:core:2.0:User",
-                "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"
+                "urn:ietf:params:scim:schemas:extension:life:2.0:User"
             ]
         },
         {
@@ -133,6 +137,10 @@ if (res0.ok) {
                 "version": "W/\"a330bc54f0671c9\"",
                 "location": "/v2/Users/2819c223-7f76-453a-919d-ab1234567892",
                 "resourceType": "User"
+            },
+            "urn:ietf:params:scim:schemas:extension:life:2°0:User" : {
+                "taxCode": "1234567790",
+                "gender": "female"
             },
             "urn:ietf:params:scim:schemas:extension:enterprise:2°0:User": {
                 "division": "Theme Park",
@@ -239,7 +247,7 @@ if (res0.ok) {
             },
             "schemas": [
                 "urn:ietf:params:scim:schemas:core:2.0:User",
-                "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"
+                "urn:ietf:params:scim:schemas:extension:life:2.0:User"
             ]
         },
         {
