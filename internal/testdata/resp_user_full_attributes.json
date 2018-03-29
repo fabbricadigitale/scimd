@@ -33,13 +33,6 @@
           "value": "tiffy@fork.org"
       }
   ],
-  "groups": [
-      {
-          "$ref": "/v2/Groups/fc348aa8-3835-40eb-a20b-c726e15c55b5",
-          "display": "Employees",
-          "value": "fc348aa8-3835-40eb-a20b-c726e15c55b5"
-      }
-  ],
   "id": "2819c223-7f76-453a-919d-ab1234567891",
   "ims": [
       {
@@ -88,7 +81,7 @@
   "profileUrl": "https://login.example.com/tfork",
   "schemas": [
       "urn:ietf:params:scim:schemas:core:2.0:User",
-      "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"
+      "urn:ietf:params:scim:schemas:extension:life:2.0:User"
   ],
   "timezone": "America/Los_Angeles",
   "title": "Electronic home entertainment equipment installer",
