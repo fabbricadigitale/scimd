@@ -57,7 +57,6 @@ func init() {
 				Uniqueness:  "none",
 				ReferenceTypes: []string{
 					"User",
-					"Group",
 				},
 			},
 			{
