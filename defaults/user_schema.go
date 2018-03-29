@@ -629,7 +629,6 @@ func init() {
 				Returned:    "default",
 				Uniqueness:  "none",
 				ReferenceTypes: []string{
-					"User",
 					"Group",
 				},
 			},
