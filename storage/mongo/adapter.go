@@ -132,6 +132,19 @@ func (a *Adapter) Update(resource *resource.Resource, id string, version string)
 	return (*a.adaptee).Update(makeQuery(resource.ResourceType().GetIdentifier(), id, version), dataResource)
 }
 
+// Patch is ...
+func (a *Adapter) Patch(resType *core.ResourceType, id string, version string, op string, path attr.Path, values []interface{}) error {
+	a.Emitter().Emit("patch")
+
+	q := makeQuery(resType.GetIdentifier(), id, version)
+	v, err := convertChangeValue(resType, op, path, values)
+	if err != nil {
+		return err
+	}
+
+	return (*a.adaptee).Patch(id, q, v)
+}
+
 // Delete is ...
 func (a *Adapter) Delete(resType *core.ResourceType, id, version string) error {
 	// Emit an event and wait it has been sent successfully

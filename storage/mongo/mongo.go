@@ -88,6 +88,15 @@ func (d *Driver) Update(query bson.M, doc *document) error {
 	return d.errorWrapper(err, (*doc)["id"])
 }
 
+// Patch is the driver method for Patch
+func (d *Driver) Patch(id string, query, values bson.M) error {
+	c, close := d.getCollection()
+	defer close()
+
+	err := c.Update(query, values)
+	return d.errorWrapper(err, id)
+}
+
 // Delete is the driver method for Delete
 func (d *Driver) Delete(query bson.M) error {
 
