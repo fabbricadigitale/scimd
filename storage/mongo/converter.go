@@ -4,11 +4,151 @@ import (
 	"regexp"
 
 	"github.com/fabbricadigitale/scimd/api"
+	"github.com/fabbricadigitale/scimd/api/attr"
 	"github.com/fabbricadigitale/scimd/api/filter"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/datatype"
 	"github.com/globalsign/mgo/bson"
 )
+
+func convertChangeValue(resType *core.ResourceType, op string, p attr.Path, values []interface{}) (m bson.M, err error) {
+
+	if resType == nil {
+		err = &api.InternalServerError{
+			Detail: "ResourceType is nil",
+		}
+		return nil, err
+	}
+
+	if p.Undefined() {
+		err = &api.InternalServerError{
+			Detail: "Path is undefined",
+		}
+		return nil, err
+	}
+
+	if values == nil && (op == "add" || op == "replace") {
+		err = &api.InternalServerError{
+			Detail: "Value is nil",
+		}
+		return nil, err
+	}
+
+	path := escapeAttribute(p.String())
+
+	ctx := p.Context(resType)
+
+	if ctx.Attribute.MultiValued == false {
+		m = getBSONSingleValued(op, path, values[0])
+	} else {
+		m = getBSONMultiValued(op, path, values)
+	}
+
+	return m, err
+}
+
+func getBSONSingleValued(op, path string, value interface{}) bson.M {
+
+	var operator string
+
+	if op == "add" || op == "replace" {
+		operator = "$set"
+	} else {
+		// remove
+		operator = "$unset"
+	}
+
+	m := bson.M{}
+	ret := bson.M{}
+
+	switch value.(type) {
+
+	case datatype.Complex:
+		values := value.(datatype.Complex)
+
+		o := bson.M{}
+
+		for key, val := range values {
+			o[key] = val
+		}
+
+		m = bson.M{
+			path: o,
+		}
+
+		break
+	default:
+		m = bson.M{
+			path: value,
+		}
+
+		break
+	}
+
+	ret[operator] = m
+
+	return ret
+}
+
+func getBSONMultiValued(op, path string, values []interface{}) bson.M {
+
+	var operator string
+
+	if op == "add" {
+		operator = "$push"
+
+	} else if op == "remove" {
+		if values != nil {
+			operator = "$pull"
+		} else {
+			operator = "$unset"
+		}
+
+	} else if op == "replace" {
+		operator = "$set"
+	}
+
+	m := bson.M{}
+	ret := bson.M{}
+
+	if values != nil {
+		switch values[0].(type) {
+
+		case datatype.Complex:
+
+			// Note
+			// $each is not supported in globalsign/mgo
+			// so we cannot append more than one value by a push operator
+			/* s := make([]interface{}, 0)
+
+			for _, value := range values { */
+			o := bson.M{}
+
+			for key, val := range values[0].(datatype.Complex) {
+				o[key] = val
+			}
+
+			/* 	s = append(s, o)
+
+			} */
+
+			m = bson.M{path: o}
+
+			break
+		default:
+
+			m = bson.M{path: values[0]}
+
+			break
+		}
+	} else {
+		m = bson.M{path: ""}
+	}
+
+	ret[operator] = m
+
+	return ret
+}
 
 func convertToMongoQuery(resType *core.ResourceType, ft filter.Filter) (m bson.M, err error) {
 	defer func() {
