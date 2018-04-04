@@ -18,7 +18,7 @@ func TestPatchAdd(t *testing.T) {
 
 	id := "2819c223-7f76-453a-919d-ab1234567891"
 
-	res, err := patch.Resource(adapter, resTypeRepo.Pull("User"), id, "add", "emails", []interface{}{datatype.Complex{"value": "gigi@gmail.com", "type": "private"}})
+	res, err := patch.Resource(adapter, resTypeRepo.Pull("User"), id, "add", "emails", datatype.Complex{"value": "gigi@gmail.com", "type": "private"})
 	require.NoError(t, err)
 	require.NotNil(t, res)
 
@@ -38,7 +38,7 @@ func TestPatchRemovePull(t *testing.T) {
 
 	id := "2819c223-7f76-453a-919d-ab1234567891"
 
-	res, err := patch.Resource(adapter, resTypeRepo.Pull("User"), id, "remove", "emails", []interface{}{datatype.Complex{"value": "tiffy@fork.org", "type": "home"}})
+	res, err := patch.Resource(adapter, resTypeRepo.Pull("User"), id, "remove", "emails", datatype.Complex{"value": "tiffy@fork.org", "type": "home"})
 	require.NoError(t, err)
 	require.NotNil(t, res)
 
@@ -78,7 +78,7 @@ func TestPatchReplace(t *testing.T) {
 
 	id := "2819c223-7f76-453a-919d-ab1234567891"
 
-	res, err := patch.Resource(adapter, resTypeRepo.Pull("User"), id, "replace", "locale", []interface{}{"it-IT"})
+	res, err := patch.Resource(adapter, resTypeRepo.Pull("User"), id, "replace", "locale", "it-IT")
 	require.NoError(t, err)
 	require.NotNil(t, res)
 

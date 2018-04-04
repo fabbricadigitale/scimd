@@ -133,11 +133,11 @@ func (a *Adapter) Update(resource *resource.Resource, id string, version string)
 }
 
 // Patch is ...
-func (a *Adapter) Patch(resType *core.ResourceType, id string, version string, op string, path attr.Path, values []interface{}) error {
+func (a *Adapter) Patch(resType *core.ResourceType, id string, version string, op string, path attr.Path, value interface{}) error {
 	a.Emitter().Emit("patch")
 
 	q := makeQuery(resType.GetIdentifier(), id, version)
-	v, err := convertChangeValue(resType, op, path, values)
+	v, err := convertChangeValue(resType, op, path, value)
 	if err != nil {
 		return err
 	}

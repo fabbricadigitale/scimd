@@ -42,7 +42,7 @@ type Storer interface {
 
 	Update(resType *resource.Resource, id, version string) error
 
-	Patch(resType *core.ResourceType, id string, version string, op string, path attr.Path, values []interface{}) error
+	Patch(resType *core.ResourceType, id string, version string, op string, path attr.Path, values interface{}) error
 
 	Delete(resType *core.ResourceType, id, version string) error
 
