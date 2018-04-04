@@ -18,7 +18,7 @@ func init() {
 	ServiceProviderConfig.Meta.Version = v
 	ServiceProviderConfig.Meta.Location = "/v2/ServiceProviderConfigs"
 	ServiceProviderConfig.DocumentationURI = "/help/scim.html"
-	ServiceProviderConfig.Patch.Supported = false
+	ServiceProviderConfig.Patch.Supported = true
 	ServiceProviderConfig.Bulk.Supported = false
 	ServiceProviderConfig.Bulk.MaxOperations = 1000
 	ServiceProviderConfig.Bulk.MaxPayloadSize = 1048576

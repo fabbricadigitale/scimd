@@ -9,7 +9,7 @@ import (
 )
 
 // Resource is ...
-func Resource(s storage.Storer, resType *core.ResourceType, id, op, path string, values []interface{}) (ret core.ResourceTyper, err error) {
+func Resource(s storage.Storer, resType *core.ResourceType, id, op, path string, value interface{}) (ret core.ResourceTyper, err error) {
 
 	if resType == nil {
 		err = &api.InternalServerError{
@@ -32,7 +32,7 @@ func Resource(s storage.Storer, resType *core.ResourceType, id, op, path string,
 		return ret, err
 	}
 
-	err = s.Patch(resType, id, "", op, *p, values)
+	err = s.Patch(resType, id, "", op, *p, value)
 	if err != nil {
 		return ret, err
 	}

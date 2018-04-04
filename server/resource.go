@@ -4,6 +4,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/fabbricadigitale/scimd/api/patch"
+
 	"github.com/gin-gonic/gin/binding"
 
 	"github.com/fabbricadigitale/scimd/api/delete"
@@ -205,7 +207,44 @@ func (rs *ResourceService) Put(c *gin.Context) {
 }
 
 // Patch ...
-func (rs *ResourceService) Patch(*gin.Context) {
+func (rs *ResourceService) Patch(c *gin.Context) {
+
+	contents := &messages.PatchOp{}
+	if err := c.ShouldBindWith(contents, binding.JSON); err != nil {
+		err := messages.NewError(err)
+		c.JSON(err.Status, err)
+		return
+	}
+	// Using the form binding engine (query)
+	var attrs api.Attributes
+	if err := c.ShouldBindWith(&attrs, binding.Form); err != nil {
+		err := messages.NewError(err)
+		c.JSON(err.Status, err)
+		return
+	}
+
+	// Explode the attributes
+	attrs.Explode()
+	// Retrieve the id segment
+	id := c.Param("id")
+
+	// Retrieve the storage adapter
+	store, ok := c.Get("storage")
+	if !ok {
+		err := messages.NewError(&api.InternalServerError{
+			Detail: "Missing storage setup ...",
+		})
+		c.JSON(err.Status, err)
+		return
+	}
+
+	res, err := patch.Resource(store.(storage.Storer), &rs.rt, id, contents.Operations[0].Op, contents.Operations[0].Path, contents.Operations[0].Value)
+	if err != nil {
+		we := handlingError(err)
+		c.JSON(we.Status, we)
+		return
+	}
+	c.JSON(http.StatusOK, res.(*resource.Resource))
 
 }
 

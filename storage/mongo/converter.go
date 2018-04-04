@@ -11,7 +11,7 @@ import (
 	"github.com/globalsign/mgo/bson"
 )
 
-func convertChangeValue(resType *core.ResourceType, op string, p attr.Path, values []interface{}) (m bson.M, err error) {
+func convertChangeValue(resType *core.ResourceType, op string, p attr.Path, value interface{}) (m bson.M, err error) {
 
 	if resType == nil {
 		err = &api.InternalServerError{
@@ -27,7 +27,7 @@ func convertChangeValue(resType *core.ResourceType, op string, p attr.Path, valu
 		return nil, err
 	}
 
-	if values == nil && (op == "add" || op == "replace") {
+	if value == nil && (op == "add" || op == "replace") {
 		err = &api.InternalServerError{
 			Detail: "Value is nil",
 		}
@@ -39,9 +39,9 @@ func convertChangeValue(resType *core.ResourceType, op string, p attr.Path, valu
 	ctx := p.Context(resType)
 
 	if ctx.Attribute.MultiValued == false {
-		m = getBSONSingleValued(op, path, values[0])
+		m = getBSONSingleValued(op, path, value)
 	} else {
-		m = getBSONMultiValued(op, path, values)
+		m = getBSONMultiValued(op, path, value)
 	}
 
 	return m, err
@@ -90,7 +90,7 @@ func getBSONSingleValued(op, path string, value interface{}) bson.M {
 	return ret
 }
 
-func getBSONMultiValued(op, path string, values []interface{}) bson.M {
+func getBSONMultiValued(op, path string, value interface{}) bson.M {
 
 	var operator string
 
@@ -98,7 +98,7 @@ func getBSONMultiValued(op, path string, values []interface{}) bson.M {
 		operator = "$push"
 
 	} else if op == "remove" {
-		if values != nil {
+		if value != nil {
 			operator = "$pull"
 		} else {
 			operator = "$unset"
@@ -111,8 +111,8 @@ func getBSONMultiValued(op, path string, values []interface{}) bson.M {
 	m := bson.M{}
 	ret := bson.M{}
 
-	if values != nil {
-		switch values[0].(type) {
+	if value != nil {
+		switch value.(type) {
 
 		case datatype.Complex:
 
@@ -124,7 +124,7 @@ func getBSONMultiValued(op, path string, values []interface{}) bson.M {
 			for _, value := range values { */
 			o := bson.M{}
 
-			for key, val := range values[0].(datatype.Complex) {
+			for key, val := range value.(datatype.Complex) {
 				o[key] = val
 			}
 
@@ -137,7 +137,7 @@ func getBSONMultiValued(op, path string, values []interface{}) bson.M {
 			break
 		default:
 
-			m = bson.M{path: values[0]}
+			m = bson.M{path: value}
 
 			break
 		}
