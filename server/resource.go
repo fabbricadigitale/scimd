@@ -215,6 +215,7 @@ func (rs *ResourceService) Patch(c *gin.Context) {
 		c.JSON(err.Status, err)
 		return
 	}
+
 	// Using the form binding engine (query)
 	var attrs api.Attributes
 	if err := c.ShouldBindWith(&attrs, binding.Form); err != nil {
