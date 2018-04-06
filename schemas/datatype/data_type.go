@@ -158,6 +158,12 @@ var rTypes = map[string]reflect.Type{
 // Cast function returns a SCIM Data Type of the given type t that holds the v's value.
 func Cast(v interface{}, t string) (DataTyper, error) {
 
+	if t == "dateTime" {
+		t, _ := time.Parse(time.RFC3339Nano, v.(string))
+		d := (DateTime)(t)
+		return &d, nil
+	}
+
 	if rt := rTypes[t]; rt != nil {
 		rv := reflect.ValueOf(v)
 		rv = reflect.Indirect(rv)
