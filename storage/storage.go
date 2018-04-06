@@ -50,3 +50,7 @@ type Storer interface {
 
 	Close()
 }
+
+type PContainer struct {
+	Value interface{}
+}

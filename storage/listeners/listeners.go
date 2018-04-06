@@ -6,6 +6,7 @@ import (
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/datatype"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
+	"github.com/fabbricadigitale/scimd/storage"
 	"github.com/fabbricadigitale/scimd/storage/mongo"
 	"github.com/olebedev/emitter"
 	set "gopkg.in/fatih/set.v0"
@@ -60,6 +61,16 @@ func AddListeners(e *emitter.Emitter) {
 		hashPassword(res)
 	})
 
+	e.On("patchPassword", func(event *emitter.Event) {
+		values, ok := event.Args[0].(*storage.PContainer)
+		if ok != true {
+			return
+		}
+
+		v := values.Value.(string)
+		(*values).Value = hashString((datatype.String)(v))
+	})
+
 	e.On("delete", func(event *emitter.Event) {
 		rt, ok := event.Args[0].(*core.ResourceType)
 		id, ok := event.Args[1].(string)
@@ -105,6 +116,19 @@ func hashPassword(res *resource.Resource) {
 	(*values)["password"] = hashedPassword
 
 	res.SetValues("urn:ietf:params:scim:schemas:core:2.0:User", values)
+}
+
+func hashString(pwd datatype.String) string {
+
+	password := []byte(pwd)
+
+	hashedPassword, err := hasher.NewBCrypt().Hash(password)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return string(hashedPassword)
 }
 
 func addMembership(rw attr.Path, ro attr.Path, res *resource.Resource, roResType *core.ResourceType, adapter mongo.Adapter) error {
