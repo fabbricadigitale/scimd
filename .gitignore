@@ -19,6 +19,7 @@ debug
 scimd*
 
 vendor
+_vendor*
 
 setting/
 settings/

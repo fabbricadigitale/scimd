@@ -31,14 +31,8 @@
 [[projects]]
   name = "github.com/cenk/backoff"
   packages = ["."]
-  revision = "61153c768f31ee5f130071d08fc82b85208528de"
-  version = "v1.1.0"
-
-[[projects]]
-  name = "github.com/cenkalti/backoff"
-  packages = ["."]
-  revision = "61153c768f31ee5f130071d08fc82b85208528de"
-  version = "v1.1.0"
+  revision = "2ea60e5f094469f9e65adb9cd103795b73ae743e"
+  version = "v2.0.0"
 
 [[projects]]
   branch = "master"
@@ -47,7 +41,6 @@
   revision = "9127e812e1e9e501ce899a18121d316ecb52e4ba"
 
 [[projects]]
-  branch = "master"
   name = "github.com/containerd/continuity"
   packages = ["pathdriver"]
   revision = "d8fb8589b0e8e85b8c8bbaa8840226d0dfeb7371"
@@ -94,19 +87,18 @@
     "pkg/term",
     "pkg/term/windows"
   ]
-  revision = "72ba7f593fa4dbb628cf5ee83cd7daf955934cf5"
+  revision = "cbde00b44273a584bed2ee3513db68924b4a6dba"
 
 [[projects]]
   name = "github.com/docker/go-connections"
   packages = ["nat"]
-  revision = "3ede32e2033de7505e6500d6c868c2b9ed9f169d"
-  version = "v0.3.0"
+  revision = "7beb39f0b969b075d1325fecb092faf27fd357b6"
 
 [[projects]]
   name = "github.com/docker/go-units"
   packages = ["."]
-  revision = "0dadbb0345b35ec7ef35e228dabb8de89a65bf52"
-  version = "v0.3.2"
+  revision = "47565b4f722fb6ceae66b95f853feed578a4a51c"
+  version = "v0.3.3"
 
 [[projects]]
   name = "github.com/fatih/structs"
@@ -158,7 +150,12 @@
     "internal/sasl",
     "internal/scram"
   ]
-  revision = "baa28fcb8e7d5dfab92026c0920cb6c9ae72faa2"
+  revision = "f76e4f9da92ecd56e3be26f5ba92580af1ef97b4"
+
+[[projects]]
+  name = "github.com/go-errors/errors"
+  packages = ["."]
+  revision = "a41850380601eeb43f4350f7d17c6bbd8944aaf8"
 
 [[projects]]
   name = "github.com/go-playground/locales"
@@ -167,8 +164,8 @@
     "currency",
     "en"
   ]
-  revision = "e4cbcb5d0652150d40ad0646651076b6bd2be4f6"
-  version = "v0.11.2"
+  revision = "f63010822830b6fe52288ee52d5a1151088ce039"
+  version = "v0.12.1"
 
 [[projects]]
   name = "github.com/go-playground/universal-translator"
@@ -177,16 +174,20 @@
   version = "v0.16.0"
 
 [[projects]]
+  name = "github.com/go-sql-driver/mysql"
+  packages = ["."]
+  revision = "0b58b37b664c21f3010e836f1b931e1d0b0b0685"
+
+[[projects]]
   name = "github.com/gogo/protobuf"
   packages = ["proto"]
-  revision = "1adfc126b41513cc696b209667c8656ea7aac67c"
-  version = "v1.0.0"
+  revision = "100ba4e885062801d56799d78530b73b178a78f3"
+  version = "v0.4"
 
 [[projects]]
   name = "github.com/golang/protobuf"
   packages = ["proto"]
-  revision = "925541529c1fa6821df4e44ce2723319eb2be768"
-  version = "v1.0.0"
+  revision = "5a0f697c9ed9d68fef0116532c6e05cfeae00e55"
 
 [[projects]]
   branch = "master"
@@ -195,6 +196,7 @@
     ".",
     "hcl/ast",
     "hcl/parser",
+    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
@@ -202,7 +204,7 @@
     "json/scanner",
     "json/token"
   ]
-  revision = "23c074d0eceb2b8a5bfdbb271ab780cde70f05a8"
+  revision = "ef8a98b0bbce4a65b5aa4c368430a80ddc533168"
 
 [[projects]]
   name = "github.com/inconshreveable/mousetrap"
@@ -217,6 +219,14 @@
   version = "v1.0.0"
 
 [[projects]]
+  name = "github.com/lib/pq"
+  packages = [
+    ".",
+    "oid"
+  ]
+  revision = "50761b0867bd1d9d069276790bcd4a3bccf2324a"
+
+[[projects]]
   name = "github.com/magiconair/properties"
   packages = ["."]
   revision = "c3beff4c2358b44d0493c7dda585e7db7ff28ae6"
@@ -225,8 +235,7 @@
 [[projects]]
   name = "github.com/mattn/go-isatty"
   packages = ["."]
-  revision = "0360b2af4f38e8d38c7fce2a9f4e702702d73a39"
-  version = "v0.0.3"
+  revision = "57fdcb988a5c543893cc61bce354a6e24ab70022"
 
 [[projects]]
   name = "github.com/mcuadros/go-defaults"
@@ -273,14 +282,25 @@
     "libcontainer/system",
     "libcontainer/user"
   ]
-  revision = "baf6536d6259209c3edfa2b22237af82942d3dfa"
-  version = "v0.1.1"
+  revision = "4fc53a81fb7c994640722ac585fa9ca548971871"
+  version = "v1.0.0-rc5"
+
+[[projects]]
+  name = "github.com/ory-am/common"
+  packages = ["env"]
+  revision = "d93c852f2d09c219fd058756caf67bbdf8cf4be4"
 
 [[projects]]
   name = "github.com/ory/dockertest"
   packages = ["."]
-  revision = "15c8e8835bba04e0d7c2b57958ffe294d5e643dc"
-  version = "v3.1.6"
+  revision = "911d4fa1cc9bfef27c518e100ff9a92e721fc1d4"
+  version = "v3.0.2"
+
+[[projects]]
+  name = "github.com/pborman/uuid"
+  packages = ["."]
+  revision = "a97ce2ca70fa5a848076093f05e639a89ca34d06"
+  version = "v1.0"
 
 [[projects]]
   name = "github.com/pelletier/go-toml"
@@ -291,8 +311,7 @@
 [[projects]]
   name = "github.com/pkg/errors"
   packages = ["."]
-  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
-  version = "v0.8.0"
+  revision = "839d9e913e063e28dfd0e6c7b7512793e0a48be9"
 
 [[projects]]
   name = "github.com/pmezard/go-difflib"
@@ -315,8 +334,8 @@
 [[projects]]
   name = "github.com/sirupsen/logrus"
   packages = ["."]
-  revision = "c155da19408a8799da419ed3eeb0cb5db0ad5dbc"
-  version = "v1.0.5"
+  revision = "f006c2ac4710855cf0f916dd6b77acf6b048dc6e"
+  version = "v1.0.3"
 
 [[projects]]
   name = "github.com/spf13/afero"
@@ -324,8 +343,8 @@
     ".",
     "mem"
   ]
-  revision = "bb8f1927f2a9d3ab41c9340aa034f6b803f4359c"
-  version = "v1.0.2"
+  revision = "63644898a8da0bc22138abf860edaf5277b6102e"
+  version = "v1.1.0"
 
 [[projects]]
   name = "github.com/spf13/cast"
@@ -339,8 +358,8 @@
     ".",
     "doc"
   ]
-  revision = "7b2c5ac9fc04fc5efafb60700713d4fa609b777b"
-  version = "v0.0.1"
+  revision = "a1f051bc3eba734da4772d60e2d677f47cf93ef4"
+  version = "v0.0.2"
 
 [[projects]]
   branch = "master"
@@ -357,8 +376,8 @@
 [[projects]]
   name = "github.com/spf13/viper"
   packages = ["."]
-  revision = "25b30aa063fc18e48662b86996252eabdcf2f0c7"
-  version = "v1.0.0"
+  revision = "b5e8006cbee93ec955a89ab31e0e3ce3204f3736"
+  version = "v1.0.2"
 
 [[projects]]
   name = "github.com/stretchr/testify"
@@ -378,8 +397,7 @@
 [[projects]]
   name = "github.com/ugorji/go"
   packages = ["codec"]
-  revision = "9831f2c3ac1068a78f50999a30db84270f647af6"
-  version = "v1.1"
+  revision = "c88ee250d0221a57af388746f5cf03768c21d6e2"
 
 [[projects]]
   branch = "master"
@@ -389,7 +407,7 @@
     "blowfish",
     "ssh/terminal"
   ]
-  revision = "374053ea96cb300f8671b8d3b07edeeb06e203b4"
+  revision = "beb2a9779c3b677077c41673505f150149fce895"
 
 [[projects]]
   branch = "master"
@@ -398,7 +416,7 @@
     "context",
     "context/ctxhttp"
   ]
-  revision = "e0c57d8f86c17f0724497efcb3bc617e82834821"
+  revision = "61147c48b25b599e5b561d2e9c4f3e1ef489ca41"
 
 [[projects]]
   branch = "master"
@@ -407,7 +425,7 @@
     "unix",
     "windows"
   ]
-  revision = "2f1e207ee39ff70f3433e49c6eb52677a515e3b5"
+  revision = "3b87a42e500a6dc65dae1a55d0b641295971163e"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -437,8 +455,8 @@
 [[projects]]
   name = "gopkg.in/go-playground/validator.v8"
   packages = ["."]
-  revision = "5f1438d3fca68893a817e4a66806cea46a9e4ebf"
-  version = "v8.18.2"
+  revision = "5f57d2222ad794d0dffb07e664ea05e2ee07d60c"
+  version = "v8.18.1"
 
 [[projects]]
   name = "gopkg.in/go-playground/validator.v9"
@@ -446,8 +464,8 @@
     ".",
     "translations/en"
   ]
-  revision = "1b8c8e19cd250435025214492d9a08411d760fdd"
-  version = "v9.12.0"
+  revision = "14984d91328f9612b58443cbdf4a077d4fd71091"
+  version = "v9.15.0"
 
 [[projects]]
   name = "gopkg.in/leodido/go-urn.v1"
@@ -458,12 +476,12 @@
 [[projects]]
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  revision = "7f97868eec74b32b0982dd158a51a446d1da7eb5"
-  version = "v2.1.1"
+  revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
+  version = "v2.2.1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a1d6845720ab87cc3a08a7e3644ac4a3a32ad4a8b2a3452c421f9bbf12c38306"
+  inputs-digest = "727ffc610539a505b6e60ab88ab6d437734d09df3d3de515968dac860d5f6139"
   solver-name = "gps-cdcl"
   solver-version = 1
