@@ -366,7 +366,13 @@ func deleteMembership(rw attr.Path, ro attr.Path, ID string, resType *core.Resou
 	}
 
 	rwValues := res.Values(rw.URI)
-	members := (*rwValues)[rw.Name].([]datatype.DataTyper)
+	m := (*rwValues)[rw.Name]
+
+	if m == nil {
+		return nil
+	}
+
+	members := m.([]datatype.DataTyper)
 
 	for _, m := range members {
 
