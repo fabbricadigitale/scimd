@@ -63,13 +63,13 @@ func getBSONSingleValued(op, path string, value interface{}) bson.M {
 
 	switch value.(type) {
 
-	case datatype.Complex:
-		values := value.(datatype.Complex)
+	case map[string]interface{}:
+		values := value.(map[string]interface{})
 
 		o := bson.M{}
 
 		for key, val := range values {
-			o[key] = val
+			o[escapeAttribute(key)] = val
 		}
 
 		m = bson.M{
@@ -114,7 +114,7 @@ func getBSONMultiValued(op, path string, value interface{}) bson.M {
 	if value != nil {
 		switch value.(type) {
 
-		case datatype.Complex:
+		case map[string]interface{}:
 
 			// Note
 			// $each is not supported in globalsign/mgo
@@ -124,8 +124,8 @@ func getBSONMultiValued(op, path string, value interface{}) bson.M {
 			for _, value := range values { */
 			o := bson.M{}
 
-			for key, val := range value.(datatype.Complex) {
-				o[key] = val
+			for key, val := range value.(map[string]interface{}) {
+				o[escapeAttribute(key)] = val
 			}
 
 			/* 	s = append(s, o)

@@ -143,14 +143,14 @@ func (a *Adapter) DoUpdate(resource *resource.Resource, id, version string) erro
 // Patch is ...
 func (a *Adapter) Patch(resType *core.ResourceType, id string, version string, op string, path attr.Path, value interface{}) error {
 
-	a.Emitter().Emit("patch")
-
 	p := &storage.PContainer{
 		Value: value,
 	}
 
 	if path.Name == "password" {
 		a.Emitter().Emit("patchPassword", p)
+	} else {
+		a.Emitter().Emit("patch", resType, id, a)
 	}
 
 	q := makeQuery(resType.GetIdentifier(), id, version)

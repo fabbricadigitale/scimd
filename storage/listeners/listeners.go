@@ -61,6 +61,27 @@ func AddListeners(e *emitter.Emitter) {
 		hashPassword(res)
 	})
 
+	e.On("patch", func(event *emitter.Event) {
+
+		resType, ok := event.Args[0].(*core.ResourceType)
+		id, ok := event.Args[1].(string)
+		adapter, ok := event.Args[1].(*mongo.Adapter)
+
+		if ok != true {
+			return
+		}
+
+		res, err := adapter.DoGet(resType, id, "", nil)
+
+		relations, err := attr.GetRelationships(resType.Schema, resType.ID)
+		if err != nil {
+			return
+		}
+		for _, relation := range relations {
+			updateMembership(relation.RWAttribute, relation.ROAttribute, res, &relation.ROResourceType, *adapter)
+		}
+	})
+
 	e.On("patchPassword", func(event *emitter.Event) {
 		values, ok := event.Args[0].(*storage.PContainer)
 		if ok != true {
