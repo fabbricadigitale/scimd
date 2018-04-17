@@ -150,7 +150,7 @@ func (a *Adapter) Patch(resType *core.ResourceType, id string, version string, o
 	if path.Name == "password" {
 		a.Emitter().Emit("patchPassword", p)
 	} else {
-		a.Emitter().Emit("patch", resType, id, a)
+		a.Emitter().Emit("patch", resType, id, a, op)
 	}
 
 	q := makeQuery(resType.GetIdentifier(), id, version)

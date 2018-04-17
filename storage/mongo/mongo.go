@@ -31,7 +31,6 @@ func (d *Driver) SetIndexes(keys [][]string) (err error) {
 
 		err = c.EnsureIndex(index)
 		if err != nil {
-			fmt.Printf("Error => %+v", err)
 			err = d.errorWrapper(err)
 		}
 	}

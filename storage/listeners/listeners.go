@@ -64,9 +64,18 @@ func AddListeners(e *emitter.Emitter) {
 	e.On("patch", func(event *emitter.Event) {
 
 		resType, ok := event.Args[0].(*core.ResourceType)
+		if ok != true {
+			return
+		}
 		id, ok := event.Args[1].(string)
-		adapter, ok := event.Args[1].(*mongo.Adapter)
-
+		if ok != true {
+			return
+		}
+		adapter, ok := event.Args[2].(*mongo.Adapter)
+		if ok != true {
+			return
+		}
+		op, ok := event.Args[3].(string)
 		if ok != true {
 			return
 		}
@@ -74,11 +83,18 @@ func AddListeners(e *emitter.Emitter) {
 		res, err := adapter.DoGet(resType, id, "", nil)
 
 		relations, err := attr.GetRelationships(resType.Schema, resType.ID)
+
 		if err != nil {
 			return
 		}
 		for _, relation := range relations {
-			updateMembership(relation.RWAttribute, relation.ROAttribute, res, &relation.ROResourceType, *adapter)
+			if op == "add" {
+				updateMembership(relation.RWAttribute, relation.ROAttribute, res, &relation.ROResourceType, *adapter)
+			} else if op == "remove" {
+				deleteMembership(relation.RWAttribute, relation.ROAttribute, id, resType, &relation.ROResourceType, *adapter)
+			} else if op == "replace" {
+
+			}
 		}
 	})
 
@@ -234,7 +250,16 @@ func updateMembership(rw attr.Path, ro attr.Path, res *resource.Resource, roResT
 		s.Add((*i)["value"].(datatype.String))
 	}
 	for _, item1 := range cCollection {
-		t.Add((item1.(datatype.Complex))["value"].(datatype.String))
+
+		switch item1.(type) {
+		case datatype.Complex:
+			t.Add((item1.(datatype.Complex))["value"].(datatype.String))
+			break
+		case *datatype.Complex:
+			it := item1.(*datatype.Complex)
+			t.Add((*it)["value"].(datatype.String))
+		}
+
 	}
 
 	// reference to add
