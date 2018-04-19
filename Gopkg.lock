@@ -153,11 +153,6 @@
   revision = "f76e4f9da92ecd56e3be26f5ba92580af1ef97b4"
 
 [[projects]]
-  name = "github.com/go-errors/errors"
-  packages = ["."]
-  revision = "a41850380601eeb43f4350f7d17c6bbd8944aaf8"
-
-[[projects]]
   name = "github.com/go-playground/locales"
   packages = [
     ".",
@@ -172,11 +167,6 @@
   packages = ["."]
   revision = "b32fa301c9fe55953584134cb6853a13c87ec0a1"
   version = "v0.16.0"
-
-[[projects]]
-  name = "github.com/go-sql-driver/mysql"
-  packages = ["."]
-  revision = "0b58b37b664c21f3010e836f1b931e1d0b0b0685"
 
 [[projects]]
   name = "github.com/gogo/protobuf"
@@ -217,14 +207,6 @@
   packages = ["."]
   revision = "9d14cd0d10ce5be74747ed6a56365bc325dea633"
   version = "v1.0.0"
-
-[[projects]]
-  name = "github.com/lib/pq"
-  packages = [
-    ".",
-    "oid"
-  ]
-  revision = "50761b0867bd1d9d069276790bcd4a3bccf2324a"
 
 [[projects]]
   name = "github.com/magiconair/properties"
@@ -286,21 +268,10 @@
   version = "v1.0.0-rc5"
 
 [[projects]]
-  name = "github.com/ory-am/common"
-  packages = ["env"]
-  revision = "d93c852f2d09c219fd058756caf67bbdf8cf4be4"
-
-[[projects]]
   name = "github.com/ory/dockertest"
   packages = ["."]
-  revision = "911d4fa1cc9bfef27c518e100ff9a92e721fc1d4"
-  version = "v3.0.2"
-
-[[projects]]
-  name = "github.com/pborman/uuid"
-  packages = ["."]
-  revision = "a97ce2ca70fa5a848076093f05e639a89ca34d06"
-  version = "v1.0"
+  revision = "6d57cd43b964e928111542771659af6a3a58521f"
+  version = "3.0.9"
 
 [[projects]]
   name = "github.com/pelletier/go-toml"

@@ -1,15 +1,66 @@
 package mongo
 
 import (
+	"fmt"
 	"regexp"
 
-	"github.com/fabbricadigitale/scimd/api"
 	"github.com/fabbricadigitale/scimd/api/attr"
+
+	"github.com/fabbricadigitale/scimd/api"
 	"github.com/fabbricadigitale/scimd/api/filter"
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/datatype"
 	"github.com/globalsign/mgo/bson"
 )
+
+func makeComplexQuery(resType *core.ResourceType, id, version string, f interface{}) (bson.M, error) {
+
+	if f == nil {
+		return makeQuery(resType.GetIdentifier(), id, version), nil
+	}
+
+	switch f.(type) {
+	case string:
+		return makeQuery(resType.GetIdentifier(), id, version), nil
+	case filter.Filter:
+		return convertToMongoQuery(resType, f.(filter.Filter), "id", id)
+	default:
+		return makeQuery(resType.GetIdentifier(), id, version), nil
+	}
+}
+
+func getPath(f interface{}) attr.Path {
+
+	switch f.(type) {
+	case *attr.Path:
+		return *(f.(*attr.Path))
+	case *filter.ValuePath:
+		node := f.(*filter.ValuePath)
+		return node.Path
+	default:
+		return attr.Path{}
+	}
+}
+
+func (c *convert) extractPath(f interface{}) attr.Path {
+
+	switch f.(type) {
+	case *attr.Path:
+		return *(f.(*attr.Path))
+	case *filter.Group:
+		node := f.(*filter.Group)
+		return c.extractPath(node.Filter)
+	case *filter.ValuePath:
+		node := f.(*filter.ValuePath)
+		return node.Path
+	case *filter.AttrExpr:
+		node := f.(*filter.AttrExpr)
+		return node.Path
+	default:
+		return attr.Path{}
+	}
+
+}
 
 func convertChangeValue(resType *core.ResourceType, op string, p attr.Path, value interface{}) (m bson.M, err error) {
 
@@ -34,20 +85,20 @@ func convertChangeValue(resType *core.ResourceType, op string, p attr.Path, valu
 		return nil, err
 	}
 
-	path := escapeAttribute(p.String())
-
 	ctx := p.Context(resType)
 
 	if ctx.Attribute.MultiValued == false {
-		m = getBSONSingleValued(op, path, value)
+		m = getBSONSingleValued(op, p, value)
 	} else {
-		m = getBSONMultiValued(op, path, value)
+		m = getBSONMultiValued(op, p, value)
 	}
 
 	return m, err
 }
 
-func getBSONSingleValued(op, path string, value interface{}) bson.M {
+func getBSONSingleValued(op string, p attr.Path, value interface{}) bson.M {
+
+	path := escapeAttribute(p.String())
 
 	var operator string
 
@@ -90,7 +141,9 @@ func getBSONSingleValued(op, path string, value interface{}) bson.M {
 	return ret
 }
 
-func getBSONMultiValued(op, path string, value interface{}) bson.M {
+func getBSONMultiValued(op string, p attr.Path, value interface{}) bson.M {
+
+	path := escapeAttribute(p.String())
 
 	var operator string
 
@@ -106,6 +159,8 @@ func getBSONMultiValued(op, path string, value interface{}) bson.M {
 
 	} else if op == "replace" {
 		operator = "$set"
+		path = escapeAttribute(fmt.Sprintf("%s:%s", p.URI, p.Name))
+		path = fmt.Sprintf("%s.$", path)
 	}
 
 	m := bson.M{}
@@ -150,7 +205,7 @@ func getBSONMultiValued(op, path string, value interface{}) bson.M {
 	return ret
 }
 
-func convertToMongoQuery(resType *core.ResourceType, ft filter.Filter) (m bson.M, err error) {
+func convertToMongoQuery(resType *core.ResourceType, ft filter.Filter, key string, value interface{}) (m bson.M, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			switch r.(type) {
@@ -171,7 +226,7 @@ func convertToMongoQuery(resType *core.ResourceType, ft filter.Filter) (m bson.M
 
 	var conv *convert
 	m = conv.do(resType, normFilterByResType)
-	m["meta.resourceType"] = resType.GetIdentifier()
+	m[key] = value
 	return m, err
 }
 

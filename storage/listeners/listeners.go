@@ -55,19 +55,22 @@ func AddListeners(e *emitter.Emitter) {
 			return
 		}
 		for _, relation := range relations {
-			updateMembership(relation.RWAttribute, relation.ROAttribute, res, &relation.ROResourceType, *adapter)
+			// stored resource
+			mRes, _ := adapter.DoGet(res.ResourceType(), res.ID, "", nil)
+			updateMembership(relation.RWAttribute, relation.ROAttribute, mRes, res, &relation.ROResourceType, *adapter)
 		}
 
 		hashPassword(res)
 	})
 
 	e.On("patch", func(event *emitter.Event) {
-
-		resType, ok := event.Args[0].(*core.ResourceType)
+		// stored resource
+		mResource, ok := event.Args[0].(*resource.Resource)
 		if ok != true {
 			return
 		}
-		id, ok := event.Args[1].(string)
+		// current resource
+		resource, ok := event.Args[1].(*resource.Resource)
 		if ok != true {
 			return
 		}
@@ -75,26 +78,15 @@ func AddListeners(e *emitter.Emitter) {
 		if ok != true {
 			return
 		}
-		op, ok := event.Args[3].(string)
-		if ok != true {
-			return
-		}
 
-		res, err := adapter.DoGet(resType, id, "", nil)
+		resType := resTypeRepo.Pull(resource.Meta.ResourceType)
 
 		relations, err := attr.GetRelationships(resType.Schema, resType.ID)
-
 		if err != nil {
 			return
 		}
 		for _, relation := range relations {
-			if op == "add" {
-				updateMembership(relation.RWAttribute, relation.ROAttribute, res, &relation.ROResourceType, *adapter)
-			} else if op == "remove" {
-				deleteMembership(relation.RWAttribute, relation.ROAttribute, id, resType, &relation.ROResourceType, *adapter)
-			} else if op == "replace" {
-
-			}
+			updateMembership(relation.RWAttribute, relation.ROAttribute, mResource, resource, &relation.ROResourceType, *adapter)
 		}
 	})
 
@@ -181,7 +173,18 @@ func addMembership(rw attr.Path, ro attr.Path, res *resource.Resource, roResType
 
 	for _, m := range members {
 
-		value := m.(datatype.Complex)["value"]
+		var value interface{}
+
+		switch m.(type) {
+		case datatype.Complex:
+			value = m.(datatype.Complex)["value"]
+			break
+		case *datatype.Complex:
+			value = (*(m.(*datatype.Complex)))["value"]
+			break
+		default:
+			break
+		}
 
 		roResource, err := adapter.DoGet(roResType, string(value.(datatype.String)), "", nil)
 		if err != nil {
@@ -224,14 +227,10 @@ func addMembership(rw attr.Path, ro attr.Path, res *resource.Resource, roResType
 	return nil
 }
 
-func updateMembership(rw attr.Path, ro attr.Path, res *resource.Resource, roResType *core.ResourceType, adapter mongo.Adapter) error {
-
-	mRes, err := adapter.DoGet(res.ResourceType(), res.ID, "", nil)
-	if err != nil {
-		return err
-	}
+func updateMembership(rw attr.Path, ro attr.Path, mRes *resource.Resource, res *resource.Resource, roResType *core.ResourceType, adapter mongo.Adapter) error {
 
 	values := mRes.Values(rw.URI)
+	// collection of the stored resource
 	mCollection := (*values)[rw.Name]
 
 	if mRes == nil || map[string]interface{}(*mRes.Values(rw.URI))[rw.Name] == nil {
@@ -239,9 +238,14 @@ func updateMembership(rw attr.Path, ro attr.Path, res *resource.Resource, roResT
 		return nil
 	}
 
-	cCollection := (*res.Values(rw.URI))[rw.Name].([]datatype.DataTyper)
-	displayName := (*res.Values(rw.URI))["displayName"]
+	// collection of the current resource
+	cCollection := make([]datatype.DataTyper, 0)
+	c := (*res.Values(rw.URI))[rw.Name]
+	if c != nil {
+		cCollection = c.([]datatype.DataTyper)
+	}
 
+	displayName := (*res.Values(rw.URI))["displayName"]
 	s := set.New()
 	t := set.New()
 

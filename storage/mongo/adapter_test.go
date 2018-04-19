@@ -220,7 +220,7 @@ func TestConvertToMongoQuery(t *testing.T) {
 		t.Run("AllAttributesUnknown", func(t *testing.T) {
 			ft, err := filter.CompileString(tt.filter)
 			require.NoError(t, err, herror(ii, tt))
-			m, err := convertToMongoQuery(&res, ft)
+			m, err := convertToMongoQuery(&res, ft, "meta.resourceType", (&res).GetIdentifier())
 			require.NoError(t, err, herror(ii, tt))
 			require.Equal(t, tt.query1, m, herror(ii, tt))
 		})
@@ -241,7 +241,7 @@ func TestConvertToMongoQuery(t *testing.T) {
 			ft, err := filter.CompileString(tt.filter)
 			require.NoError(t, err, herror(ii, tt))
 
-			m, err := convertToMongoQuery(&res, ft)
+			m, err := convertToMongoQuery(&res, ft, "meta.resourceType", (&res).GetIdentifier())
 			require.NoError(t, err, herror(ii, tt))
 
 			require.Equal(t, tt.query2, m, herror(ii, tt))

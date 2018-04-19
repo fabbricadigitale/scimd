@@ -3,7 +3,6 @@ package mongo
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/fabbricadigitale/scimd/schemas/datatype"
 	"io/ioutil"
 	"log"
 	"os"
@@ -11,11 +10,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fabbricadigitale/scimd/schemas/datatype"
+	"github.com/ory/dockertest"
+
 	"github.com/fabbricadigitale/scimd/schemas/core"
 	"github.com/fabbricadigitale/scimd/schemas/resource"
 	"github.com/fabbricadigitale/scimd/storage"
 	"github.com/globalsign/mgo/bson"
-	"github.com/ory/dockertest"
 	"github.com/stretchr/testify/require"
 )
 

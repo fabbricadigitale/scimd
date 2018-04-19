@@ -141,25 +141,46 @@ func (a *Adapter) DoUpdate(resource *resource.Resource, id, version string) erro
 }
 
 // Patch is ...
-func (a *Adapter) Patch(resType *core.ResourceType, id string, version string, op string, path attr.Path, value interface{}) error {
+func (a *Adapter) Patch(resType *core.ResourceType, id string, version string, op string, f interface{}, value interface{}) error {
 
 	p := &storage.PContainer{
 		Value: value,
 	}
 
+	c := convert{}
+	path := c.extractPath(f)
+
+	var mResource *resource.Resource // resource before the update
 	if path.Name == "password" {
 		a.Emitter().Emit("patchPassword", p)
-	} else {
-		a.Emitter().Emit("patch", resType, id, a, op)
 	}
 
-	q := makeQuery(resType.GetIdentifier(), id, version)
+	mResource, _ = a.Get(resType, id, version, nil)
+
+	q, err := makeComplexQuery(resType, id, version, f)
+	if err != nil {
+		return err
+	}
+
 	v, err := convertChangeValue(resType, op, path, (*p).Value)
 	if err != nil {
 		return err
 	}
 
-	return (*a.adaptee).Patch(id, q, v)
+	err = (*a.adaptee).Patch(id, q, v)
+
+	if err == nil {
+		// Get the current resource
+		// Persist the update in related resources' readOnly attributes
+		resource, err := a.Get(resType, id, version, nil)
+		if err != nil {
+			return err
+		}
+		a.Emitter().Emit("patch", mResource, resource, a)
+
+	}
+
+	return err
 }
 
 // Delete is ...
@@ -179,7 +200,7 @@ func (a *Adapter) Find(resTypes []*core.ResourceType, filter filter.Filter) (sto
 
 	for i, resType := range resTypes {
 		var err error
-		or[i], err = convertToMongoQuery(resType, filter)
+		or[i], err = convertToMongoQuery(resType, filter, "meta.resourceType", resType.GetIdentifier())
 		if err != nil {
 			return nil, err
 		}
