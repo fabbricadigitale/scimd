@@ -1,8 +1,6 @@
 package patch
 
 import (
-	"fmt"
-
 	"github.com/fabbricadigitale/scimd/api/filter"
 
 	"github.com/fabbricadigitale/scimd/api"
@@ -55,7 +53,7 @@ func getFilter(resType *core.ResourceType, path string) (interface{}, error) {
 		return nil, err
 	}
 	fn := f.Normalize(resType)
-	fmt.Printf("fn %+v\n", fn)
+
 	return fn, nil
 
 }

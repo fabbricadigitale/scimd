@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"fmt"
+	"reflect"
 	"regexp"
 
 	"github.com/fabbricadigitale/scimd/api/attr"
@@ -160,7 +161,11 @@ func getBSONMultiValued(op string, p attr.Path, value interface{}) bson.M {
 	} else if op == "replace" {
 		operator = "$set"
 		path = escapeAttribute(fmt.Sprintf("%s:%s", p.URI, p.Name))
-		path = fmt.Sprintf("%s.$", path)
+
+		v := reflect.ValueOf(value)
+		if !(v.Kind() == reflect.Array || v.Kind() == reflect.Slice) {
+			path = fmt.Sprintf("%s.$", path)
+		}
 	}
 
 	m := bson.M{}
@@ -170,30 +175,23 @@ func getBSONMultiValued(op string, p attr.Path, value interface{}) bson.M {
 		switch value.(type) {
 
 		case map[string]interface{}:
-
-			// Note
-			// $each is not supported in globalsign/mgo
-			// so we cannot append more than one value by a push operator
-			/* s := make([]interface{}, 0)
-
-			for _, value := range values { */
-			o := bson.M{}
-
-			for key, val := range value.(map[string]interface{}) {
-				o[escapeAttribute(key)] = val
-			}
-
-			/* 	s = append(s, o)
-
-			} */
-
+			o := escapeValue(value.(map[string]interface{}))
 			m = bson.M{path: o}
-
 			break
+
+		case []interface{}:
+			values := value.([]interface{})
+
+			o := make([]bson.M, 0)
+			for _, v := range values {
+				i := escapeValue(v.(map[string]interface{}))
+				o = append(o, i)
+			}
+			m = bson.M{path: o}
+			break
+
 		default:
-
 			m = bson.M{path: value}
-
 			break
 		}
 	} else {
@@ -203,6 +201,16 @@ func getBSONMultiValued(op string, p attr.Path, value interface{}) bson.M {
 	ret[operator] = m
 
 	return ret
+}
+
+func escapeValue(value map[string]interface{}) bson.M {
+	o := bson.M{}
+
+	for key, val := range value {
+		o[escapeAttribute(key)] = val
+	}
+
+	return o
 }
 
 func convertToMongoQuery(resType *core.ResourceType, ft filter.Filter, key string, value interface{}) (m bson.M, err error) {
