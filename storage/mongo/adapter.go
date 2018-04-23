@@ -272,9 +272,13 @@ func (a *Adapter) toDoc(r *resource.Resource) *document {
 		panic(err)
 	}
 	for ns := range schemas {
-		if c := map[string]interface{}(*r.Values(ns)); c != nil {
-			d[ns] = c
+		values := r.Values(ns)
+		if values != nil {
+			if c := map[string]interface{}(*values); c != nil {
+				d[ns] = c
+			}
 		}
+
 	}
 	return &d
 }
