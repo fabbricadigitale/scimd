@@ -184,14 +184,23 @@ func getBSONMultiValued(op string, p attr.Path, value interface{}) bson.M {
 		case []interface{}:
 			values := value.([]interface{})
 
-			o := make([]bson.M, 0)
+			o := make([]interface{}, 0)
 			for _, v := range values {
-				i := escapeValue(v.(map[string]interface{}))
+				var i interface{}
+				switch v.(type) {
+				case map[string]interface{}:
+					i = escapeValue(v.(map[string]interface{}))
+					break
+				default:
+					i = v
+					break
+				}
 				o = append(o, i)
 			}
 			if modifier != "" {
 				e := bson.M{}
 				e[modifier] = o
+
 				m = bson.M{path: e}
 			} else {
 				m = bson.M{path: o}
