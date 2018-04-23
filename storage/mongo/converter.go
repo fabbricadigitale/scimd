@@ -147,9 +147,11 @@ func getBSONMultiValued(op string, p attr.Path, value interface{}) bson.M {
 	path := escapeAttribute(p.String())
 
 	var operator string
+	modifier := ""
 
 	if op == "add" {
 		operator = "$push"
+		modifier = "$each"
 
 	} else if op == "remove" {
 		if value != nil {
@@ -187,7 +189,14 @@ func getBSONMultiValued(op string, p attr.Path, value interface{}) bson.M {
 				i := escapeValue(v.(map[string]interface{}))
 				o = append(o, i)
 			}
-			m = bson.M{path: o}
+			if modifier != "" {
+				e := bson.M{}
+				e[modifier] = o
+				m = bson.M{path: e}
+			} else {
+				m = bson.M{path: o}
+			}
+
 			break
 
 		default:
