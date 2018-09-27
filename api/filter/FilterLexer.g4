@@ -17,7 +17,7 @@ Space
         ;
 
 Urn
-        : [uU][rR][nN] Colon (. | ~[ ])+ Colon
+        : [uU][rR][nN] Colon ~(' ')+ Colon
         ;
 
 Colon
