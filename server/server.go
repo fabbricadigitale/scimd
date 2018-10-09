@@ -6,6 +6,8 @@ import (
 
 	"github.com/fabbricadigitale/scimd/config"
 	"github.com/fabbricadigitale/scimd/schemas/core"
+	"github.com/fabbricadigitale/scimd/storage/listeners"
+	"github.com/fabbricadigitale/scimd/storage/mongo"
 	"github.com/gin-gonic/gin"
 )
 
@@ -42,7 +44,13 @@ func Get(spc *core.ServiceProviderConfig) *gin.Engine {
 
 	// (todo) > switch endpoint by config.Values.Storage.Type
 	endpoint := fmt.Sprintf("%s:%d", config.Values.Storage.Host, config.Values.Storage.Port)
-	v2.Use(Storage(endpoint, config.Values.Storage.Name, config.Values.Storage.Coll))
+	adapter, err := mongo.New(endpoint, config.Values.Storage.Name, config.Values.Storage.Coll)
+	if err != nil {
+		panic(err)
+	}
+	listeners.AddListeners(adapter.Emitter())
+
+	v2.Use(Storage(adapter))
 
 	unsupportedMethods := []string{}
 	if !spc.Patch.Supported {

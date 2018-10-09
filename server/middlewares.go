@@ -2,17 +2,10 @@ package server
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
-	"time"
 
-	"github.com/cenk/backoff"
-	"github.com/fabbricadigitale/scimd/api/messages"
-	"github.com/fabbricadigitale/scimd/config"
 	"github.com/fabbricadigitale/scimd/storage"
-	"github.com/fabbricadigitale/scimd/storage/listeners"
-	"github.com/fabbricadigitale/scimd/storage/mongo"
 	"github.com/gin-gonic/gin"
 	funk "github.com/thoas/go-funk"
 )
@@ -48,35 +41,8 @@ func Status(code int) gin.HandlerFunc {
 }
 
 // Storage is a middleware to
-func Storage(endpoint, db, collection string) gin.HandlerFunc {
+func Storage(adapter storage.Storer) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-
-		b := backoff.NewExponentialBackOff()
-		b.MaxElapsedTime = 1 * time.Millisecond
-
-		err := backoff.Retry(func() error {
-			var err error
-
-			adapter, err = mongo.New(endpoint, db, collection)
-			if err != nil {
-				return err
-			}
-			listeners.AddListeners(adapter.Emitter())
-
-			return adapter.Ping()
-		}, b)
-
-		if err != nil {
-			if config.Values.Debug {
-				log.Printf("error after retrying: %v", err)
-			}
-
-			e := messages.NewError(InternalServerError{
-				msg: fmt.Sprintf("error after retrying: %v", err),
-			})
-			ctx.JSON(e.Status, e)
-			ctx.Abort()
-		}
 
 		ctx.Set("storage", adapter)
 
